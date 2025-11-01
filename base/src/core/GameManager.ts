@@ -1,7 +1,6 @@
 /**
- * Game Manager - SOLID-based game lifecycle manager
- * Implements Singleton pattern and Dependency Injection
- * Users don't need to manually create instances or manage lifecycle
+ * Game Manager - Centralized game lifecycle manager
+ * Implements Singleton pattern for easy access throughout the application
  */
 
 import { GameEngine, GameEngineConfig } from './GameEngine';
@@ -103,28 +102,28 @@ export class GameManager {
   }
 
   /**
-   * Get the map builder (Dependency Injection)
+   * Get the map builder
    */
   public getMapBuilder(): MapBuilder {
     return this.mapBuilder;
   }
 
   /**
-   * Get the character builder (Dependency Injection)
+   * Get the character builder
    */
   public getCharacterBuilder(): CharacterBuilder {
     return this.characterBuilder;
   }
 
   /**
-   * Get the effect builder (Dependency Injection)
+   * Get the effect builder
    */
   public getEffectBuilder(): EffectBuilder {
     return this.effectBuilder;
   }
 
   /**
-   * Get the input manager (Dependency Injection)
+   * Get the input manager
    */
   public getInputManager(): InputManager {
     if (!this.inputManager) {
@@ -134,7 +133,7 @@ export class GameManager {
   }
 
   /**
-   * Get the asset loader (Dependency Injection)
+   * Get the asset loader
    */
   public getAssetLoader(): AssetLoader {
     return this.assetLoader;
@@ -181,7 +180,6 @@ export class GameManager {
 
 /**
  * Convenience function to initialize the game
- * Users can simply call this without managing instances
  */
 export function initGame(config: GameManagerConfig): GameManager {
   return GameManager.getInstance().initialize(config);

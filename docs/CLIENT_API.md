@@ -1,8 +1,8 @@
 # Client Engine API Documentation
 
-## SOLID-Based API (Recommended)
+## Recommended API
 
-The game engine uses SOLID principles. You don't need to manually create instances or manage lifecycle.
+The game engine uses a singleton pattern for easy access. You don't need to manually create instances or manage lifecycle.
 
 ### Quick Start
 

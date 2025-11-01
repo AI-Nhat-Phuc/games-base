@@ -1,13 +1,13 @@
 # PNP Game Engine
 
-A comprehensive 2D web game engine with client-side rendering and server-side multiplayer support, built with **SOLID principles** for easy development.
+A comprehensive 2D web game engine with client-side rendering and server-side multiplayer support for easy game development.
 
 ## Overview
 
 This repository provides a complete game development platform consisting of:
 
 - **CLI Tool** (`@pnp/cli`): Command-line tool for creating game projects instantly
-- **Base/Client Engine** (`@pnp/client`): A powerful 2D game engine that runs in web browsers with SOLID architecture
+- **Base/Client Engine** (`@pnp/client`): A powerful 2D game engine that runs in web browsers
 - **Character Builder** (`@pnp/character-builder`): A visual tool for creating and configuring game characters
 - **Server** (`@pnp/server`): A scalable game server for multiplayer functionality
 
@@ -30,12 +30,12 @@ Your game will include:
 
 ## ✨ Key Features
 
-### SOLID Principles Implementation
+### Simple API
 
 **No manual instance management or lifecycle handling required!**
 
 ```typescript
-// Simple, clean API with SOLID principles
+// Simple, clean API
 import { initGame, getGame } from '@pnp/client';
 
 initGame({ canvasId: 'game', width: 800, height: 600 });
@@ -44,12 +44,10 @@ const builder = getGame().getCharacterBuilder(); // Access anywhere!
 
 **Benefits:**
 - ✅ Automatic lifecycle management
-- ✅ Dependency injection built-in
+- ✅ Easy access to game components
 - ✅ No need to pass instances around
 - ✅ Singleton pattern for global access
 - ✅ Clean, maintainable code
-
-[📖 Read full SOLID documentation](docs/SOLID_PRINCIPLES.md)
 
 ## Features
 
@@ -84,7 +82,6 @@ games-base build-character \
 
 The client engine provides everything needed to build 2D browser games:
 
-- **SOLID Architecture**: Singleton pattern, dependency injection, factory pattern
 - **Game Engine Core**: Main game loop, canvas rendering, and state management
 - **Map Builder**: Create and manage tile-based maps with multiple layers
 - **Character Builder**: Define and control game characters with stats and animations

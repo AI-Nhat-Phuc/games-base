@@ -194,9 +194,9 @@ The build-character command supports:
 - **Remote URLs**: Reference external image URLs
 - **Auto-generation**: Creates TypeScript integration code automatically
 
-### SOLID Architecture
+### Simple Architecture
 
-All projects use the games-base SOLID principles:
+All projects use a simple singleton pattern for easy access:
 ```typescript
 import { initGame, getGame } from '@pnp/client';
 
