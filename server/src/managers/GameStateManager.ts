@@ -9,6 +9,7 @@ import { PlayerManager } from './PlayerManager';
 export interface GameConfig {
   tickRate: number; // Updates per second
   autoSaveInterval?: number; // Auto-save interval in ms
+  disconnectTimeout?: number; // Timeout for disconnected players in ms (default: 60000)
 }
 
 export class GameStateManager {
@@ -18,11 +19,13 @@ export class GameStateManager {
   private running: boolean = false;
   private tickInterval: NodeJS.Timeout | null = null;
   private lastTick: number = 0;
+  private readonly DISCONNECT_TIMEOUT: number;
 
   constructor(config: GameConfig, roomManager: RoomManager, playerManager: PlayerManager) {
     this.config = config;
     this.roomManager = roomManager;
     this.playerManager = playerManager;
+    this.DISCONNECT_TIMEOUT = config.disconnectTimeout || 60000; // Default 60 seconds
   }
 
   /**
@@ -97,10 +100,9 @@ export class GameStateManager {
   private cleanupDisconnectedPlayers(): void {
     const players = this.playerManager.getAllPlayers();
     const now = Date.now();
-    const timeout = 60000; // 60 seconds
 
     for (const player of players) {
-      if (!player.connected && (now - player.lastUpdate) > timeout) {
+      if (!player.connected && (now - player.lastUpdate) > this.DISCONNECT_TIMEOUT) {
         this.playerManager.removePlayer(player.id);
       }
     }

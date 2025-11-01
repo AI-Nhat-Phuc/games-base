@@ -13,6 +13,7 @@ export interface ServerConfig {
   host?: string;
   tickRate?: number;
   maxRooms?: number;
+  stateSyncFrequency?: number; // State sync updates per second (default: 10)
 }
 
 export class GameServer {
@@ -22,14 +23,17 @@ export class GameServer {
   private roomManager: RoomManager;
   private gameStateManager: GameStateManager;
   private clients: Map<string, WebSocket> = new Map();
+  private readonly STATE_SYNC_FREQUENCY: number;
 
   constructor(config: ServerConfig) {
     this.config = {
       host: 'localhost',
       tickRate: 30,
       maxRooms: 100,
+      stateSyncFrequency: 10,
       ...config
     };
+    this.STATE_SYNC_FREQUENCY = this.config.stateSyncFrequency!;
 
     this.playerManager = new PlayerManager();
     this.roomManager = new RoomManager();
@@ -69,7 +73,7 @@ export class GameServer {
     // Setup periodic state sync
     setInterval(() => {
       this.broadcastState();
-    }, 1000 / 10); // 10 times per second
+    }, 1000 / this.STATE_SYNC_FREQUENCY);
   }
 
   /**

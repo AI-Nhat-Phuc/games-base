@@ -37,6 +37,10 @@ export interface EffectConfig {
 export class EffectBuilder {
   private effects: Map<string, Effect> = new Map();
   private nextId: number = 0;
+  
+  // Constants for sparkle effect
+  private readonly SPARKLE_MIN_SPEED = 20;
+  private readonly SPARKLE_MAX_SPEED = 30;
 
   /**
    * Create a particle explosion effect
@@ -119,7 +123,7 @@ export class EffectBuilder {
 
     for (let i = 0; i < 10; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 20 + Math.random() * 30;
+      const speed = this.SPARKLE_MIN_SPEED + Math.random() * this.SPARKLE_MAX_SPEED;
 
       particles.push({
         position: { x: position.x, y: position.y },
