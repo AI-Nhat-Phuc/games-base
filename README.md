@@ -6,9 +6,27 @@ A comprehensive 2D web game engine with client-side rendering and server-side mu
 
 This repository provides a complete game development platform consisting of:
 
+- **CLI Tool**: Command-line tool for creating game projects instantly
 - **Base (Client Engine)**: A powerful 2D game engine that runs in web browsers with SOLID architecture
 - **Character Builder**: A visual tool for creating and configuring game characters
 - **Server**: A scalable game server for multiplayer functionality
+
+## 🚀 Quick Start
+
+Create a new game project in seconds:
+
+```bash
+npx @games-base/cli create my-game
+cd my-game
+npm start
+```
+
+Your game will include:
+- ✅ Credit screen showing "Made with Games Base Engine"
+- ✅ Character movement (WASD/Arrow keys)
+- ✅ Particle effects system
+- ✅ Full TypeScript support
+- ✅ Hot reload with Vite
 
 ## ✨ Key Features
 
@@ -34,6 +52,33 @@ const builder = getGame().getCharacterBuilder(); // Access anywhere!
 [📖 Read full SOLID documentation](docs/SOLID_PRINCIPLES.md)
 
 ## Features
+
+### CLI Tool (`/cli`)
+
+Command-line tool for instant game project creation:
+
+- **Project Generator**: Create complete game projects with one command
+- **Credit Screen**: Automatic "Made with Games Base Engine" credit
+- **Character Builder**: Build characters from sprite and 5 animations (walk, run, attack, injured, dead)
+- **Asset Support**: Local files or remote URLs
+- **TypeScript**: Full type safety out of the box
+- **Vite Integration**: Fast development with hot reload
+
+**Usage:**
+```bash
+# Create project
+npx @games-base/cli create my-game
+
+# Build character
+games-base build-character \
+  --name Hero \
+  --sprite ./assets/hero.png \
+  --walk ./assets/hero_walk.png \
+  --run ./assets/hero_run.png \
+  --attack ./assets/hero_attack.png \
+  --injured ./assets/hero_injured.png \
+  --dead ./assets/hero_dead.png
+```
 
 ### Client Engine (`/base`)
 
@@ -161,6 +206,13 @@ PORT=3000 npm start
 
 ```
 games-base/
+├── cli/                  # CLI tool for project creation
+│   ├── bin/
+│   │   └── games-base.js # CLI entry point
+│   ├── src/
+│   │   └── commands/    # CLI commands
+│   ├── package.json
+│   └── README.md
 ├── base/                 # Client game engine
 │   ├── src/
 │   │   ├── core/        # Core engine components
