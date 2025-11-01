@@ -1,0 +1,29 @@
+{
+  "name": "@nhatphucpham/game-core-client",
+  "version": "1.0.0",
+  "description": "2D Web Game Engine - Client Side",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "game",
+    "engine",
+    "2d",
+    "canvas",
+    "web"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}
