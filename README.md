@@ -7,6 +7,7 @@ A comprehensive 2D web game engine with client-side rendering and server-side mu
 This repository provides a complete game development platform consisting of:
 
 - **Base (Client Engine)**: A powerful 2D game engine that runs in web browsers
+- **Character Builder**: A visual tool for creating and configuring game characters
 - **Server**: A scalable game server for multiplayer functionality
 
 ## Features
@@ -21,6 +22,16 @@ The client engine provides everything needed to build 2D browser games:
 - **Effect Builder**: Create particle effects, explosions, and visual effects
 - **Input Manager**: Handle keyboard and mouse input
 - **Asset Loader**: Load and manage images and sounds
+
+### Character Builder (`/character-builder`)
+
+A visual tool for creating game characters without writing code:
+
+- **Visual Interface**: Upload sprites, animation sheets, and audio files
+- **Configuration Panel**: Set character stats, dimensions, and animation settings
+- **Live Preview**: See your character assets as you upload them
+- **Auto-Generation**: Automatically generates JSON data and TypeScript code
+- **Export System**: Download character data ready for the base engine
 
 ### Server Engine (`/server`)
 
@@ -69,6 +80,32 @@ npm run build
 </script>
 ```
 
+### Character Builder
+
+1. Navigate to the character-builder directory:
+```bash
+cd character-builder
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the tool:
+```bash
+npm start
+```
+
+4. Open your browser at `http://localhost:3000` and start creating characters!
+
+The Character Builder provides a visual interface to:
+- Upload character sprites and animation sheets
+- Configure character stats and properties
+- Add voice/sound effects
+- Generate JSON data and TypeScript code automatically
+- Export character data for use in your games
+
 ### Server Engine
 
 1. Navigate to the server directory:
@@ -107,6 +144,14 @@ games-base/
 │   │   └── utils/       # Utility classes
 │   ├── package.json
 │   └── tsconfig.json
+├── character-builder/   # Visual character creation tool
+│   ├── src/
+│   │   └── server.js    # Express server
+│   ├── public/
+│   │   ├── index.html   # UI interface
+│   │   └── character-builder.js  # Client logic
+│   ├── package.json
+│   └── README.md
 ├── server/              # Game server
 │   ├── src/
 │   │   ├── core/        # Server core and types
