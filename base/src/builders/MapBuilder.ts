@@ -89,6 +89,11 @@ export class MapBuilder {
       throw new Error(`Tile position (${x}, ${y}) out of bounds`);
     }
 
+    // Prevent prototype pollution
+    if (tileId && (tileId === '__proto__' || tileId === 'constructor' || tileId === 'prototype')) {
+      throw new Error('Invalid tile ID: reserved property name');
+    }
+
     this.layers[layerIndex].tiles[y][x] = tileId;
     return this;
   }
