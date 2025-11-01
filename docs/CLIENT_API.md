@@ -1,41 +1,16 @@
 # Client Engine API Documentation
 
-## GameEngine
+## SOLID-Based API (Recommended)
 
-The main game engine class that manages the game loop and rendering.
+The game engine uses SOLID principles. You don't need to manually create instances or manage lifecycle.
 
-### Constructor
-
-```typescript
-constructor(config: GameEngineConfig)
-```
-
-#### GameEngineConfig
+### Quick Start
 
 ```typescript
-interface GameEngineConfig {
-  canvasId: string;        // ID of the canvas element
-  width: number;           // Canvas width in pixels
-  height: number;          // Canvas height in pixels
-  backgroundColor?: string; // Optional background color
-  targetFPS?: number;      // Optional target FPS (default: 60)
-}
-```
+import { initGame, getGame } from '@games-base/client';
 
-### Methods
-
-- `start()`: Start the game loop
-- `stop()`: Stop the game loop
-- `getCanvas()`: Get the canvas element
-- `getContext()`: Get the 2D rendering context
-- `getSize()`: Get canvas dimensions
-
-### Example
-
-```typescript
-import { GameEngine } from '@games-base/client';
-
-const engine = new GameEngine({
+// Initialize the game
+initGame({
   canvasId: 'myGame',
   width: 800,
   height: 600,
@@ -43,7 +18,67 @@ const engine = new GameEngine({
   targetFPS: 60
 });
 
-engine.start();
+// Access game components anywhere
+const game = getGame();
+const characterBuilder = game.getCharacterBuilder();
+const mapBuilder = game.getMapBuilder();
+const effectBuilder = game.getEffectBuilder();
+const inputManager = game.getInputManager();
+const assetLoader = game.getAssetLoader();
+```
+
+### Alternative: Fluent API
+
+```typescript
+import { createGame, getGame } from '@games-base/client';
+
+await createGame({
+  canvasId: 'myGame',
+  width: 800,
+  height: 600
+})
+.onInit(async () => {
+  // Load assets
+  const assetLoader = getGame().getAssetLoader();
+  await assetLoader.loadImage('player', '/assets/player.png');
+})
+.onUpdate((deltaTime) => {
+  // Update game logic
+})
+.onRender((ctx) => {
+  // Render game
+})
+.create();
+```
+
+## GameManager
+
+Access the singleton game manager to get all game components.
+
+### Methods
+
+- `initGame(config)`: Initialize the game with configuration
+- `getGame()`: Get the game manager instance (use anywhere)
+- `start()`: Start the game loop (called automatically)
+- `stop()`: Stop the game loop
+- `getEngine()`: Get the underlying engine instance
+- `getMapBuilder()`: Get the map builder
+- `getCharacterBuilder()`: Get the character builder
+- `getEffectBuilder()`: Get the effect builder
+- `getInputManager()`: Get the input manager
+- `getAssetLoader()`: Get the asset loader
+
+### Configuration
+
+```typescript
+interface GameManagerConfig {
+  canvasId: string;        // ID of the canvas element
+  width: number;           // Canvas width in pixels
+  height: number;          // Canvas height in pixels
+  backgroundColor?: string; // Optional background color
+  targetFPS?: number;      // Optional target FPS (default: 60)
+  autoStart?: boolean;     // Auto-start game (default: true)
+}
 ```
 
 ## MapBuilder
@@ -65,9 +100,10 @@ Create and manage tile-based maps with multiple layers.
 ### Example
 
 ```typescript
-import { MapBuilder } from '@games-base/client';
+import { getGame } from '@games-base/client';
 
-const mapBuilder = new MapBuilder();
+// Get the map builder from the game manager
+const mapBuilder = getGame().getMapBuilder();
 
 // Configure map
 mapBuilder
@@ -91,7 +127,7 @@ const map = mapBuilder.build();
 
 ## CharacterBuilder
 
-Create and manage game characters with sprites, animations, and stats.
+Access via `getGame().getCharacterBuilder()`. Create and manage game characters with sprites, animations, and stats.
 
 ### Methods
 
@@ -109,9 +145,10 @@ Create and manage game characters with sprites, animations, and stats.
 ### Example
 
 ```typescript
-import { CharacterBuilder } from '@games-base/client';
+import { getGame } from '@games-base/client';
 
-const characterBuilder = new CharacterBuilder();
+// Get the character builder from the game manager
+const characterBuilder = getGame().getCharacterBuilder();
 
 const player = characterBuilder.createCharacter(
   'player1',
@@ -129,7 +166,7 @@ characterBuilder.setSprite('player1', {
 
 ## EffectBuilder
 
-Create particle-based visual effects.
+Access via `getGame().getEffectBuilder()`. Create particle-based visual effects.
 
 ### Methods
 
@@ -145,9 +182,10 @@ Create particle-based visual effects.
 ### Example
 
 ```typescript
-import { EffectBuilder } from '@games-base/client';
+import { getGame } from '@games-base/client';
 
-const effectBuilder = new EffectBuilder();
+// Get the effect builder from the game manager
+const effectBuilder = getGame().getEffectBuilder();
 
 // Create explosion
 effectBuilder.createExplosion(
@@ -170,7 +208,7 @@ effectBuilder.render(ctx);
 
 ## InputManager
 
-Handle keyboard and mouse input.
+Access via `getGame().getInputManager()`. Handle keyboard and mouse input.
 
 ### Methods
 
@@ -182,9 +220,10 @@ Handle keyboard and mouse input.
 ### Example
 
 ```typescript
-import { InputManager } from '@games-base/client';
+import { getGame } from '@games-base/client';
 
-const inputManager = new InputManager(canvas);
+// Get the input manager from the game manager
+const inputManager = getGame().getInputManager();
 
 // In update loop
 if (inputManager.isKeyPressed('KeyW')) {
@@ -199,7 +238,7 @@ if (inputManager.isMouseButtonPressed(0)) {
 
 ## AssetLoader
 
-Load and manage game assets (images, sounds).
+Access via `getGame().getAssetLoader()`. Load and manage game assets (images, sounds).
 
 ### Methods
 
@@ -214,9 +253,10 @@ Load and manage game assets (images, sounds).
 ### Example
 
 ```typescript
-import { AssetLoader } from '@games-base/client';
+import { getGame } from '@games-base/client';
 
-const assetLoader = new AssetLoader();
+// Get the asset loader from the game manager
+const assetLoader = getGame().getAssetLoader();
 
 // Load assets
 await assetLoader.loadImage('player', '/assets/player.png');

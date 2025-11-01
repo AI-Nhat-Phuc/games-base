@@ -17,12 +17,7 @@ This repository provides a complete game development platform consisting of:
 **No manual instance management or lifecycle handling required!**
 
 ```typescript
-// Old way (manual management)
-const engine = new GameEngine({ canvasId: 'game', width: 800, height: 600 });
-const builder = new CharacterBuilder();
-engine.start();
-
-// New way (SOLID principles) - Recommended!
+// Simple, clean API with SOLID principles
 import { initGame, getGame } from '@games-base/client';
 
 initGame({ canvasId: 'game', width: 800, height: 600 });

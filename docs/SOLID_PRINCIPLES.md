@@ -337,39 +337,9 @@ const game = new MyGame({
 game.start();
 ```
 
-## Comparison
+## Usage Example
 
-### Before (Manual Instance Management)
-
-```typescript
-// User has to create and manage instances
-const engine = new GameEngine({ canvasId: 'game', width: 800, height: 600 });
-const characterBuilder = new CharacterBuilder();
-const mapBuilder = new MapBuilder();
-const effectBuilder = new EffectBuilder();
-const inputManager = new InputManager(engine.getCanvas());
-const assetLoader = new AssetLoader();
-
-// Pass instances everywhere
-function createPlayer(builder: CharacterBuilder) {
-  return builder.createCharacter(...);
-}
-
-function handleInput(input: InputManager, builder: CharacterBuilder) {
-  if (input.isKeyPressed('W')) {
-    builder.moveCharacter(...);
-  }
-}
-
-// Call with instances
-createPlayer(characterBuilder);
-handleInput(inputManager, characterBuilder);
-
-// Start manually
-engine.start();
-```
-
-### After (SOLID Principles)
+Here's how easy it is to build a game with SOLID principles:
 
 ```typescript
 // Initialize once
@@ -406,32 +376,13 @@ handleInput();
 4. **Interface Segregation**: Clean separation between core engine and managers
 5. **Dependency Inversion**: Depend on abstractions (getGame()) not concrete instances
 
-## Migration Guide
-
-Existing code still works! The new SOLID APIs are additions, not replacements:
-
-```typescript
-// Old way still works
-import { GameEngine, CharacterBuilder } from '@games-base/client';
-const engine = new GameEngine({ canvasId: 'game', width: 800, height: 600 });
-const builder = new CharacterBuilder();
-
-// New way (recommended)
-import { initGame, getGame } from '@games-base/client';
-initGame({ canvasId: 'game', width: 800, height: 600 });
-const builder = getGame().getCharacterBuilder();
-```
-
 ## Summary
 
-No more:
-- ❌ Manually creating instances
-- ❌ Passing instances between functions
-- ❌ Managing lifecycle (start/stop)
-- ❌ Keeping track of references
-
-Just:
-- ✅ Initialize once
+The SOLID-based API provides:
+- ✅ Initialize once with `initGame()`
 - ✅ Access anywhere with `getGame()`
 - ✅ Automatic lifecycle management
 - ✅ Clean, testable code
+- ✅ No manual instance creation
+- ✅ No passing instances between functions
+- ✅ No managing lifecycle (start/stop)
