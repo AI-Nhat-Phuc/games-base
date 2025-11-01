@@ -7,19 +7,36 @@
     "games-base": "./bin/games-base.js",
     "gb": "./bin/games-base.js"
   },
+  "files": [
+    "bin",
+    "dist",
+    "templates",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
   },
   "keywords": [
     "game",
     "cli",
     "game-engine",
-    "2d-games"
+    "2d-games",
+    "2d",
+    "canvas",
+    "typescript",
+    "solid"
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AI-Nhat-Phuc/games-base.git",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/AI-Nhat-Phuc/games-base#readme",
   "dependencies": {
     "commander": "^11.1.0",
     "chalk": "^4.1.2",
@@ -32,5 +49,8 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

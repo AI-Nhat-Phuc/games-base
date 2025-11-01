@@ -4,14 +4,43 @@ Command-line tool for creating game projects with the games-base engine.
 
 ## Installation
 
+### Global Installation
+
 ```bash
 npm install -g @games-base/cli
 ```
 
-Or use directly with npx:
+Then use directly:
+```bash
+games-base create my-game
+# or
+gb create my-game
+```
+
+### Use with npx (Recommended)
+
+No installation required! Use directly with npx:
 
 ```bash
 npx @games-base/cli create my-game
+```
+
+### Local Development / Testing
+
+To test locally before publishing:
+
+```bash
+cd cli
+npm install
+npm run build
+npm link
+
+# Now you can use it globally
+games-base create test-game
+
+# Or test with npx from parent directory
+cd ..
+npx ./cli create test-game
 ```
 
 ## Commands
