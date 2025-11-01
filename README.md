@@ -89,7 +89,7 @@ The client engine provides everything needed to build 2D browser games:
 - **Input Manager**: Handle keyboard and mouse input
 - **Asset Loader**: Load and manage images and sounds
 
-### Character Builder (`/character-builder`)
+### Character Builder (`/builders`)
 
 A visual tool for creating game characters without writing code:
 
@@ -148,9 +148,9 @@ npm run build
 
 ### Character Builder
 
-1. Navigate to the character-builder directory:
+1. Navigate to the builders directory:
 ```bash
-cd character-builder
+cd builders
 ```
 
 2. Install dependencies:
@@ -217,12 +217,12 @@ games-base/
 │   │   └── utils/       # Utility classes
 │   ├── package.json
 │   └── tsconfig.json
-├── character-builder/   # Visual character creation tool
+├── builders/   # Visual character creation tool
 │   ├── src/
 │   │   └── server.js    # Express server
 │   ├── public/
 │   │   ├── index.html   # UI interface
-│   │   └── character-builder.js  # Client logic
+│   │   └── builders.js  # Client logic
 │   ├── package.json
 │   └── README.md
 ├── server/              # Game server

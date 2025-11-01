@@ -8,7 +8,7 @@ This document explains how to use the Character Builder tool to create character
 
 1. Start the Character Builder:
 ```bash
-cd character-builder
+cd builders
 npm install
 npm start
 ```
@@ -270,7 +270,7 @@ class MyGame extends GameEngine {
 Edit the Character Builder to add custom fields:
 
 1. Add input field in `public/index.html`
-2. Capture value in `public/character-builder.js`
+2. Capture value in `public/builders.js`
 3. Include in JSON output
 4. Use in your game code
 

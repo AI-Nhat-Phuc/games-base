@@ -31,11 +31,11 @@ This repository is organized as a monorepo containing multiple packages under th
 - **Purpose**: Handle multiplayer game state and player connections
 - **Usage**: `import { GameServer } from '@pnp/game-core-server'`
 
-### @pnp/builder (character-builder/)
+### @pnp/builder (builders/)
 **Visual character creation tool**
 
 - **Package Name**: `@pnp/builder`
-- **Location**: `/character-builder`
+- **Location**: `/builders`
 - **Purpose**: Web-based UI for creating game characters
 - **Usage**: Run locally with `npm start`
 
@@ -85,7 +85,7 @@ cd base && npm publish --access public
 cd server && npm publish --access public
 
 # Publish Character Builder
-cd character-builder && npm publish --access public
+cd builders && npm publish --access public
 ```
 
 Or use the GitHub Actions workflow for automated publishing.
@@ -104,7 +104,7 @@ All packages have been renamed from the `@games-base` scope to `@pnp`:
 - `@games-base/client` → `@pnp/game-core-client`
 - `@games-base/cli` → `@pnp/cli`
 - `@games-base/server` → `@pnp/game-core-server`
-- `@games-base/character-builder` → `@pnp/builder`
+- `@games-base/builders` → `@pnp/builder`
 
 Commands have also been updated:
 - `games-base` → `pnp`

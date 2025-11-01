@@ -7,7 +7,7 @@
     "base",
     "cli",
     "server",
-    "character-builder"
+    "builders"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",

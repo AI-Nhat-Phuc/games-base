@@ -8,7 +8,7 @@ on:
       - 'cli/**'
       - 'base/**'
       - 'server/**'
-      - 'character-builder/**'
+      - 'builders/**'
       - 'package.json'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -16,7 +16,7 @@ on:
       - 'cli/**'
       - 'base/**'
       - 'server/**'
-      - 'character-builder/**'
+      - 'builders/**'
   workflow_dispatch:
     inputs:
       package:
@@ -99,7 +99,7 @@ jobs:
               echo "server=false" >> $GITHUB_OUTPUT
             fi
             
-            if git diff --name-only HEAD^ HEAD | grep -q '^character-builder/'; then
+            if git diff --name-only HEAD^ HEAD | grep -q '^builders/'; then
               echo "builder=true" >> $GITHUB_OUTPUT
             else
               echo "builder=false" >> $GITHUB_OUTPUT
@@ -335,18 +335,18 @@ jobs:
           
       - name: Install dependencies
         run: |
-          cd character-builder
+          cd builders
           npm install
           
       - name: Build package
         run: |
-          cd character-builder
+          cd builders
           npm run build
           
       - name: Set version
         id: version
         run: |
-          cd character-builder
+          cd builders
           if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
             VERSION=$(node -p "require('./package.json').version")
             echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -364,7 +364,7 @@ jobs:
           
       - name: Publish to NPM
         run: |
-          cd character-builder
+          cd builders
           npm publish --access public --tag ${{ steps.version.outputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

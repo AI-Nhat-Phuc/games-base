@@ -44,7 +44,7 @@ Visual interface for creating game maps with two distinct perspectives.
 ### Installation
 
 ```bash
-cd character-builder
+cd builders
 npm install
 ```
 

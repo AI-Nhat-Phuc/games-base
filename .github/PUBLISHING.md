@@ -132,7 +132,7 @@ The workflow will:
 Before merging to main, update the version in `package.json`:
 
 ```bash
-cd cli  # or base, server, character-builder
+cd cli  # or base, server, builders
 npm version patch  # 1.0.0 → 1.0.1
 # or
 npm version minor  # 1.0.0 → 1.1.0
@@ -323,7 +323,7 @@ npm run build
 npm publish --access public
 
 # Build and publish Builder
-cd ../character-builder
+cd ../builders
 npm version patch
 npm run build
 npm publish --access public
