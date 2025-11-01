@@ -198,7 +198,7 @@ The build-character command supports:
 
 All projects use a simple singleton pattern for easy access:
 ```typescript
-import { initGame, getGame } from '@pnp/client';
+import { initGame, getGame } from '@pnp/game-core-client';
 
 // Initialize once
 initGame({ canvasId: 'gameCanvas', width: 800, height: 600 });

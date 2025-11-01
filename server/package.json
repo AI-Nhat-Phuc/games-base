@@ -1,5 +1,5 @@
 {
-  "name": "@pnp/server",
+  "name": "@pnp/game-core-server",
   "version": "1.0.0",
   "description": "Game Server Engine for all game platforms",
   "main": "dist/index.js",

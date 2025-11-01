@@ -4,13 +4,13 @@ This repository is organized as a monorepo containing multiple packages under th
 
 ## Packages
 
-### @pnp/client (base/)
+### @pnp/game-core-client (base/)
 **Client-side 2D game engine for web browsers**
 
-- **Package Name**: `@pnp/client`
+- **Package Name**: `@pnp/game-core-client`
 - **Location**: `/base`
 - **Purpose**: Core game engine with rendering, physics, and game loop
-- **Usage**: `import { initGame, getGame } from '@pnp/client'`
+- **Usage**: `import { initGame, getGame } from '@pnp/game-core-client'`
 
 ### @pnp/cli (cli/)
 **Command-line tool for project creation and character building**
@@ -23,18 +23,18 @@ This repository is organized as a monorepo containing multiple packages under th
   - `pnp build-character` - Generate character from sprites
 - **Usage**: `npx @pnp/cli create my-game`
 
-### @pnp/server (server/)
+### @pnp/game-core-server (server/)
 **Multiplayer game server with WebSocket support**
 
-- **Package Name**: `@pnp/server`
+- **Package Name**: `@pnp/game-core-server`
 - **Location**: `/server`
 - **Purpose**: Handle multiplayer game state and player connections
-- **Usage**: `import { GameServer } from '@pnp/server'`
+- **Usage**: `import { GameServer } from '@pnp/game-core-server'`
 
-### @pnp/character-builder (character-builder/)
+### @pnp/builder (character-builder/)
 **Visual character creation tool**
 
-- **Package Name**: `@pnp/character-builder`
+- **Package Name**: `@pnp/builder`
 - **Location**: `/character-builder`
 - **Purpose**: Web-based UI for creating game characters
 - **Usage**: Run locally with `npm start`
@@ -92,19 +92,19 @@ Or use the GitHub Actions workflow for automated publishing.
 
 ## Package Relationships
 
-- **@pnp/cli** → Creates projects that use **@pnp/client**
-- **@pnp/character-builder** → Generates data for **@pnp/client**
-- **@pnp/client** → Can connect to **@pnp/server** for multiplayer
-- **@pnp/server** → Works independently but designed for **@pnp/client** games
+- **@pnp/cli** → Creates projects that use **@pnp/game-core-client**
+- **@pnp/builder** → Generates data for **@pnp/game-core-client**
+- **@pnp/game-core-client** → Can connect to **@pnp/game-core-server** for multiplayer
+- **@pnp/game-core-server** → Works independently but designed for **@pnp/game-core-client** games
 
 ## Migration from @games-base
 
 All packages have been renamed from the `@games-base` scope to `@pnp`:
 
-- `@games-base/client` → `@pnp/client`
+- `@games-base/client` → `@pnp/game-core-client`
 - `@games-base/cli` → `@pnp/cli`
-- `@games-base/server` → `@pnp/server`
-- `@games-base/character-builder` → `@pnp/character-builder`
+- `@games-base/server` → `@pnp/game-core-server`
+- `@games-base/character-builder` → `@pnp/builder`
 
 Commands have also been updated:
 - `games-base` → `pnp`

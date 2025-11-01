@@ -7,9 +7,9 @@ A comprehensive 2D web game engine with client-side rendering and server-side mu
 This repository provides a complete game development platform consisting of:
 
 - **CLI Tool** (`@pnp/cli`): Command-line tool for creating game projects instantly
-- **Base/Client Engine** (`@pnp/client`): A powerful 2D game engine that runs in web browsers
-- **Character Builder** (`@pnp/character-builder`): A visual tool for creating and configuring game characters
-- **Server** (`@pnp/server`): A scalable game server for multiplayer functionality
+- **Base/Client Engine** (`@pnp/game-core-client`): A powerful 2D game engine that runs in web browsers
+- **Character Builder** (`@pnp/builder`): A visual tool for creating and configuring game characters
+- **Server** (`@pnp/game-core-server`): A scalable game server for multiplayer functionality
 
 ## 🚀 Quick Start
 
@@ -36,7 +36,7 @@ Your game will include:
 
 ```typescript
 // Simple, clean API
-import { initGame, getGame } from '@pnp/client';
+import { initGame, getGame } from '@pnp/game-core-client';
 
 initGame({ canvasId: 'game', width: 800, height: 600 });
 const builder = getGame().getCharacterBuilder(); // Access anywhere!
@@ -338,8 +338,8 @@ This project includes automated GitHub Actions workflows for publishing packages
 
 **Supported Packages:**
 - `@pnp/cli` - CLI tool
-- `@pnp/client` - Client engine
-- `@pnp/server` - Server engine
+- `@pnp/game-core-client` - Client engine
+- `@pnp/game-core-server` - Server engine
 
 ## Contributing
 

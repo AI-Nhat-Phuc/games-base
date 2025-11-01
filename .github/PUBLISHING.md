@@ -35,13 +35,13 @@ The workflow automatically handles versioning based on the branch:
 - **Version**: Uses version from `package.json` (e.g., `1.0.0`)
 - **NPM Tag**: `latest`
 - **When**: Automatically publishes when changes are pushed to `main` branch
-- **Install**: `npm install @pnp/client` (gets latest version)
+- **Install**: `npm install @pnp/game-core-client` (gets latest version)
 
 ### Pull Request Branch (Beta/Development)
 - **Version**: `{base-version}-beta-pr-{pr-number}.{timestamp}` (e.g., `1.0.0-beta-pr-123.20241101120000`)
 - **NPM Tag**: `beta`
 - **When**: Automatically publishes when PR is opened/updated
-- **Install**: `npm install @pnp/client@1.0.0-beta-pr-123.20241101120000`
+- **Install**: `npm install @pnp/game-core-client@1.0.0-beta-pr-123.20241101120000`
 
 ## Publishing Methods
 
@@ -62,7 +62,7 @@ The workflow will:
 2. Publish only changed packages with `latest` tag
 3. Use version from `package.json`
 
-**Example**: If `base/package.json` has version `1.2.0`, it publishes `@pnp/client@1.2.0` with tag `latest`.
+**Example**: If `base/package.json` has version `1.2.0`, it publishes `@pnp/game-core-client@1.2.0` with tag `latest`.
 
 ### Method 2: Automatic on Pull Request (Beta Release)
 
@@ -81,7 +81,7 @@ The workflow will:
 2. Generate beta version: `{version}-beta-pr-{number}.{timestamp}`
 3. Publish with `beta` tag
 
-**Example**: PR #123 with `base/package.json` version `1.2.0` publishes as `@pnp/client@1.2.0-beta-pr-123.20241101120530` with tag `beta`.
+**Example**: PR #123 with `base/package.json` version `1.2.0` publishes as `@pnp/game-core-client@1.2.0-beta-pr-123.20241101120530` with tag `beta`.
 
 ### Method 3: Manual Trigger (Any Package, Any Time)
 
@@ -121,9 +121,9 @@ The workflow will:
 | Package | NPM Name | Description |
 |---------|----------|-------------|
 | CLI | `@pnp/cli` | Command-line tool for project creation |
-| Client | `@pnp/client` | Client-side 2D game engine |
-| Server | `@pnp/server` | Multiplayer server engine |
-| Builder | `@pnp/character-builder` | Visual character creation tool |
+| Client | `@pnp/game-core-client` | Client-side 2D game engine |
+| Server | `@pnp/game-core-server` | Multiplayer server engine |
+| Builder | `@pnp/builder` | Visual character creation tool |
 
 ## Package Versioning
 
@@ -163,7 +163,7 @@ Beta versions are automatically generated for PRs:
 
 ### Latest (Production)
 ```bash
-npm install @pnp/client          # Installs latest
+npm install @pnp/game-core-client          # Installs latest
 npm install @pnp/cli             # Installs latest
 npx @pnp/cli create my-game      # Uses latest
 ```
@@ -171,10 +171,10 @@ npx @pnp/cli create my-game      # Uses latest
 ### Beta (Development/Testing)
 ```bash
 # Install specific beta version
-npm install @pnp/client@1.0.0-beta-pr-45.20241101153025
+npm install @pnp/game-core-client@1.0.0-beta-pr-45.20241101153025
 
 # Install latest beta
-npm install @pnp/client@beta
+npm install @pnp/game-core-client@beta
 
 # Use specific beta CLI
 npx @pnp/cli@1.0.0-beta-pr-45.20241101153025 create my-game
@@ -187,9 +187,9 @@ After the workflow completes:
 1. Check the **Actions** tab for workflow status
 2. View npm registry:
    - CLI: https://www.npmjs.com/package/@pnp/cli
-   - Client: https://www.npmjs.com/package/@pnp/client
-   - Server: https://www.npmjs.com/package/@pnp/server
-   - Builder: https://www.npmjs.com/package/@pnp/character-builder
+   - Client: https://www.npmjs.com/package/@pnp/game-core-client
+   - Server: https://www.npmjs.com/package/@pnp/game-core-server
+   - Builder: https://www.npmjs.com/package/@pnp/builder
 
 3. Test installation:
 ```bash
@@ -206,16 +206,16 @@ npx @pnp/cli@1.0.0-beta-pr-123.20241101120000 create test-game
 1. Create feature branch: `git checkout -b feature/new-feature`
 2. Make changes to `base/` (client engine)
 3. Commit and push: Creates PR
-4. **Automatic**: Publishes `@pnp/client@1.0.0-beta-pr-45.{timestamp}` with tag `beta`
+4. **Automatic**: Publishes `@pnp/game-core-client@1.0.0-beta-pr-45.{timestamp}` with tag `beta`
 5. Test beta version in other projects
 6. Merge to main after approval
-7. **Automatic**: Publishes `@pnp/client@1.0.0` with tag `latest`
+7. **Automatic**: Publishes `@pnp/game-core-client@1.0.0` with tag `latest`
 
 ### Scenario 2: Bug Fix
 1. Update version: `cd base && npm version patch` (1.0.0 → 1.0.1)
 2. Commit: `git commit -m "Fix character collision bug"`
 3. Push to main: `git push origin main`
-4. **Automatic**: Publishes `@pnp/client@1.0.1` with tag `latest`
+4. **Automatic**: Publishes `@pnp/game-core-client@1.0.1` with tag `latest`
 
 ### Scenario 3: Multiple Package Update
 1. Make changes to `cli/`, `base/`, and `server/`
@@ -277,7 +277,7 @@ npx @pnp/cli@1.0.0-beta-pr-123.20241101120000 create test-game
 
 3. **Test beta versions before production:**
    - Create PR to test beta version
-   - Install and test: `npm install @pnp/client@beta`
+   - Install and test: `npm install @pnp/game-core-client@beta`
    - Merge to main only after testing
 
 4. **Update CHANGELOG.md** before releasing to production
@@ -287,7 +287,7 @@ npx @pnp/cli@1.0.0-beta-pr-123.20241101120000 create test-game
 6. **Use beta versions for testing:**
    ```bash
    # In your test project
-   npm install @pnp/client@beta
+   npm install @pnp/game-core-client@beta
    npm install @pnp/cli@1.0.0-beta-pr-45.20241101120000
    ```
 
