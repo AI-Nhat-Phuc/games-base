@@ -330,6 +330,20 @@ CMD ["npm", "start"]
 
 MIT
 
+## Publishing to NPM
+
+This project includes automated GitHub Actions workflows for publishing packages to npm. See [Publishing Guide](.github/PUBLISHING.md) for detailed instructions.
+
+**Quick Steps:**
+1. Add `NPM_TOKEN` to GitHub repository secrets
+2. Go to **Actions** → **Publish CLI to NPM**
+3. Click **Run workflow** and select package to publish
+
+**Supported Packages:**
+- `@games-base/cli` - CLI tool
+- `@games-base/client` - Client engine
+- `@games-base/server` - Server engine
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.

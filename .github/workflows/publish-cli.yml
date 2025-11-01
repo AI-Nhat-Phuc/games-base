@@ -1,0 +1,125 @@
+name: Publish CLI to NPM
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cli/**'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish'
+        required: true
+        default: 'cli'
+        type: choice
+        options:
+          - cli
+          - base
+          - server
+          - all
+
+jobs:
+  publish-cli:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-cli]'))
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies for CLI
+        if: github.event.inputs.package == 'cli' || github.event.inputs.package == 'all' || github.event_name != 'workflow_dispatch'
+        run: |
+          cd cli
+          npm install
+          
+      - name: Build CLI
+        if: github.event.inputs.package == 'cli' || github.event.inputs.package == 'all' || github.event_name != 'workflow_dispatch'
+        run: |
+          cd cli
+          npm run build
+          
+      - name: Run tests (if available)
+        if: github.event.inputs.package == 'cli' || github.event.inputs.package == 'all' || github.event_name != 'workflow_dispatch'
+        run: |
+          cd cli
+          if npm run test --if-present; then
+            echo "Tests passed or no tests found"
+          fi
+        continue-on-error: true
+        
+      - name: Publish CLI to npm
+        if: github.event.inputs.package == 'cli' || github.event.inputs.package == 'all' || github.event_name != 'workflow_dispatch'
+        run: |
+          cd cli
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Install dependencies for Base
+        if: github.event.inputs.package == 'base' || github.event.inputs.package == 'all'
+        run: |
+          cd base
+          npm install
+          
+      - name: Build Base
+        if: github.event.inputs.package == 'base' || github.event.inputs.package == 'all'
+        run: |
+          cd base
+          npm run build
+          
+      - name: Publish Base to npm
+        if: github.event.inputs.package == 'base' || github.event.inputs.package == 'all'
+        run: |
+          cd base
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Install dependencies for Server
+        if: github.event.inputs.package == 'server' || github.event.inputs.package == 'all'
+        run: |
+          cd server
+          npm install
+          
+      - name: Build Server
+        if: github.event.inputs.package == 'server' || github.event.inputs.package == 'all'
+        run: |
+          cd server
+          npm run build
+          
+      - name: Publish Server to npm
+        if: github.event.inputs.package == 'server' || github.event.inputs.package == 'all'
+        run: |
+          cd server
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create Release Notes
+        if: success()
+        run: |
+          echo "## Published Packages" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event.inputs.package }}" == "cli" ] || [ "${{ github.event.inputs.package }}" == "all" ] || [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "- ✅ @games-base/cli" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ github.event.inputs.package }}" == "base" ] || [ "${{ github.event.inputs.package }}" == "all" ]; then
+            echo "- ✅ @games-base/client" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ github.event.inputs.package }}" == "server" ] || [ "${{ github.event.inputs.package }}" == "all" ]; then
+            echo "- ✅ @games-base/server" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Usage:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "npx @games-base/cli create my-game" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
