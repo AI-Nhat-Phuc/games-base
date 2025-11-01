@@ -14,7 +14,7 @@ The game engine now follows SOLID principles, providing a simplified API where u
 ## Quick Start (Simplest Way)
 
 ```typescript
-import { quickStart, getGame } from '@games-base/client';
+import { quickStart, getGame } from '@pnp/client';
 
 // Initialize and auto-start the game
 await quickStart('gameCanvas', 800, 600);
@@ -37,7 +37,7 @@ const player = characterBuilder.createCharacter(
 ## Fluent API (Recommended Way)
 
 ```typescript
-import { createGame, getGame } from '@games-base/client';
+import { createGame, getGame } from '@pnp/client';
 
 // Create game with fluent API
 await createGame({
@@ -84,7 +84,7 @@ await createGame({
 ## Using Game Manager Directly
 
 ```typescript
-import { initGame, getGame } from '@games-base/client';
+import { initGame, getGame } from '@pnp/client';
 
 // Initialize the game
 initGame({
@@ -132,7 +132,7 @@ function handleInput() {
 ## Complete Example
 
 ```typescript
-import { createGame, getGame } from '@games-base/client';
+import { createGame, getGame } from '@pnp/client';
 
 // Game state
 let player: any = null;
@@ -236,7 +236,7 @@ console.log('Game started!');
 
 ```typescript
 // In module-a.ts
-import { getGame } from '@games-base/client';
+import { getGame } from '@pnp/client';
 
 export function createEnemy(x: number, y: number) {
   const game = getGame();
@@ -252,7 +252,7 @@ export function createEnemy(x: number, y: number) {
 }
 
 // In module-b.ts
-import { getGame } from '@games-base/client';
+import { getGame } from '@pnp/client';
 
 export function handleEnemyMovement(deltaTime: number) {
   const game = getGame();
@@ -266,7 +266,7 @@ export function handleEnemyMovement(deltaTime: number) {
 }
 
 // In main.ts
-import { initGame } from '@games-base/client';
+import { initGame } from '@pnp/client';
 import { createEnemy } from './module-a';
 import { handleEnemyMovement } from './module-b';
 
@@ -281,7 +281,7 @@ createEnemy(200, 150);
 ## Lifecycle Management
 
 ```typescript
-import { initGame, getGame } from '@games-base/client';
+import { initGame, getGame } from '@pnp/client';
 
 // Initialize
 const game = initGame({
@@ -309,7 +309,7 @@ initGame({ canvasId: 'gameCanvas', width: 800, height: 600 });
 For users who want more control:
 
 ```typescript
-import { GameEngine, GameEngineConfig } from '@games-base/client';
+import { GameEngine, GameEngineConfig } from '@pnp/client';
 
 class MyGame extends GameEngine {
   constructor(config: GameEngineConfig) {

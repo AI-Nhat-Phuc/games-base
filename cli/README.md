@@ -7,7 +7,7 @@ Command-line tool for creating game projects with the games-base engine.
 ### Global Installation
 
 ```bash
-npm install -g @games-base/cli
+npm install -g @pnp/cli
 ```
 
 Then use directly:
@@ -22,7 +22,7 @@ gb create my-game
 No installation required! Use directly with npx:
 
 ```bash
-npx @games-base/cli create my-game
+npx @pnp/cli create my-game
 ```
 
 ### Local Development / Testing
@@ -67,7 +67,7 @@ gb create my-game
 
 **What it creates:**
 - Complete project structure with TypeScript
-- Credit screen showing "Made with Games Base Engine"
+- Credit screen showing "Made with PNP Game Engine"
 - Vite dev server configuration
 - Character movement with WASD/Arrow keys
 - Particle effects system
@@ -129,7 +129,7 @@ When you create a new project, you get:
 my-game/
 ├── src/
 │   ├── main.ts          # Main game file
-│   ├── credits.ts       # Credit screen (shows "Made with Games Base Engine")
+│   ├── credits.ts       # Credit screen (shows "Made with PNP Game Engine")
 │   ├── assets/
 │   │   ├── images/      # Image assets
 │   │   └── sounds/      # Sound assets
@@ -146,7 +146,7 @@ my-game/
 
 1. **Create a new game:**
 ```bash
-npx @games-base/cli create my-game
+npx @pnp/cli create my-game
 cd my-game
 ```
 
@@ -177,7 +177,7 @@ const player = await loadPlayer(getGame());
 
 All projects created with the CLI include an automatic credit screen that displays:
 - "Made with"
-- "Games Base Engine" (highlighted in green)
+- "PNP Game Engine" (highlighted in green)
 - "Press any key to start"
 
 The credit screen:
@@ -198,7 +198,7 @@ The build-character command supports:
 
 All projects use the games-base SOLID principles:
 ```typescript
-import { initGame, getGame } from '@games-base/client';
+import { initGame, getGame } from '@pnp/client';
 
 // Initialize once
 initGame({ canvasId: 'gameCanvas', width: 800, height: 600 });

@@ -9,7 +9,7 @@
 ### 1. Create a New Game Project
 
 ```bash
-npx @games-base/cli create my-game
+npx @pnp/cli create my-game
 ```
 
 This will:
@@ -27,14 +27,14 @@ npm start
 ```
 
 Your game will open in the browser at `http://localhost:3000` with:
-- ✅ Credit screen showing "Made with Games Base Engine"
+- ✅ Credit screen showing "Made with PNP Game Engine"
 - ✅ Character movement (WASD/Arrow keys)
 - ✅ Particle effects (Space key)
 
 ### 3. Build Characters
 
 ```bash
-npx @games-base/cli build-character \
+npx @pnp/cli build-character \
   --name Hero \
   --sprite ./assets/hero.png \
   --walk ./assets/hero_walk.png \
@@ -77,7 +77,7 @@ npx /absolute/path/to/games-base/cli create test-game
 
 ## Publishing to npm
 
-To make the CLI available via `npx @games-base/cli`:
+To make the CLI available via `npx @pnp/cli`:
 
 1. **Ensure you're logged in to npm:**
    ```bash
@@ -97,7 +97,7 @@ To make the CLI available via `npx @games-base/cli`:
 
 4. **Now anyone can use it:**
    ```bash
-   npx @games-base/cli create my-game
+   npx @pnp/cli create my-game
    ```
 
 ## Package Structure for npx
@@ -135,8 +135,8 @@ The package is configured to work with npx through:
 
 ### CLI Not Found
 
-If `npx @games-base/cli` doesn't work:
-- Check if the package is published: `npm view @games-base/cli`
+If `npx @pnp/cli` doesn't work:
+- Check if the package is published: `npm view @pnp/cli`
 - Try clearing npx cache: `npx clear-npx-cache`
 - Use the full path for local testing: `npx /path/to/cli`
 
@@ -163,7 +163,7 @@ npm run build
 
 ```bash
 # Create and run a game in 3 commands
-npx @games-base/cli create awesome-game
+npx @pnp/cli create awesome-game
 cd awesome-game
 npm start
 ```
@@ -172,7 +172,7 @@ npm start
 
 ```bash
 # Skip auto-install
-npx @games-base/cli create my-game --no-install
+npx @pnp/cli create my-game --no-install
 
 cd my-game
 npm install
@@ -183,13 +183,13 @@ npm start
 
 ```bash
 # Hero character
-npx @games-base/cli build-character \
+npx @pnp/cli build-character \
   --name Hero \
   --sprite ./assets/hero.png \
   --walk ./assets/hero_walk.png
 
 # Enemy character
-npx @games-base/cli build-character \
+npx @pnp/cli build-character \
   --name Goblin \
   --sprite ./assets/goblin.png \
   --attack ./assets/goblin_attack.png \
@@ -202,7 +202,7 @@ npx @games-base/cli build-character \
 
 After global install:
 ```bash
-npm install -g @games-base/cli
+npm install -g @pnp/cli
 
 # Use short alias
 gb create my-game
@@ -214,13 +214,13 @@ gb build-character --name Player
 ```yaml
 # .github/workflows/create-game.yml
 - name: Create Game Project
-  run: npx @games-base/cli create game-project --no-install
+  run: npx @pnp/cli create game-project --no-install
 ```
 
 ### Docker
 
 ```dockerfile
-RUN npx @games-base/cli create game \
+RUN npx @pnp/cli create game \
     && cd game \
     && npm install \
     && npm run build

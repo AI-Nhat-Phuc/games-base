@@ -85,9 +85,9 @@ The workflow will automatically trigger when:
 
 | Package | NPM Name | Description |
 |---------|----------|-------------|
-| CLI | `@games-base/cli` | Command-line tool for project creation |
-| Base | `@games-base/client` | Client-side 2D game engine |
-| Server | `@games-base/server` | Multiplayer server engine |
+| CLI | `@pnp/cli` | Command-line tool for project creation |
+| Base | `@pnp/client` | Client-side 2D game engine |
+| Server | `@pnp/server` | Multiplayer server engine |
 
 ## Package Versioning
 
@@ -115,13 +115,13 @@ After the workflow completes:
 
 1. Check the **Actions** tab for workflow status
 2. View npm registry:
-   - CLI: https://www.npmjs.com/package/@games-base/cli
-   - Base: https://www.npmjs.com/package/@games-base/client
-   - Server: https://www.npmjs.com/package/@games-base/server
+   - CLI: https://www.npmjs.com/package/@pnp/cli
+   - Base: https://www.npmjs.com/package/@pnp/client
+   - Server: https://www.npmjs.com/package/@pnp/server
 
 3. Test installation:
 ```bash
-npx @games-base/cli@latest create test-game
+npx @pnp/cli@latest create test-game
 ```
 
 ## Troubleshooting
@@ -140,7 +140,7 @@ npx @games-base/cli@latest create test-game
 - Consider renaming your package in `package.json`
 
 ### Error: "You do not have permission to publish"
-- Scoped packages (`@games-base/...`) require organization membership
+- Scoped packages (`@pnp/...`) require organization membership
 - Ensure you're a member of the `games-base` organization on npm
 - Or create the organization first: https://www.npmjs.com/org/create
 
@@ -169,7 +169,7 @@ npx @games-base/cli@latest create test-game
 
 5. **Test in a clean environment** after publishing:
    ```bash
-   npx @games-base/cli@latest create test-project
+   npx @pnp/cli@latest create test-project
    ```
 
 ## Manual Publishing (Alternative)

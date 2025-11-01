@@ -1,4 +1,4 @@
-# Games Base
+# PNP Game Engine
 
 A comprehensive 2D web game engine with client-side rendering and server-side multiplayer support, built with **SOLID principles** for easy development.
 
@@ -6,23 +6,23 @@ A comprehensive 2D web game engine with client-side rendering and server-side mu
 
 This repository provides a complete game development platform consisting of:
 
-- **CLI Tool**: Command-line tool for creating game projects instantly
-- **Base (Client Engine)**: A powerful 2D game engine that runs in web browsers with SOLID architecture
-- **Character Builder**: A visual tool for creating and configuring game characters
-- **Server**: A scalable game server for multiplayer functionality
+- **CLI Tool** (`@pnp/cli`): Command-line tool for creating game projects instantly
+- **Base/Client Engine** (`@pnp/client`): A powerful 2D game engine that runs in web browsers with SOLID architecture
+- **Character Builder** (`@pnp/character-builder`): A visual tool for creating and configuring game characters
+- **Server** (`@pnp/server`): A scalable game server for multiplayer functionality
 
 ## 🚀 Quick Start
 
 Create a new game project in seconds:
 
 ```bash
-npx @games-base/cli create my-game
+npx @pnp/cli create my-game
 cd my-game
 npm start
 ```
 
 Your game will include:
-- ✅ Credit screen showing "Made with Games Base Engine"
+- ✅ Credit screen showing "Made with PNP Game Engine"
 - ✅ Character movement (WASD/Arrow keys)
 - ✅ Particle effects system
 - ✅ Full TypeScript support
@@ -36,7 +36,7 @@ Your game will include:
 
 ```typescript
 // Simple, clean API with SOLID principles
-import { initGame, getGame } from '@games-base/client';
+import { initGame, getGame } from '@pnp/client';
 
 initGame({ canvasId: 'game', width: 800, height: 600 });
 const builder = getGame().getCharacterBuilder(); // Access anywhere!
@@ -58,7 +58,7 @@ const builder = getGame().getCharacterBuilder(); // Access anywhere!
 Command-line tool for instant game project creation:
 
 - **Project Generator**: Create complete game projects with one command
-- **Credit Screen**: Automatic "Made with Games Base Engine" credit
+- **Credit Screen**: Automatic "Made with PNP Game Engine" credit
 - **Character Builder**: Build characters from sprite and 5 animations (walk, run, attack, injured, dead)
 - **Asset Support**: Local files or remote URLs
 - **TypeScript**: Full type safety out of the box
@@ -67,7 +67,7 @@ Command-line tool for instant game project creation:
 **Usage:**
 ```bash
 # Create project
-npx @games-base/cli create my-game
+npx @pnp/cli create my-game
 
 # Build character
 games-base build-character \
@@ -340,9 +340,9 @@ This project includes automated GitHub Actions workflows for publishing packages
 3. Click **Run workflow** and select package to publish
 
 **Supported Packages:**
-- `@games-base/cli` - CLI tool
-- `@games-base/client` - Client engine
-- `@games-base/server` - Server engine
+- `@pnp/cli` - CLI tool
+- `@pnp/client` - Client engine
+- `@pnp/server` - Server engine
 
 ## Contributing
 

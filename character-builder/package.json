@@ -1,5 +1,5 @@
 {
-  "name": "@games-base/character-builder",
+  "name": "@pnp/character-builder",
   "version": "1.0.0",
   "description": "Character Builder Tool - Generate character data for the game engine",
   "main": "dist/index.js",

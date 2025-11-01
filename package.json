@@ -1,0 +1,34 @@
+{
+  "name": "@pnp/games-base",
+  "version": "1.0.0",
+  "description": "Complete 2D Web Game Engine Platform - Monorepo",
+  "private": true,
+  "workspaces": [
+    "base",
+    "cli",
+    "server",
+    "character-builder"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "clean": "rm -rf */dist */node_modules node_modules"
+  },
+  "keywords": [
+    "game",
+    "engine",
+    "2d",
+    "multiplayer",
+    "cli",
+    "monorepo"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AI-Nhat-Phuc/games-base.git"
+  },
+  "homepage": "https://github.com/AI-Nhat-Phuc/games-base#readme"
+}

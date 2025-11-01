@@ -59,7 +59,7 @@ async function createCommand(projectName: string, options: CreateOptions) {
         preview: 'vite preview'
       },
       dependencies: {
-        '@games-base/client': 'file:../base'
+        '@pnp/client': 'file:../base'
       },
       devDependencies: {
         'vite': '^5.0.0',
@@ -161,7 +161,7 @@ function generateIndexHtml(projectName: string): string {
 }
 
 function generateMainGame(template: string): string {
-  return `import { initGame, getGame } from '@games-base/client';
+  return `import { initGame, getGame } from '@pnp/client';
 import { showCredits } from './credits';
 
 // Initialize the game
@@ -250,7 +250,7 @@ function startGame() {
 }
 
 function generateCreditScreen(): string {
-  return `import { getGame } from '@games-base/client';
+  return `import { getGame } from '@pnp/client';
 
 export function showCredits(): Promise<void> {
   return new Promise((resolve) => {

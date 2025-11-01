@@ -61,7 +61,7 @@ my-game/
 #### B. Load the character data
 
 ```typescript
-import { GameEngine, CharacterBuilder, AssetLoader } from '@games-base/client';
+import { GameEngine, CharacterBuilder, AssetLoader } from '@pnp/client';
 
 // Load character metadata
 const characterData = await fetch('/characters/warrior_001.json')

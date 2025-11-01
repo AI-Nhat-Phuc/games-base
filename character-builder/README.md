@@ -116,7 +116,7 @@ Set the character's attributes:
 The generated TypeScript code can be directly used with the base engine:
 
 ```typescript
-import { CharacterBuilder, AssetLoader } from '@games-base/client';
+import { CharacterBuilder, AssetLoader } from '@pnp/client';
 
 const assetLoader = new AssetLoader();
 const characterBuilder = new CharacterBuilder();

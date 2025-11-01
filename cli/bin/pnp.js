@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Games Base CLI
- * Command-line tool for creating game projects with games-base engine
+ * PNP Game Engine CLI
+ * Command-line tool for creating game projects with PNP game engine
  */
 
 const { program } = require('commander');
@@ -14,8 +14,8 @@ const createCommand = require('../dist/commands/create');
 const buildCharacterCommand = require('../dist/commands/buildCharacter');
 
 program
-  .name('games-base')
-  .description('CLI tool for creating game projects with games-base engine')
+  .name('pnp')
+  .description('CLI tool for creating game projects with PNP game engine')
   .version('1.0.0');
 
 // Create command

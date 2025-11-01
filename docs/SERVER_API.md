@@ -30,7 +30,7 @@ interface ServerConfig {
 ### Example
 
 ```typescript
-import { GameServer } from '@games-base/server';
+import { GameServer } from '@pnp/server';
 
 const server = new GameServer({
   port: 8080,
@@ -63,7 +63,7 @@ Manage player connections and state.
 ### Example
 
 ```typescript
-import { PlayerManager } from '@games-base/server';
+import { PlayerManager } from '@pnp/server';
 
 const playerManager = new PlayerManager();
 
@@ -94,7 +94,7 @@ Create and manage game rooms/lobbies.
 ### Example
 
 ```typescript
-import { RoomManager } from '@games-base/server';
+import { RoomManager } from '@pnp/server';
 
 const roomManager = new RoomManager();
 
@@ -132,7 +132,7 @@ interface GameConfig {
 ### Example
 
 ```typescript
-import { GameStateManager } from '@games-base/server';
+import { GameStateManager } from '@pnp/server';
 
 const gameStateManager = new GameStateManager(
   { tickRate: 30 },

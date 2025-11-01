@@ -110,16 +110,16 @@ jobs:
         run: |
           echo "## Published Packages" >> $GITHUB_STEP_SUMMARY
           if [ "${{ github.event.inputs.package }}" == "cli" ] || [ "${{ github.event.inputs.package }}" == "all" ] || [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-            echo "- ✅ @games-base/cli" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ @pnp/cli" >> $GITHUB_STEP_SUMMARY
           fi
           if [ "${{ github.event.inputs.package }}" == "base" ] || [ "${{ github.event.inputs.package }}" == "all" ]; then
-            echo "- ✅ @games-base/client" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ @pnp/client" >> $GITHUB_STEP_SUMMARY
           fi
           if [ "${{ github.event.inputs.package }}" == "server" ] || [ "${{ github.event.inputs.package }}" == "all" ]; then
-            echo "- ✅ @games-base/server" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ @pnp/server" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Usage:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "npx @games-base/cli create my-game" >> $GITHUB_STEP_SUMMARY
+          echo "npx @pnp/cli create my-game" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY

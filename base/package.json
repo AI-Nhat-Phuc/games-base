@@ -1,5 +1,5 @@
 {
-  "name": "@games-base/client",
+  "name": "@pnp/client",
   "version": "1.0.0",
   "description": "2D Web Game Engine - Client Side",
   "main": "dist/index.js",

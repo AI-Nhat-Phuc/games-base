@@ -1,11 +1,11 @@
 {
-  "name": "@games-base/cli",
+  "name": "@pnp/cli",
   "version": "1.0.0",
-  "description": "CLI tool for creating game projects with games-base engine",
+  "description": "CLI tool for creating game projects with @pnp engine",
   "main": "dist/index.js",
   "bin": {
-    "games-base": "./bin/games-base.js",
-    "gb": "./bin/games-base.js"
+    "pnp": "./bin/pnp.js",
+    "pnp-games": "./bin/pnp.js"
   },
   "files": [
     "bin",
