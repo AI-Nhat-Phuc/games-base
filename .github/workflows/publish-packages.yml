@@ -37,7 +37,65 @@ on:
         default: false
 
 jobs:
+  # Run tests first before publishing
+  test-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install CLI dependencies
+        run: |
+          cd cli
+          npm install
+          
+      - name: Build CLI
+        run: |
+          cd cli
+          npm run build
+          
+      - name: Test CLI commands
+        run: |
+          cd cli
+          node bin/pnp.js --version
+          node bin/pnp.js --help
+  
+  test-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [base, server, builders]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: |
+          cd ${{ matrix.package }}
+          npm install
+          
+      - name: Build package
+        run: |
+          cd ${{ matrix.package }}
+          npm run build
+          
+      - name: Run security audit
+        run: |
+          cd ${{ matrix.package }}
+          npm audit --audit-level=moderate || true
+
   detect-changes:
+    needs: [test-cli, test-packages]
     runs-on: ubuntu-latest
     outputs:
       cli_changed: ${{ steps.changes.outputs.cli }}
