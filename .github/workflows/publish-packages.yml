@@ -1,0 +1,385 @@
+name: Publish Packages to NPM
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cli/**'
+      - 'base/**'
+      - 'server/**'
+      - 'character-builder/**'
+      - 'package.json'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'cli/**'
+      - 'base/**'
+      - 'server/**'
+      - 'character-builder/**'
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - cli
+          - client
+          - server
+          - builder
+          - all
+      force_publish:
+        description: 'Force publish even if no changes'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      cli_changed: ${{ steps.changes.outputs.cli }}
+      client_changed: ${{ steps.changes.outputs.client }}
+      server_changed: ${{ steps.changes.outputs.server }}
+      builder_changed: ${{ steps.changes.outputs.builder }}
+      pr_number: ${{ steps.pr.outputs.pr_number }}
+      is_main: ${{ steps.branch.outputs.is_main }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check branch
+        id: branch
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "is_main=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_main=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get PR number
+        id: pr
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Detect changes
+        id: changes
+        run: |
+          if [ "${{ github.event.inputs.force_publish }}" == "true" ] || [ "${{ github.event.inputs.package }}" != "" ]; then
+            # Manual workflow dispatch or force publish
+            echo "cli=true" >> $GITHUB_OUTPUT
+            echo "client=true" >> $GITHUB_OUTPUT
+            echo "server=true" >> $GITHUB_OUTPUT
+            echo "builder=true" >> $GITHUB_OUTPUT
+          else
+            # Check for actual file changes
+            if git diff --name-only HEAD^ HEAD | grep -q '^cli/'; then
+              echo "cli=true" >> $GITHUB_OUTPUT
+            else
+              echo "cli=false" >> $GITHUB_OUTPUT
+            fi
+            
+            if git diff --name-only HEAD^ HEAD | grep -q '^base/'; then
+              echo "client=true" >> $GITHUB_OUTPUT
+            else
+              echo "client=false" >> $GITHUB_OUTPUT
+            fi
+            
+            if git diff --name-only HEAD^ HEAD | grep -q '^server/'; then
+              echo "server=true" >> $GITHUB_OUTPUT
+            else
+              echo "server=false" >> $GITHUB_OUTPUT
+            fi
+            
+            if git diff --name-only HEAD^ HEAD | grep -q '^character-builder/'; then
+              echo "builder=true" >> $GITHUB_OUTPUT
+            else
+              echo "builder=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+  publish-cli:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: |
+      (needs.detect-changes.outputs.cli_changed == 'true' && 
+       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.package == 'cli' || github.event.inputs.package == 'all'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: |
+          cd cli
+          npm install
+          
+      - name: Build package
+        run: |
+          cd cli
+          npm run build
+          
+      - name: Set version
+        id: version
+        run: |
+          cd cli
+          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
+            # Main branch - publish as latest
+            VERSION=$(node -p "require('./package.json').version")
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "Publishing version: $VERSION with tag: latest"
+          else
+            # PR branch - publish as beta
+            BASE_VERSION=$(node -p "require('./package.json').version")
+            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
+            BETA_VERSION="${BASE_VERSION}-beta-pr-${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+            npm version $BETA_VERSION --no-git-tag-version
+            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
+            echo "tag=beta" >> $GITHUB_OUTPUT
+            echo "Publishing version: $BETA_VERSION with tag: beta"
+          fi
+          
+      - name: Publish to NPM
+        run: |
+          cd cli
+          npm publish --access public --tag ${{ steps.version.outputs.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create summary
+        run: |
+          echo "## ✅ Published @pnp/cli" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Install:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
+            echo "npx @pnp/cli create my-game" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "npx @pnp/cli@${{ steps.version.outputs.version }} create my-game" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  publish-client:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: |
+      (needs.detect-changes.outputs.client_changed == 'true' && 
+       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.package == 'client' || github.event.inputs.package == 'all'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: |
+          cd base
+          npm install
+          
+      - name: Build package
+        run: |
+          cd base
+          npm run build
+          
+      - name: Set version
+        id: version
+        run: |
+          cd base
+          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
+            VERSION=$(node -p "require('./package.json').version")
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "Publishing version: $VERSION with tag: latest"
+          else
+            BASE_VERSION=$(node -p "require('./package.json').version")
+            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
+            BETA_VERSION="${BASE_VERSION}-beta-pr-${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+            npm version $BETA_VERSION --no-git-tag-version
+            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
+            echo "tag=beta" >> $GITHUB_OUTPUT
+            echo "Publishing version: $BETA_VERSION with tag: beta"
+          fi
+          
+      - name: Publish to NPM
+        run: |
+          cd base
+          npm publish --access public --tag ${{ steps.version.outputs.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create summary
+        run: |
+          echo "## ✅ Published @pnp/client" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Install:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
+            echo "npm install @pnp/client" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "npm install @pnp/client@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  publish-server:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: |
+      (needs.detect-changes.outputs.server_changed == 'true' && 
+       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.package == 'server' || github.event.inputs.package == 'all'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: |
+          cd server
+          npm install
+          
+      - name: Build package
+        run: |
+          cd server
+          npm run build
+          
+      - name: Set version
+        id: version
+        run: |
+          cd server
+          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
+            VERSION=$(node -p "require('./package.json').version")
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "Publishing version: $VERSION with tag: latest"
+          else
+            BASE_VERSION=$(node -p "require('./package.json').version")
+            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
+            BETA_VERSION="${BASE_VERSION}-beta-pr-${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+            npm version $BETA_VERSION --no-git-tag-version
+            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
+            echo "tag=beta" >> $GITHUB_OUTPUT
+            echo "Publishing version: $BETA_VERSION with tag: beta"
+          fi
+          
+      - name: Publish to NPM
+        run: |
+          cd server
+          npm publish --access public --tag ${{ steps.version.outputs.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create summary
+        run: |
+          echo "## ✅ Published @pnp/server" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Install:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
+            echo "npm install @pnp/server" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "npm install @pnp/server@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  publish-builder:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: |
+      (needs.detect-changes.outputs.builder_changed == 'true' && 
+       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.package == 'builder' || github.event.inputs.package == 'all'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: |
+          cd character-builder
+          npm install
+          
+      - name: Build package
+        run: |
+          cd character-builder
+          npm run build
+          
+      - name: Set version
+        id: version
+        run: |
+          cd character-builder
+          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
+            VERSION=$(node -p "require('./package.json').version")
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "Publishing version: $VERSION with tag: latest"
+          else
+            BASE_VERSION=$(node -p "require('./package.json').version")
+            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
+            BETA_VERSION="${BASE_VERSION}-beta-pr-${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+            npm version $BETA_VERSION --no-git-tag-version
+            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
+            echo "tag=beta" >> $GITHUB_OUTPUT
+            echo "Publishing version: $BETA_VERSION with tag: beta"
+          fi
+          
+      - name: Publish to NPM
+        run: |
+          cd character-builder
+          npm publish --access public --tag ${{ steps.version.outputs.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create summary
+        run: |
+          echo "## ✅ Published @pnp/character-builder" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Install:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
+            echo "npm install @pnp/character-builder" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "npm install @pnp/character-builder@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
