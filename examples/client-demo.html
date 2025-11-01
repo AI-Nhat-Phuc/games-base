@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Engine Example</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #222;
+      color: #fff;
+    }
+    #gameCanvas {
+      border: 2px solid #fff;
+      display: block;
+      margin: 20px auto;
+      background: #000;
+    }
+    .info {
+      text-align: center;
+      margin: 20px;
+    }
+    .controls {
+      text-align: center;
+      margin: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="info">
+    <h1>2D Game Engine Demo</h1>
+    <p>Use WASD or Arrow keys to move the character</p>
+    <p>Click to create sparkle effects</p>
+  </div>
+  
+  <canvas id="gameCanvas"></canvas>
+  
+  <div class="controls">
+    <button onclick="game.createExplosion()">Create Explosion</button>
+    <button onclick="game.toggleMap()">Toggle Map</button>
+  </div>
+
+  <script type="module">
+    // This example demonstrates the game engine
+    // In a real project, you would import from the compiled library
+    
+    class DemoGame {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.canvas.width = 800;
+        this.canvas.height = 600;
+        
+        this.player = {
+          x: 400,
+          y: 300,
+          width: 32,
+          height: 32,
+          speed: 200
+        };
+        
+        this.effects = [];
+        this.keys = new Set();
+        this.showMap = true;
+        
+        this.setupInput();
+        this.lastTime = performance.now();
+        this.gameLoop();
+      }
+      
+      setupInput() {
+        window.addEventListener('keydown', (e) => this.keys.add(e.code));
+        window.addEventListener('keyup', (e) => this.keys.delete(e.code));
+        
+        this.canvas.addEventListener('click', (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          this.createSparkle(x, y);
+        });
+      }
+      
+      update(deltaTime) {
+        // Movement
+        if (this.keys.has('KeyW') || this.keys.has('ArrowUp')) {
+          this.player.y -= this.player.speed * deltaTime;
+        }
+        if (this.keys.has('KeyS') || this.keys.has('ArrowDown')) {
+          this.player.y += this.player.speed * deltaTime;
+        }
+        if (this.keys.has('KeyA') || this.keys.has('ArrowLeft')) {
+          this.player.x -= this.player.speed * deltaTime;
+        }
+        if (this.keys.has('KeyD') || this.keys.has('ArrowRight')) {
+          this.player.x += this.player.speed * deltaTime;
+        }
+        
+        // Keep player in bounds
+        this.player.x = Math.max(0, Math.min(this.canvas.width - this.player.width, this.player.x));
+        this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, this.player.y));
+        
+        // Update effects
+        this.effects = this.effects.filter(effect => {
+          effect.life -= deltaTime;
+          effect.y += effect.vy * deltaTime;
+          effect.vy += 100 * deltaTime; // gravity
+          return effect.life > 0;
+        });
+      }
+      
+      render() {
+        // Clear
+        this.ctx.fillStyle = '#1a1a2e';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw grid if map is shown
+        if (this.showMap) {
+          this.ctx.strokeStyle = '#333';
+          this.ctx.lineWidth = 1;
+          for (let x = 0; x < this.canvas.width; x += 32) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, 0);
+            this.ctx.lineTo(x, this.canvas.height);
+            this.ctx.stroke();
+          }
+          for (let y = 0; y < this.canvas.height; y += 32) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(0, y);
+            this.ctx.lineTo(this.canvas.width, y);
+            this.ctx.stroke();
+          }
+        }
+        
+        // Draw player
+        this.ctx.fillStyle = '#00ff00';
+        this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        
+        // Draw effects
+        this.effects.forEach(effect => {
+          this.ctx.globalAlpha = effect.life / effect.maxLife;
+          this.ctx.fillStyle = effect.color;
+          this.ctx.beginPath();
+          this.ctx.arc(effect.x, effect.y, effect.size, 0, Math.PI * 2);
+          this.ctx.fill();
+        });
+        this.ctx.globalAlpha = 1.0;
+        
+        // Draw UI
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = '16px Arial';
+        this.ctx.fillText(`Position: (${Math.floor(this.player.x)}, ${Math.floor(this.player.y)})`, 10, 20);
+        this.ctx.fillText(`Effects: ${this.effects.length}`, 10, 40);
+      }
+      
+      gameLoop(currentTime = performance.now()) {
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+        
+        this.update(deltaTime);
+        this.render();
+        
+        requestAnimationFrame((time) => this.gameLoop(time));
+      }
+      
+      createExplosion() {
+        const x = this.player.x + this.player.width / 2;
+        const y = this.player.y + this.player.height / 2;
+        
+        for (let i = 0; i < 20; i++) {
+          const angle = (Math.PI * 2 * i) / 20;
+          const speed = 100 + Math.random() * 100;
+          this.effects.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 1.0,
+            maxLife: 1.0,
+            size: 3 + Math.random() * 3,
+            color: `hsl(${Math.random() * 60 + 10}, 100%, 50%)`
+          });
+        }
+      }
+      
+      createSparkle(x, y) {
+        for (let i = 0; i < 10; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 50 + Math.random() * 100;
+          this.effects.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 0.5 + Math.random() * 0.5,
+            maxLife: 1.0,
+            size: 2 + Math.random() * 3,
+            color: `hsl(${200 + Math.random() * 60}, 100%, 70%)`
+          });
+        }
+      }
+      
+      toggleMap() {
+        this.showMap = !this.showMap;
+      }
+    }
+    
+    // Start the game
+    window.game = new DemoGame();
+  </script>
+</body>
+</html>
