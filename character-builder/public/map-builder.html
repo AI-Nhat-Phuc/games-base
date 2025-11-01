@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map Builder - PNP Game Engine</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .nav-link {
+      position: absolute;
+      left: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 30px;
+      padding: 30px;
+      min-height: 600px;
+    }
+
+    .sidebar {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 25px;
+      height: fit-content;
+    }
+
+    .sidebar h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+
+    .map-type-selector {
+      margin-bottom: 30px;
+    }
+
+    .map-type-btn {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .map-type-btn:hover {
+      border-color: #667eea;
+      transform: translateY(-2px);
+    }
+
+    .map-type-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .map-type-btn .icon {
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 13px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 13px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .tileset-upload {
+      margin-top: 30px;
+    }
+
+    .file-upload-btn {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .file-upload-btn:hover {
+      background: #5568d3;
+    }
+
+    .file-upload-btn.uploaded {
+      background: #48bb78;
+    }
+
+    .preview-thumbnail {
+      margin-top: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px;
+      background: white;
+      max-height: 100px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-thumbnail img {
+      max-width: 100%;
+      max-height: 80px;
+      image-rendering: pixelated;
+    }
+
+    .canvas-area {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .canvas-container {
+      position: relative;
+      background: #f0f0f0;
+      border: 3px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: auto;
+      max-width: 100%;
+      max-height: 600px;
+    }
+
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      cursor: crosshair;
+    }
+
+    .canvas-info {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .action-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #38a169;
+    }
+
+    .btn-danger {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #e53e3e;
+    }
+
+    .map-info-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #667eea;
+      color: white;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .layer-controls {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+    }
+
+    .layer-controls h3 {
+      font-size: 14px;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .layer-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .layer-item {
+      padding: 10px;
+      background: #f8f9fa;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .layer-item:hover {
+      border-color: #667eea;
+    }
+
+    .layer-item.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .layer-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .add-layer-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px;
+      background: #48bb78;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .add-layer-btn:hover {
+      background: #38a169;
+    }
+
+    @media (max-width: 1024px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="index.html" class="nav-link">← Back to Builder</a>
+      <h1>🗺️ Map Builder</h1>
+      <p>Create 2.5D isometric and side-scrolling maps for your game</p>
+    </header>
+
+    <div class="content">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <h2>Map Type</h2>
+        <div class="map-type-selector">
+          <button class="map-type-btn active" onclick="setMapType('2.5d')" id="btn-2.5d">
+            <span class="icon">📐</span>
+            <div>
+              <div>2.5D Isometric</div>
+              <small style="opacity: 0.7; font-weight: normal;">Top-down perspective</small>
+            </div>
+          </button>
+          <button class="map-type-btn" onclick="setMapType('sidescroll')" id="btn-sidescroll">
+            <span class="icon">🎮</span>
+            <div>
+              <div>Side-Scrolling</div>
+              <small style="opacity: 0.7; font-weight: normal;">Platform-style view</small>
+            </div>
+          </button>
+        </div>
+
+        <h2>Map Settings</h2>
+        <div class="form-group">
+          <label for="mapName">Map Name</label>
+          <input type="text" id="mapName" placeholder="Enter map name" value="Level 1">
+        </div>
+
+        <div class="form-group">
+          <label for="mapWidth">Map Width (tiles)</label>
+          <input type="number" id="mapWidth" value="20" min="5" max="100" onchange="updateMapSize()">
+        </div>
+
+        <div class="form-group">
+          <label for="mapHeight">Map Height (tiles)</label>
+          <input type="number" id="mapHeight" value="15" min="5" max="100" onchange="updateMapSize()">
+        </div>
+
+        <div class="form-group">
+          <label for="tileSize">Tile Size (px)</label>
+          <input type="number" id="tileSize" value="32" min="8" max="128" onchange="updateMapSize()">
+        </div>
+
+        <div class="tileset-upload">
+          <h2>Tileset</h2>
+          <input type="file" id="tilesetUpload" accept="image/*" style="display: none;" onchange="loadTileset(event)">
+          <button class="file-upload-btn" onclick="document.getElementById('tilesetUpload').click()">
+            <span>🎨</span>
+            <span id="tilesetLabel">Upload Tileset</span>
+          </button>
+          <div class="preview-thumbnail" id="tilesetPreview" style="display: none;">
+            <img id="tilesetImg" src="" alt="Tileset">
+          </div>
+        </div>
+
+        <div class="layer-controls">
+          <h3>Layers</h3>
+          <div class="layer-list" id="layerList">
+            <div class="layer-item active" data-layer="0">
+              <span class="layer-name">Ground Layer</span>
+              <span>📍</span>
+            </div>
+          </div>
+          <button class="add-layer-btn" onclick="addLayer()">+ Add Layer</button>
+        </div>
+      </div>
+
+      <!-- Canvas Area -->
+      <div class="canvas-area">
+        <div class="canvas-container" id="canvasContainer">
+          <canvas id="mapCanvas" width="640" height="480"></canvas>
+        </div>
+        <div class="canvas-info">
+          <span class="map-info-badge" id="mapInfo">Map: 20×15 | Tile: 32px | Type: 2.5D Isometric</span>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="generateMapData()">✨ Generate Map Data</button>
+          <button class="btn btn-secondary" onclick="downloadMapData()">💾 Download Map</button>
+          <button class="btn btn-danger" onclick="clearMap()">🗑️ Clear Map</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="map-builder.js"></script>
+</body>
+</html>

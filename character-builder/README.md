@@ -1,25 +1,43 @@
-# Character Builder Tool
+# PNP Builder Tools (@pnp/builder)
 
-A web-based tool for creating and configuring game characters for the games-base engine. This tool provides a user-friendly interface to design characters with sprites, animations, and audio, then automatically generates the data needed by the base engine.
+A comprehensive web-based toolset for creating and configuring game assets for the PNP Game Engine. This package includes two powerful visual builders: Character Builder and Map Builder.
 
 ## Features
 
-### Visual Interface
+### 👤 Character Builder
+Visual interface for creating game characters with sprites, animations, and audio.
+
+#### Character Features
 - **Sprite Upload**: Add character sprite images
 - **Animation Sheet Upload**: Upload sprite sheets for character animations
 - **Voice/Audio Upload**: Add sound effects or voice lines
 - **Real-time Preview**: See your assets as you upload them
-
-### Character Configuration
-- **Basic Info**: Name, ID, and description
 - **Stats System**: Health, speed, strength, defense, and level
 - **Dimensions**: Configurable character size
 - **Animation Settings**: Frame count, frame size, and duration
+- **Output Generation**: JSON format and TypeScript integration code
 
-### Output Generation
-- **JSON Format**: Export character data as JSON
-- **TypeScript Code**: Generate ready-to-use TypeScript integration code
-- **Downloadable Package**: Save all character data including assets
+### 🗺️ Map Builder
+Visual interface for creating game maps with two distinct perspectives.
+
+#### Map Types
+1. **2.5D Isometric**: Top-down perspective with depth simulation
+   - Pseudo-3D isometric grid
+   - Multiple layers support
+   - Ideal for RPGs and strategy games
+
+2. **Side-Scrolling**: Traditional 2D side-view platformer style
+   - Standard orthogonal grid
+   - Platform-based level design
+   - Perfect for action and platform games
+
+#### Map Features
+- **Visual Grid Editor**: Click-to-paint tile placement
+- **Layer System**: Multiple layers for background, foreground, and collision
+- **Tileset Support**: Import and use custom tilesets
+- **Configurable Dimensions**: Set map size and tile size
+- **Live Preview**: See your map as you build it
+- **Export Options**: JSON data and TypeScript integration code
 
 ## Getting Started
 
@@ -36,7 +54,11 @@ npm install
 npm start
 ```
 
-The character builder will start at `http://localhost:3000`
+The builder tools will start at `http://localhost:3000`
+
+You'll see two options:
+- **Character Builder** - Create characters with sprites and animations
+- **Map Builder** - Design game maps with 2.5D or side-scrolling views
 
 ### Development Mode
 
@@ -44,7 +66,7 @@ The character builder will start at `http://localhost:3000`
 npm run dev
 ```
 
-## How to Use
+## How to Use Character Builder
 
 ### 1. Basic Information
 - Enter character name and unique ID
@@ -77,7 +99,94 @@ Set the character's attributes:
 - Review the JSON and TypeScript code
 - Click "Download Character Data" to save
 
-## Output Format
+## How to Use Map Builder
+
+### 1. Choose Map Type
+Select between:
+- **2.5D Isometric**: Top-down perspective with depth
+- **Side-Scrolling**: Traditional platformer view
+
+### 2. Configure Map Settings
+- **Map Name**: Give your map a descriptive name
+- **Dimensions**: Set width and height in tiles (5-100)
+- **Tile Size**: Set the pixel size of each tile (8-128px)
+
+### 3. Upload Tileset (Optional)
+- Upload a tileset image containing your tile graphics
+- The tileset will be used to render tiles visually
+
+### 4. Build Your Map
+- **Click to Paint**: Click tiles on the canvas to place them
+- **Cycle Tiles**: Each click cycles through available tile types
+- **Layers**: Use multiple layers for complex maps
+  - Ground layer for terrain
+  - Object layer for items and decorations
+  - Collision layer for blocking movement
+
+### 5. Layer Management
+- **Add Layers**: Click "+ Add Layer" to create new layers
+- **Switch Layers**: Click a layer to make it active
+- **Active Layer**: Only the active layer is edited
+
+### 6. Generate and Export
+- **Generate Map Data**: Create JSON and TypeScript code
+- **Download Map**: Save map data and integration code
+- **Clear Map**: Reset all tiles (with confirmation)
+
+## Map Builder Output Format
+
+### JSON Structure
+```json
+{
+  "name": "Level 1",
+  "type": "2.5d",
+  "width": 20,
+  "height": 15,
+  "tileSize": 32,
+  "layers": [
+    {
+      "name": "Ground Layer",
+      "tiles": [[0, 1, 2, ...], ...]
+    }
+  ],
+  "tileset": {
+    "name": "tileset.png"
+  },
+  "metadata": {
+    "createdAt": "2024-01-01T00:00:00Z",
+    "engine": "PNP Game Engine",
+    "version": "1.0.0"
+  }
+}
+```
+
+### Integration with Base Engine (Map)
+
+```typescript
+import { getGame } from '@pnp/game-core-client';
+import { Level1MapData } from './maps/level1_map';
+
+// Load the map
+const mapBuilder = getGame().getMapBuilder();
+mapBuilder.setMapSize(Level1MapData.width, Level1MapData.height);
+mapBuilder.setTileSize(Level1MapData.tileSize, Level1MapData.tileSize);
+
+// Create layers
+Level1MapData.layers.forEach(layer => {
+  mapBuilder.createLayer(layer.name);
+  
+  // Place tiles
+  layer.tiles.forEach((row, y) => {
+    row.forEach((tileId, x) => {
+      if (tileId > 0) {
+        mapBuilder.setTile(layer.name, x, y, tileId);
+      }
+    });
+  });
+});
+```
+
+## Character Builder Output Format
 
 ### JSON Structure
 ```json
@@ -116,10 +225,10 @@ Set the character's attributes:
 The generated TypeScript code can be directly used with the base engine:
 
 ```typescript
-import { CharacterBuilder, AssetLoader } from '@pnp/client';
+import { getGame } from '@pnp/game-core-client';
 
-const assetLoader = new AssetLoader();
-const characterBuilder = new CharacterBuilder();
+const characterBuilder = getGame().getCharacterBuilder();
+const assetLoader = getGame().getAssetLoader();
 
 // Load assets
 await assetLoader.loadImage('hero_sprite', '/assets/hero_sprite.png');
@@ -152,7 +261,27 @@ characterBuilder.setSprite('hero_001', {
 characterBuilder.render(ctx, hero);
 ```
 
-## Asset Guidelines
+## Map Building Guidelines
+
+### 2.5D Isometric Maps
+- **Perspective**: Use isometric tiles for depth effect
+- **Best For**: RPGs, strategy games, city builders
+- **Tile Design**: Tiles should fit isometric grid (diamond shape)
+- **Layering**: Use layers for terrain, buildings, and objects
+
+### Side-Scrolling Maps
+- **Perspective**: Traditional orthogonal view
+- **Best For**: Platformers, side-scrollers, Metroidvania games
+- **Tile Design**: Standard square tiles work perfectly
+- **Layering**: Background, midground, foreground layers for parallax
+
+### Tileset Guidelines
+- **Format**: PNG (with transparency) recommended
+- **Organization**: Arrange tiles in a grid pattern
+- **Size**: Each tile should match your configured tile size
+- **Consistency**: Maintain consistent art style across tileset
+
+## Character Asset Guidelines
 
 ### Sprite Images
 - **Format**: PNG (with transparency) or JPG
@@ -176,21 +305,32 @@ Example animation sheet layout:
 
 ## Tips
 
+### Character Building
 1. **Naming Convention**: Use descriptive IDs like `hero_001`, `enemy_goblin`, etc.
 2. **Consistent Sizes**: Keep character sizes consistent within your game
 3. **Animation Timing**: 100ms per frame (10 FPS) works well for pixel art
 4. **Asset Organization**: Store all character assets in a dedicated folder
 5. **Version Control**: Save character JSON files in your project repository
 
+### Map Building
+1. **Start Simple**: Begin with a small map and expand
+2. **Layer Strategy**: Ground → Objects → Collision → Foreground
+3. **Test Frequently**: Export and test maps in your game regularly
+4. **Tile Variety**: Use 5-10 different tile types for visual interest
+5. **Performance**: Keep maps under 100x100 tiles for best performance
+6. **Backup**: Save map JSON files frequently during editing
+
 ## File Structure
 
 ```
 character-builder/
 ├── src/
-│   └── server.js          # Express server
+│   └── server.js              # Express server
 ├── public/
-│   ├── index.html         # Main UI
-│   └── character-builder.js  # Client-side logic
+│   ├── index.html             # Main navigation page
+│   ├── character-builder.js   # Character builder logic
+│   ├── map-builder.html       # Map builder UI
+│   └── map-builder.js         # Map builder logic
 ├── package.json
 └── README.md
 ```
