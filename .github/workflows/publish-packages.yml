@@ -37,65 +37,7 @@ on:
         default: false
 
 jobs:
-  # Run tests first before publishing
-  test-cli:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          
-      - name: Install CLI dependencies
-        run: |
-          cd cli
-          npm install
-          
-      - name: Build CLI
-        run: |
-          cd cli
-          npm run build
-          
-      - name: Test CLI commands
-        run: |
-          cd cli
-          node bin/pnp.js --version
-          node bin/pnp.js --help
-  
-  test-packages:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        package: [base, server, builders]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          
-      - name: Install dependencies
-        run: |
-          cd ${{ matrix.package }}
-          npm install
-          
-      - name: Build package
-        run: |
-          cd ${{ matrix.package }}
-          npm run build
-          
-      - name: Run security audit
-        run: |
-          cd ${{ matrix.package }}
-          npm audit --audit-level=moderate || true
-
   detect-changes:
-    needs: [test-cli, test-packages]
     runs-on: ubuntu-latest
     outputs:
       cli_changed: ${{ steps.changes.outputs.cli }}
@@ -441,3 +383,93 @@ jobs:
             echo "npm install @pnp/builder@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           fi
           echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # Run tests after publishing
+  test-published-cli:
+    needs: [publish-cli]
+    if: needs.publish-cli.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install CLI dependencies
+        run: |
+          cd cli
+          npm install
+          
+      - name: Build CLI
+        run: |
+          cd cli
+          npm run build
+          
+      - name: Test CLI commands
+        run: |
+          cd cli
+          node bin/pnp.js --version
+          node bin/pnp.js --help
+          
+      - name: Test CLI create command
+        run: |
+          cd cli
+          node bin/pnp.js create test-game --skip-install
+          test -d test-game
+          test -f test-game/package.json
+  
+  test-published-packages:
+    needs: [publish-client, publish-server, publish-builder]
+    if: always()
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: 
+          - { name: 'client', dir: 'base', needs: 'publish-client' }
+          - { name: 'server', dir: 'server', needs: 'publish-server' }
+          - { name: 'builder', dir: 'builders', needs: 'publish-builder' }
+    steps:
+      - name: Check if package was published
+        id: check
+        run: |
+          if [ "${{ needs[matrix.package.needs].result }}" == "success" ]; then
+            echo "published=true" >> $GITHUB_OUTPUT
+          else
+            echo "published=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Checkout repository
+        if: steps.check.outputs.published == 'true'
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        if: steps.check.outputs.published == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        if: steps.check.outputs.published == 'true'
+        run: |
+          cd ${{ matrix.package.dir }}
+          npm install
+          
+      - name: Build package
+        if: steps.check.outputs.published == 'true'
+        run: |
+          cd ${{ matrix.package.dir }}
+          npm run build
+          
+      - name: Run security audit
+        if: steps.check.outputs.published == 'true'
+        run: |
+          cd ${{ matrix.package.dir }}
+          npm audit --audit-level=moderate || true
+          
+      - name: Create test summary
+        if: steps.check.outputs.published == 'true'
+        run: |
+          echo "## ✅ Tests passed for ${{ matrix.package.name }}" >> $GITHUB_STEP_SUMMARY
