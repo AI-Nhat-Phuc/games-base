@@ -299,7 +299,7 @@ function generateMapData() {
 function generateTypeScriptCode(mapName, jsonData) {
   const safeName = mapName.replace(/[^a-zA-Z0-9]/g, '');
   
-  return `import { getGame } from '@pnp/game-core-client';
+  return `import { getGame } from '@nhatphucpham/game-core-client';
 
 // Load the ${mapName} map
 export function load${safeName}Map() {

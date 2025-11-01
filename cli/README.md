@@ -7,7 +7,7 @@ Command-line tool for creating game projects with the games-base engine.
 ### Global Installation
 
 ```bash
-npm install -g @pnp/cli
+npm install -g @nhatphucpham/cli
 ```
 
 Then use directly:
@@ -22,7 +22,7 @@ gb create my-game
 No installation required! Use directly with npx:
 
 ```bash
-npx @pnp/cli create my-game
+npx @nhatphucpham/cli create my-game
 ```
 
 ### Local Development / Testing
@@ -146,7 +146,7 @@ my-game/
 
 1. **Create a new game:**
 ```bash
-npx @pnp/cli create my-game
+npx @nhatphucpham/cli create my-game
 cd my-game
 ```
 
@@ -198,7 +198,7 @@ The build-character command supports:
 
 All projects use a simple singleton pattern for easy access:
 ```typescript
-import { initGame, getGame } from '@pnp/game-core-client';
+import { initGame, getGame } from '@nhatphucpham/game-core-client';
 
 // Initialize once
 initGame({ canvasId: 'gameCanvas', width: 800, height: 600 });

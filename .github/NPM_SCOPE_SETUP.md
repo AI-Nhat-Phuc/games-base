@@ -4,15 +4,15 @@
 
 If you see errors like:
 ```
-npm error 404 Not Found - PUT https://registry.npmjs.org/@pnp%2fbuilder
+npm error 404 Not Found - PUT https://registry.npmjs.org/@nhatphucpham%2fbuilder
 npm error 404 Not found
 ```
 
-This means the `@pnp` scope doesn't exist or you don't have permission to publish to it.
+This means the `@nhatphucpham` scope doesn't exist or you don't have permission to publish to it.
 
 ## Solutions
 
-### Option 1: Create the @pnp Organization on NPM (Recommended if you control @pnp)
+### Option 1: Create the @nhatphucpham Organization on NPM (Recommended if you control @nhatphucpham)
 
 1. Go to https://www.npmjs.com/org/create
 2. Create an organization named `pnp`
@@ -21,25 +21,25 @@ This means the `@pnp` scope doesn't exist or you don't have permission to publis
 
 ### Option 2: Change to Your Own Scope
 
-If you don't control the `@pnp` scope, use your own NPM username or organization:
+If you don't control the `@nhatphucpham` scope, use your own NPM username or organization:
 
 1. **Update package names** in all `package.json` files:
 
 ```bash
-# Replace @pnp with @your-username or @your-org
-# Example: @pnp/cli → @your-username/cli
+# Replace @nhatphucpham with @your-username or @your-org
+# Example: @nhatphucpham/cli → @your-username/cli
 
 # Update these files:
-- base/package.json: "@pnp/game-core-client" → "@your-username/game-core-client"
-- cli/package.json: "@pnp/cli" → "@your-username/cli"
-- server/package.json: "@pnp/game-core-server" → "@your-username/game-core-server"
-- builders/package.json: "@pnp/builder" → "@your-username/builder"
+- base/package.json: "@nhatphucpham/game-core-client" → "@your-username/game-core-client"
+- cli/package.json: "@nhatphucpham/cli" → "@your-username/cli"
+- server/package.json: "@nhatphucpham/game-core-server" → "@your-username/game-core-server"
+- builders/package.json: "@nhatphucpham/builder" → "@your-username/builder"
 ```
 
 2. **Update imports in CLI templates** (`cli/src/commands/create.ts`):
 ```typescript
 // Change from:
-import { initGame } from '@pnp/game-core-client';
+import { initGame } from '@nhatphucpham/game-core-client';
 
 // To:
 import { initGame } from '@your-username/game-core-client';
@@ -58,10 +58,10 @@ Remove the scope entirely and use plain names:
 
 ```json
 {
-  "name": "games-base-client",  // instead of @pnp/game-core-client
-  "name": "games-base-cli",     // instead of @pnp/cli
-  "name": "games-base-server",  // instead of @pnp/game-core-server
-  "name": "games-base-builder"  // instead of @pnp/builder
+  "name": "games-base-client",  // instead of @nhatphucpham/game-core-client
+  "name": "games-base-cli",     // instead of @nhatphucpham/cli
+  "name": "games-base-server",  // instead of @nhatphucpham/game-core-server
+  "name": "games-base-builder"  // instead of @nhatphucpham/builder
 }
 ```
 
@@ -77,18 +77,18 @@ Use this script to change all package names at once:
 YOUR_SCOPE="your-username"
 
 # Update package.json files
-find . -name "package.json" -type f -exec sed -i "s/@pnp/@${YOUR_SCOPE}/g" {} +
+find . -name "package.json" -type f -exec sed -i "s/@nhatphucpham/@${YOUR_SCOPE}/g" {} +
 
 # Update TypeScript files
-find . -name "*.ts" -type f -exec sed -i "s/@pnp/@${YOUR_SCOPE}/g" {} +
+find . -name "*.ts" -type f -exec sed -i "s/@nhatphucpham/@${YOUR_SCOPE}/g" {} +
 
 # Update JavaScript files
-find . -name "*.js" -type f -exec sed -i "s/@pnp/@${YOUR_SCOPE}/g" {} +
+find . -name "*.js" -type f -exec sed -i "s/@nhatphucpham/@${YOUR_SCOPE}/g" {} +
 
 # Update Markdown files
-find . -name "*.md" -type f -exec sed -i "s/@pnp/@${YOUR_SCOPE}/g" {} +
+find . -name "*.md" -type f -exec sed -i "s/@nhatphucpham/@${YOUR_SCOPE}/g" {} +
 
-echo "Updated all files from @pnp to @${YOUR_SCOPE}"
+echo "Updated all files from @nhatphucpham to @${YOUR_SCOPE}"
 echo "Please review changes and commit"
 ```
 

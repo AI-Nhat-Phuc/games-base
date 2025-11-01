@@ -1,4 +1,4 @@
-# PNP Builder Tools (@pnp/builder)
+# PNP Builder Tools (@nhatphucpham/builder)
 
 A comprehensive web-based toolset for creating and configuring game assets for the PNP Game Engine. This package includes two powerful visual builders: Character Builder and Map Builder.
 
@@ -163,7 +163,7 @@ Select between:
 ### Integration with Base Engine (Map)
 
 ```typescript
-import { getGame } from '@pnp/game-core-client';
+import { getGame } from '@nhatphucpham/game-core-client';
 import { Level1MapData } from './maps/level1_map';
 
 // Load the map
@@ -225,7 +225,7 @@ Level1MapData.layers.forEach(layer => {
 The generated TypeScript code can be directly used with the base engine:
 
 ```typescript
-import { getGame } from '@pnp/game-core-client';
+import { getGame } from '@nhatphucpham/game-core-client';
 
 const characterBuilder = getGame().getCharacterBuilder();
 const assetLoader = getGame().getAssetLoader();

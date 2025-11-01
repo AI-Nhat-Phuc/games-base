@@ -18,7 +18,7 @@ on:
 
 jobs:
   test-client:
-    name: Test Client Package (@pnp/game-core-client)
+    name: Test Client Package (@nhatphucpham/game-core-client)
     runs-on: ubuntu-latest
     
     steps:
@@ -69,7 +69,7 @@ jobs:
           retention-days: 7
 
   test-server:
-    name: Test Server Package (@pnp/game-core-server)
+    name: Test Server Package (@nhatphucpham/game-core-server)
     runs-on: ubuntu-latest
     
     steps:
@@ -123,7 +123,7 @@ jobs:
           retention-days: 7
 
   test-builder:
-    name: Test Builder Package (@pnp/builder)
+    name: Test Builder Package (@nhatphucpham/builder)
     runs-on: ubuntu-latest
     
     steps:

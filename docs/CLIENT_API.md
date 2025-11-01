@@ -7,7 +7,7 @@ The game engine uses a singleton pattern for easy access. You don't need to manu
 ### Quick Start
 
 ```typescript
-import { initGame, getGame } from '@pnp/game-core-client';
+import { initGame, getGame } from '@nhatphucpham/game-core-client';
 
 // Initialize the game
 initGame({
@@ -30,7 +30,7 @@ const assetLoader = game.getAssetLoader();
 ### Alternative: Fluent API
 
 ```typescript
-import { createGame, getGame } from '@pnp/game-core-client';
+import { createGame, getGame } from '@nhatphucpham/game-core-client';
 
 await createGame({
   canvasId: 'myGame',
@@ -100,7 +100,7 @@ Create and manage tile-based maps with multiple layers.
 ### Example
 
 ```typescript
-import { getGame } from '@pnp/game-core-client';
+import { getGame } from '@nhatphucpham/game-core-client';
 
 // Get the map builder from the game manager
 const mapBuilder = getGame().getMapBuilder();
@@ -145,7 +145,7 @@ Access via `getGame().getCharacterBuilder()`. Create and manage game characters 
 ### Example
 
 ```typescript
-import { getGame } from '@pnp/game-core-client';
+import { getGame } from '@nhatphucpham/game-core-client';
 
 // Get the character builder from the game manager
 const characterBuilder = getGame().getCharacterBuilder();
@@ -182,7 +182,7 @@ Access via `getGame().getEffectBuilder()`. Create particle-based visual effects.
 ### Example
 
 ```typescript
-import { getGame } from '@pnp/game-core-client';
+import { getGame } from '@nhatphucpham/game-core-client';
 
 // Get the effect builder from the game manager
 const effectBuilder = getGame().getEffectBuilder();
@@ -220,7 +220,7 @@ Access via `getGame().getInputManager()`. Handle keyboard and mouse input.
 ### Example
 
 ```typescript
-import { getGame } from '@pnp/game-core-client';
+import { getGame } from '@nhatphucpham/game-core-client';
 
 // Get the input manager from the game manager
 const inputManager = getGame().getInputManager();
@@ -253,7 +253,7 @@ Access via `getGame().getAssetLoader()`. Load and manage game assets (images, so
 ### Example
 
 ```typescript
-import { getGame } from '@pnp/game-core-client';
+import { getGame } from '@nhatphucpham/game-core-client';
 
 // Get the asset loader from the game manager
 const assetLoader = getGame().getAssetLoader();

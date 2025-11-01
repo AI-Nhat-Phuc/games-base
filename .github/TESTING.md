@@ -1,6 +1,6 @@
 # Testing Guide
 
-This document describes the automated testing workflows for the @pnp monorepo packages.
+This document describes the automated testing workflows for the @nhatphucpham monorepo packages.
 
 ## Overview
 
@@ -12,7 +12,7 @@ The monorepo includes comprehensive automated testing for all packages:
 ## Test CLI Workflow
 
 ### Purpose
-Tests the `@pnp/cli` package across multiple operating systems and Node.js versions.
+Tests the `@nhatphucpham/cli` package across multiple operating systems and Node.js versions.
 
 ### Triggers
 - Push to `main` or `develop` branches (when CLI files change)
@@ -87,7 +87,7 @@ Tests all monorepo packages: client, server, and builder.
 
 ### Package Tests
 
-#### 1. Test Client Package (@pnp/game-core-client)
+#### 1. Test Client Package (@nhatphucpham/game-core-client)
 
 **Steps:**
 - Install dependencies
@@ -106,7 +106,7 @@ npm run build
 npm test
 ```
 
-#### 2. Test Server Package (@pnp/game-core-server)
+#### 2. Test Server Package (@nhatphucpham/game-core-server)
 
 **Steps:**
 - Install dependencies
@@ -126,7 +126,7 @@ npm test
 node -e "const {GameServer} = require('./dist/index.js'); new GameServer({port:0})"
 ```
 
-#### 3. Test Builder Package (@pnp/builder)
+#### 3. Test Builder Package (@nhatphucpham/builder)
 
 **Steps:**
 - Install dependencies

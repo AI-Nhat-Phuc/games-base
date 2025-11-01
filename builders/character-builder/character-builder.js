@@ -158,7 +158,7 @@ function generateTypeScriptOutput() {
   const hasAnimation = characterData.animationSheet !== null;
   const hasVoice = characterData.voice !== null;
 
-  const code = `import { CharacterBuilder } from '@pnp/client';
+  const code = `import { CharacterBuilder } from '@nhatphucpham/client';
 
 // Create character builder
 const characterBuilder = new CharacterBuilder();

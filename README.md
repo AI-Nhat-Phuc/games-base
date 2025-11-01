@@ -6,17 +6,17 @@ A comprehensive 2D web game engine with client-side rendering and server-side mu
 
 This repository provides a complete game development platform consisting of:
 
-- **CLI Tool** (`@pnp/cli`): Command-line tool for creating game projects instantly
-- **Base/Client Engine** (`@pnp/game-core-client`): A powerful 2D game engine that runs in web browsers
-- **Character Builder** (`@pnp/builder`): A visual tool for creating and configuring game characters
-- **Server** (`@pnp/game-core-server`): A scalable game server for multiplayer functionality
+- **CLI Tool** (`@nhatphucpham/cli`): Command-line tool for creating game projects instantly
+- **Base/Client Engine** (`@nhatphucpham/game-core-client`): A powerful 2D game engine that runs in web browsers
+- **Character Builder** (`@nhatphucpham/builder`): A visual tool for creating and configuring game characters
+- **Server** (`@nhatphucpham/game-core-server`): A scalable game server for multiplayer functionality
 
 ## 🚀 Quick Start
 
 Create a new game project in seconds:
 
 ```bash
-npx @pnp/cli create my-game
+npx @nhatphucpham/cli create my-game
 cd my-game
 npm start
 ```
@@ -36,7 +36,7 @@ Your game will include:
 
 ```typescript
 // Simple, clean API
-import { initGame, getGame } from '@pnp/game-core-client';
+import { initGame, getGame } from '@nhatphucpham/game-core-client';
 
 initGame({ canvasId: 'game', width: 800, height: 600 });
 const builder = getGame().getCharacterBuilder(); // Access anywhere!
@@ -65,7 +65,7 @@ Command-line tool for instant game project creation:
 **Usage:**
 ```bash
 # Create project
-npx @pnp/cli create my-game
+npx @nhatphucpham/cli create my-game
 
 # Build character
 games-base build-character \
@@ -337,9 +337,9 @@ This project includes automated GitHub Actions workflows for publishing packages
 3. Click **Run workflow** and select package to publish
 
 **Supported Packages:**
-- `@pnp/cli` - CLI tool
-- `@pnp/game-core-client` - Client engine
-- `@pnp/game-core-server` - Server engine
+- `@nhatphucpham/cli` - CLI tool
+- `@nhatphucpham/game-core-client` - Client engine
+- `@nhatphucpham/game-core-server` - Server engine
 
 ## Contributing
 

@@ -9,7 +9,7 @@
 ### 1. Create a New Game Project
 
 ```bash
-npx @pnp/cli create my-game
+npx @nhatphucpham/cli create my-game
 ```
 
 This will:
@@ -34,7 +34,7 @@ Your game will open in the browser at `http://localhost:3000` with:
 ### 3. Build Characters
 
 ```bash
-npx @pnp/cli build-character \
+npx @nhatphucpham/cli build-character \
   --name Hero \
   --sprite ./assets/hero.png \
   --walk ./assets/hero_walk.png \
@@ -77,7 +77,7 @@ npx /absolute/path/to/games-base/cli create test-game
 
 ## Publishing to npm
 
-To make the CLI available via `npx @pnp/cli`:
+To make the CLI available via `npx @nhatphucpham/cli`:
 
 1. **Ensure you're logged in to npm:**
    ```bash
@@ -97,7 +97,7 @@ To make the CLI available via `npx @pnp/cli`:
 
 4. **Now anyone can use it:**
    ```bash
-   npx @pnp/cli create my-game
+   npx @nhatphucpham/cli create my-game
    ```
 
 ## Package Structure for npx
@@ -135,8 +135,8 @@ The package is configured to work with npx through:
 
 ### CLI Not Found
 
-If `npx @pnp/cli` doesn't work:
-- Check if the package is published: `npm view @pnp/cli`
+If `npx @nhatphucpham/cli` doesn't work:
+- Check if the package is published: `npm view @nhatphucpham/cli`
 - Try clearing npx cache: `npx clear-npx-cache`
 - Use the full path for local testing: `npx /path/to/cli`
 
@@ -163,7 +163,7 @@ npm run build
 
 ```bash
 # Create and run a game in 3 commands
-npx @pnp/cli create awesome-game
+npx @nhatphucpham/cli create awesome-game
 cd awesome-game
 npm start
 ```
@@ -172,7 +172,7 @@ npm start
 
 ```bash
 # Skip auto-install
-npx @pnp/cli create my-game --no-install
+npx @nhatphucpham/cli create my-game --no-install
 
 cd my-game
 npm install
@@ -183,13 +183,13 @@ npm start
 
 ```bash
 # Hero character
-npx @pnp/cli build-character \
+npx @nhatphucpham/cli build-character \
   --name Hero \
   --sprite ./assets/hero.png \
   --walk ./assets/hero_walk.png
 
 # Enemy character
-npx @pnp/cli build-character \
+npx @nhatphucpham/cli build-character \
   --name Goblin \
   --sprite ./assets/goblin.png \
   --attack ./assets/goblin_attack.png \
@@ -202,7 +202,7 @@ npx @pnp/cli build-character \
 
 After global install:
 ```bash
-npm install -g @pnp/cli
+npm install -g @nhatphucpham/cli
 
 # Use short alias
 gb create my-game
@@ -214,13 +214,13 @@ gb build-character --name Player
 ```yaml
 # .github/workflows/create-game.yml
 - name: Create Game Project
-  run: npx @pnp/cli create game-project --no-install
+  run: npx @nhatphucpham/cli create game-project --no-install
 ```
 
 ### Docker
 
 ```dockerfile
-RUN npx @pnp/cli create game \
+RUN npx @nhatphucpham/cli create game \
     && cd game \
     && npm install \
     && npm run build

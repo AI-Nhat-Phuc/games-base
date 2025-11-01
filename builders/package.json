@@ -1,5 +1,5 @@
 {
-  "name": "@pnp/builder",
+  "name": "@nhatphucpham/builder",
   "version": "1.0.0",
   "description": "Visual builders tool (character and map) for PNP Game Engine",
   "main": "dist/index.js",

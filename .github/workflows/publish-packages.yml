@@ -166,16 +166,16 @@ jobs:
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @pnp/cli" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/cli" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npx @pnp/cli create my-game" >> $GITHUB_STEP_SUMMARY
+            echo "npx @nhatphucpham/cli create my-game" >> $GITHUB_STEP_SUMMARY
           else
-            echo "npx @pnp/cli@${{ steps.version.outputs.version }} create my-game" >> $GITHUB_STEP_SUMMARY
+            echo "npx @nhatphucpham/cli@${{ steps.version.outputs.version }} create my-game" >> $GITHUB_STEP_SUMMARY
           fi
           echo '```' >> $GITHUB_STEP_SUMMARY
 
@@ -237,16 +237,16 @@ jobs:
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @pnp/game-core-client" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/game-core-client" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @pnp/game-core-client" >> $GITHUB_STEP_SUMMARY
+            echo "npm install @nhatphucpham/game-core-client" >> $GITHUB_STEP_SUMMARY
           else
-            echo "npm install @pnp/game-core-client@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "npm install @nhatphucpham/game-core-client@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           fi
           echo '```' >> $GITHUB_STEP_SUMMARY
 
@@ -308,16 +308,16 @@ jobs:
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @pnp/game-core-server" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @pnp/game-core-server" >> $GITHUB_STEP_SUMMARY
+            echo "npm install @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
           else
-            echo "npm install @pnp/game-core-server@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "npm install @nhatphucpham/game-core-server@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           fi
           echo '```' >> $GITHUB_STEP_SUMMARY
 
@@ -379,16 +379,16 @@ jobs:
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @pnp/builder" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/builder" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @pnp/builder" >> $GITHUB_STEP_SUMMARY
+            echo "npm install @nhatphucpham/builder" >> $GITHUB_STEP_SUMMARY
           else
-            echo "npm install @pnp/builder@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "npm install @nhatphucpham/builder@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           fi
           echo '```' >> $GITHUB_STEP_SUMMARY
 

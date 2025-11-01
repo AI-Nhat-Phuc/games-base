@@ -1,40 +1,40 @@
 # PNP Game Engine - Monorepo Structure
 
-This repository is organized as a monorepo containing multiple packages under the `@pnp` scope.
+This repository is organized as a monorepo containing multiple packages under the `@nhatphucpham` scope.
 
 ## Packages
 
-### @pnp/game-core-client (base/)
+### @nhatphucpham/game-core-client (base/)
 **Client-side 2D game engine for web browsers**
 
-- **Package Name**: `@pnp/game-core-client`
+- **Package Name**: `@nhatphucpham/game-core-client`
 - **Location**: `/base`
 - **Purpose**: Core game engine with rendering, physics, and game loop
-- **Usage**: `import { initGame, getGame } from '@pnp/game-core-client'`
+- **Usage**: `import { initGame, getGame } from '@nhatphucpham/game-core-client'`
 
-### @pnp/cli (cli/)
+### @nhatphucpham/cli (cli/)
 **Command-line tool for project creation and character building**
 
-- **Package Name**: `@pnp/cli`
+- **Package Name**: `@nhatphucpham/cli`
 - **Location**: `/cli`
 - **Purpose**: Scaffold new game projects and generate character assets
 - **Commands**: 
   - `pnp create <project-name>` - Create new game project
   - `pnp build-character` - Generate character from sprites
-- **Usage**: `npx @pnp/cli create my-game`
+- **Usage**: `npx @nhatphucpham/cli create my-game`
 
-### @pnp/game-core-server (server/)
+### @nhatphucpham/game-core-server (server/)
 **Multiplayer game server with WebSocket support**
 
-- **Package Name**: `@pnp/game-core-server`
+- **Package Name**: `@nhatphucpham/game-core-server`
 - **Location**: `/server`
 - **Purpose**: Handle multiplayer game state and player connections
-- **Usage**: `import { GameServer } from '@pnp/game-core-server'`
+- **Usage**: `import { GameServer } from '@nhatphucpham/game-core-server'`
 
-### @pnp/builder (builders/)
+### @nhatphucpham/builder (builders/)
 **Visual character creation tool**
 
-- **Package Name**: `@pnp/builder`
+- **Package Name**: `@nhatphucpham/builder`
 - **Location**: `/builders`
 - **Purpose**: Web-based UI for creating game characters
 - **Usage**: Run locally with `npm start`
@@ -92,20 +92,20 @@ Or use the GitHub Actions workflow for automated publishing.
 
 ## Package Relationships
 
-- **@pnp/cli** → Creates projects that use **@pnp/game-core-client**
-- **@pnp/builder** → Generates data for **@pnp/game-core-client**
-- **@pnp/game-core-client** → Can connect to **@pnp/game-core-server** for multiplayer
-- **@pnp/game-core-server** → Works independently but designed for **@pnp/game-core-client** games
+- **@nhatphucpham/cli** → Creates projects that use **@nhatphucpham/game-core-client**
+- **@nhatphucpham/builder** → Generates data for **@nhatphucpham/game-core-client**
+- **@nhatphucpham/game-core-client** → Can connect to **@nhatphucpham/game-core-server** for multiplayer
+- **@nhatphucpham/game-core-server** → Works independently but designed for **@nhatphucpham/game-core-client** games
 
 ## Migration from @games-base
 
-All packages have been renamed from the `@games-base` scope to `@pnp`:
+All packages have been renamed from the `@games-base` scope to `@nhatphucpham`:
 
-- `@games-base/client` → `@pnp/game-core-client`
-- `@games-base/cli` → `@pnp/cli`
-- `@games-base/server` → `@pnp/game-core-server`
-- `@games-base/builders` → `@pnp/builder`
+- `@games-base/client` → `@nhatphucpham/game-core-client`
+- `@games-base/cli` → `@nhatphucpham/cli`
+- `@games-base/server` → `@nhatphucpham/game-core-server`
+- `@games-base/builders` → `@nhatphucpham/builder`
 
 Commands have also been updated:
 - `games-base` → `pnp`
-- `npx @games-base/cli` → `npx @pnp/cli`
+- `npx @games-base/cli` → `npx @nhatphucpham/cli`

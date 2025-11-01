@@ -1,7 +1,7 @@
 {
-  "name": "@pnp/cli",
+  "name": "@nhatphucpham/cli",
   "version": "1.0.0",
-  "description": "CLI tool for creating game projects with @pnp engine",
+  "description": "CLI tool for creating game projects with @nhatphucpham engine",
   "main": "dist/index.js",
   "bin": {
     "pnp": "./bin/pnp.js",

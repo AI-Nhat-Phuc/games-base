@@ -121,10 +121,10 @@ git push
 
 | Workspace | Directory | Job Name | Package Name |
 |-----------|-----------|----------|--------------|
-| Client | `base/**` | `publish-client` | `@pnp/game-core-client` |
-| CLI | `cli/**` | `publish-cli` | `@pnp/cli` |
-| Server | `server/**` | `publish-server` | `@pnp/game-core-server` |
-| Builder | `builders/**` | `publish-builder` | `@pnp/builder` |
+| Client | `base/**` | `publish-client` | `@nhatphucpham/game-core-client` |
+| CLI | `cli/**` | `publish-cli` | `@nhatphucpham/cli` |
+| Server | `server/**` | `publish-server` | `@nhatphucpham/game-core-server` |
+| Builder | `builders/**` | `publish-builder` | `@nhatphucpham/builder` |
 
 ## Versioning Per Workspace
 
@@ -132,18 +132,18 @@ Each workspace has independent versioning:
 
 ### Main Branch (Production)
 ```bash
-@pnp/game-core-client@1.2.3
-@pnp/cli@1.0.5
-@pnp/game-core-server@2.1.0
-@pnp/builder@1.1.2
+@nhatphucpham/game-core-client@1.2.3
+@nhatphucpham/cli@1.0.5
+@nhatphucpham/game-core-server@2.1.0
+@nhatphucpham/builder@1.1.2
 ```
 
 ### Pull Request (Beta)
 ```bash
-@pnp/game-core-client@1.2.4-beta-pr-123.20241101120530
-@pnp/cli@1.0.6-beta-pr-123.20241101120530
-@pnp/game-core-server@2.1.1-beta-pr-123.20241101120530
-@pnp/builder@1.1.3-beta-pr-123.20241101120530
+@nhatphucpham/game-core-client@1.2.4-beta-pr-123.20241101120530
+@nhatphucpham/cli@1.0.6-beta-pr-123.20241101120530
+@nhatphucpham/game-core-server@2.1.1-beta-pr-123.20241101120530
+@nhatphucpham/builder@1.1.3-beta-pr-123.20241101120530
 ```
 
 ## Manual Publishing
