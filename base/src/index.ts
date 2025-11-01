@@ -3,7 +3,13 @@
  * Exports all public APIs
  */
 
-// Core
+// Core - SOLID-based APIs (Recommended)
+export { GameManager, initGame, getGame } from './core/GameManager';
+export type { GameManagerConfig } from './core/GameManager';
+export { GameFactory, createGame, quickStart } from './core/GameFactory';
+export type { GameSetup } from './core/GameFactory';
+
+// Core - Original APIs (for advanced users)
 export { GameEngine } from './core/GameEngine';
 export type { GameEngineConfig } from './core/GameEngine';
 export * from './core/types';
