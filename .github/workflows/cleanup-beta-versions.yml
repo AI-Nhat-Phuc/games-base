@@ -15,6 +15,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      pull-requests: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -87,6 +88,48 @@ jobs:
             done
           fi
           
+      - name: Cleanup beta tags from other closed PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo ""
+          echo "🧹 Checking for beta tags from other closed PRs..."
+          
+          # Get all beta tags
+          ALL_BETA_TAGS=$(git tag -l | grep "beta\.pr[0-9]\+\." || true)
+          
+          if [ -z "$ALL_BETA_TAGS" ]; then
+            echo "  ℹ️  No beta tags found from any PRs"
+          else
+            # Extract unique PR numbers from tags
+            PR_NUMBERS=$(echo "$ALL_BETA_TAGS" | grep -oP 'beta\.pr\K[0-9]+' | sort -u)
+            
+            echo "  Found beta tags for PR(s): $(echo $PR_NUMBERS | tr '\n' ' ')"
+            
+            # Check each PR to see if it's closed
+            for PR_NUM in $PR_NUMBERS; do
+              # Use GitHub CLI to check if PR is closed
+              PR_STATE=$(gh pr view "$PR_NUM" --json state --jq '.state' 2>/dev/null || echo "NOT_FOUND")
+              
+              if [ "$PR_STATE" == "CLOSED" ] || [ "$PR_STATE" == "MERGED" ] || [ "$PR_STATE" == "NOT_FOUND" ]; then
+                echo ""
+                echo "  PR #${PR_NUM} is ${PR_STATE} - cleaning up beta tags"
+                
+                # Find and delete all beta tags for this closed PR
+                TAGS_TO_DELETE=$(git tag -l | grep "beta\.pr${PR_NUM}\." || true)
+                
+                if [ -n "$TAGS_TO_DELETE" ]; then
+                  echo "$TAGS_TO_DELETE" | while read -r TAG; do
+                    echo "    Deleting: $TAG"
+                    git push --delete origin "$TAG" 2>/dev/null || echo "      ⚠️  Failed to delete tag $TAG"
+                  done
+                fi
+              else
+                echo "  PR #${PR_NUM} is still ${PR_STATE} - keeping tags"
+              fi
+            done
+          fi
+          
       - name: Create cleanup summary
         run: |
           PR_NUMBER="${{ steps.pr.outputs.pr_number }}"
@@ -94,5 +137,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ Deprecated all beta npm package versions for this PR" >> $GITHUB_STEP_SUMMARY
           echo "✅ Deleted all beta Git tags for this PR" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Cleaned up beta Git tags from other closed PRs" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Note:** Beta versions are deprecated (not unpublished) to maintain npm registry integrity." >> $GITHUB_STEP_SUMMARY
