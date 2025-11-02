@@ -106,8 +106,8 @@ jobs:
             
             echo "  Found beta tags for PR(s): $PR_NUMBERS"
             
-            # Collect tags to delete
-            TAGS_TO_DELETE=""
+            # Create temporary file to collect tags to delete
+            TAGS_FILE=$(mktemp)
             
             # Check each PR to see if it's closed
             for PR_NUM in $PR_NUMBERS; do
@@ -118,34 +118,50 @@ jobs:
                 echo ""
                 echo "  PR #${PR_NUM} is ${PR_STATE} - marking beta tags for deletion"
                 
-                # Find all beta tags for this closed PR and add to deletion list
-                PR_TAGS=$(git tag -l | grep "beta\.pr${PR_NUM}\." || true)
-                
-                if [ -n "$PR_TAGS" ]; then
-                  echo "$PR_TAGS" | while read -r TAG; do
-                    echo "    Will delete: $TAG"
-                  done
-                  TAGS_TO_DELETE="${TAGS_TO_DELETE} ${PR_TAGS}"
-                fi
+                # Find all beta tags for this closed PR and add to deletion file
+                git tag -l | grep "beta\.pr${PR_NUM}\." | while read -r TAG; do
+                  echo "    Will delete: $TAG"
+                  echo "$TAG" >> "$TAGS_FILE"
+                done
               else
                 echo "  PR #${PR_NUM} is still ${PR_STATE} - keeping tags"
               fi
             done
             
             # Delete all collected tags in batches
-            if [ -n "$TAGS_TO_DELETE" ]; then
+            if [ -s "$TAGS_FILE" ]; then
               echo ""
-              echo "  Deleting tags in batch..."
-              # Convert newlines to spaces and delete all tags at once
-              TAGS_ARRAY=($TAGS_TO_DELETE)
+              echo "  Deleting tags in batches..."
+              
+              # Read tags into array
+              TAGS_TO_DELETE=()
+              while IFS= read -r tag; do
+                TAGS_TO_DELETE+=("$tag")
+              done < "$TAGS_FILE"
+              
               # Delete in batches of 10 to avoid command line length issues
-              for ((i=0; i<${#TAGS_ARRAY[@]}; i+=10)); do
-                BATCH=("${TAGS_ARRAY[@]:i:10}")
+              total=${#TAGS_TO_DELETE[@]}
+              i=0
+              while [ $i -lt $total ]; do
+                # Calculate end of batch
+                end=$((i + 10))
+                if [ $end -gt $total ]; then
+                  end=$total
+                fi
+                
+                # Get batch
+                BATCH=("${TAGS_TO_DELETE[@]:i:10}")
                 if [ ${#BATCH[@]} -gt 0 ]; then
+                  echo "  Deleting batch $(((i/10)+1))..."
                   git push --delete origin "${BATCH[@]}" 2>/dev/null || echo "    ⚠️  Failed to delete some tags in batch"
                 fi
+                
+                i=$end
               done
             fi
+            
+            # Clean up temp file
+            rm -f "$TAGS_FILE"
           fi
           
       - name: Create cleanup summary
