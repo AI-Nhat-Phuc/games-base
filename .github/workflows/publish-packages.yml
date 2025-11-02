@@ -80,29 +80,44 @@ jobs:
             echo "server=true" >> $GITHUB_OUTPUT
             echo "builder=true" >> $GITHUB_OUTPUT
           else
-            # Check for actual file changes
-            if git diff --name-only HEAD^ HEAD | grep -q '^cli/'; then
+            # Check for code-related file changes only (exclude docs, tests metadata)
+            # Include: src/, bin/, package.json, tsconfig.json, dependencies
+            # Exclude: README.md, CHANGELOG.md, .md files, LICENSE, etc.
+            
+            # CLI package
+            if git diff --name-only HEAD^ HEAD | grep -E '^cli/(src/|bin/|package\.json|tsconfig\.json|templates/)' | grep -qv '\.md$'; then
               echo "cli=true" >> $GITHUB_OUTPUT
+              echo "✓ CLI: Code changes detected"
             else
               echo "cli=false" >> $GITHUB_OUTPUT
+              echo "✗ CLI: No code changes (docs/metadata only or no changes)"
             fi
             
-            if git diff --name-only HEAD^ HEAD | grep -q '^base/'; then
+            # Base/Client package
+            if git diff --name-only HEAD^ HEAD | grep -E '^base/(src/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
               echo "client=true" >> $GITHUB_OUTPUT
+              echo "✓ Client: Code changes detected"
             else
               echo "client=false" >> $GITHUB_OUTPUT
+              echo "✗ Client: No code changes (docs/metadata only or no changes)"
             fi
             
-            if git diff --name-only HEAD^ HEAD | grep -q '^server/'; then
+            # Server package
+            if git diff --name-only HEAD^ HEAD | grep -E '^server/(src/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
               echo "server=true" >> $GITHUB_OUTPUT
+              echo "✓ Server: Code changes detected"
             else
               echo "server=false" >> $GITHUB_OUTPUT
+              echo "✗ Server: No code changes (docs/metadata only or no changes)"
             fi
             
-            if git diff --name-only HEAD^ HEAD | grep -q '^builders/'; then
+            # Builder package
+            if git diff --name-only HEAD^ HEAD | grep -E '^builders/(src/|public/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
               echo "builder=true" >> $GITHUB_OUTPUT
+              echo "✓ Builder: Code changes detected"
             else
               echo "builder=false" >> $GITHUB_OUTPUT
+              echo "✗ Builder: No code changes (docs/metadata only or no changes)"
             fi
           fi
 

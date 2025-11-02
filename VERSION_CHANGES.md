@@ -36,6 +36,7 @@ npm view @nhatphucpham/builder  # 404 Not Found
 - Updated comments to clarify semantic versioning compliance
 - **Added NPM token verification step** using `npm whoami` before publishing to catch authentication issues early
 - **Added Git tag creation** after successful package publication to link versions to repository tags
+- **Improved change detection** to only trigger publishing when code-related files change (excludes documentation-only changes)
 
 ### 2. Created Beta Cleanup Workflow (`.github/workflows/cleanup-beta-versions.yml`)
 - **Automatically triggers when a PR is merged or closed**
@@ -98,6 +99,36 @@ To complete the npm publishing setup, the repository owner needs to:
    - Or manually trigger workflow from GitHub Actions tab
    - Verify packages are published with new version format
    - Check that Git tags are created (visible in GitHub repository under "Releases" or "Tags")
+
+## Smart Change Detection
+
+The publish workflow uses intelligent change detection to only trigger publishing when actual code changes occur:
+
+**Files That Trigger Publishing:**
+- Source code: `src/` directory changes
+- Executables: `bin/` directory changes (CLI package)
+- Configuration: `package.json`, `tsconfig.json` changes
+- Templates: `templates/` directory changes (CLI package)
+- Public assets: `public/` directory changes (Builder package)
+
+**Files That DON'T Trigger Publishing:**
+- Documentation: `README.md`, `CHANGELOG.md`, `*.md` files
+- Metadata: `LICENSE`, `.gitignore`, editor configs
+- Non-code assets: Images, example files
+
+**Benefits:**
+- Prevents unnecessary package versions for documentation-only updates
+- Reduces npm registry clutter
+- Saves CI/CD resources
+- Only publishes when actual functionality changes
+- Manual override available via workflow_dispatch with `force_publish` option
+
+**Example Scenarios:**
+- ✅ Updating `src/index.ts` → Triggers publishing
+- ✅ Modifying `package.json` dependencies → Triggers publishing
+- ✅ Changing `bin/pnp.js` → Triggers publishing
+- ❌ Updating `README.md` only → Does NOT trigger publishing
+- ❌ Fixing typos in documentation → Does NOT trigger publishing
 
 ## Beta Version Cleanup
 
