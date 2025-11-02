@@ -171,6 +171,15 @@ jobs:
           cd cli
           npm publish --access public --tag ${{ steps.version.outputs.tag }}
           
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="cli@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/cli@${{ steps.version.outputs.version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
+          
       - name: Create summary
         run: |
           echo "## ✅ Published @nhatphucpham/cli" >> $GITHUB_STEP_SUMMARY
@@ -248,6 +257,15 @@ jobs:
         run: |
           cd base
           npm publish --access public --tag ${{ steps.version.outputs.tag }}
+          
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="client@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/game-core-client@${{ steps.version.outputs.version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
           
       - name: Create summary
         run: |
@@ -327,6 +345,15 @@ jobs:
           cd server
           npm publish --access public --tag ${{ steps.version.outputs.tag }}
           
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="server@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/game-core-server@${{ steps.version.outputs.version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
+          
       - name: Create summary
         run: |
           echo "## ✅ Published @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
@@ -404,6 +431,15 @@ jobs:
         run: |
           cd builders
           npm publish --access public --tag ${{ steps.version.outputs.tag }}
+          
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="builder@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/builder@${{ steps.version.outputs.version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
           
       - name: Create summary
         run: |

@@ -35,6 +35,7 @@ npm view @nhatphucpham/builder  # 404 Not Found
 - Applied to all 4 package publishing jobs (cli, client, server, builder)
 - Updated comments to clarify semantic versioning compliance
 - **Added NPM token verification step** using `npm whoami` before publishing to catch authentication issues early
+- **Added Git tag creation** after successful package publication to link versions to repository tags
 
 ### 2. Added `publishConfig` to all package.json files
 Added to: `cli/package.json`, `base/package.json`, `server/package.json`, `builders/package.json`
@@ -89,6 +90,27 @@ To complete the npm publishing setup, the repository owner needs to:
    - Create a pull request to trigger beta publishing
    - Or manually trigger workflow from GitHub Actions tab
    - Verify packages are published with new version format
+   - Check that Git tags are created (visible in GitHub repository under "Releases" or "Tags")
+
+## Git Tagging
+
+Each successful package publication automatically creates a Git tag in the repository:
+
+**Tag Format:** `<package>@<version>`
+
+**Examples:**
+- `cli@1.0.0` - CLI package version 1.0.0 (latest release)
+- `cli@1.0.0-beta.pr123.20251102020619` - CLI package beta version for PR #123
+- `client@1.0.0-beta.pr456.20251102030000` - Client package beta version for PR #456
+- `server@1.1.0` - Server package version 1.1.0
+- `builder@2.0.0` - Builder package version 2.0.0
+
+**Benefits:**
+- Links published npm packages to specific commits in the repository
+- Enables easy code review of what was published
+- Allows checking out specific published versions: `git checkout cli@1.0.0`
+- Provides version history in GitHub's releases/tags interface
+- Useful for debugging and tracking changes between versions
 
 ## Version Format Examples
 
