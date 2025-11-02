@@ -1,0 +1,1 @@
+{\n  "name": "@nhatphucpham/game-cli",\n  "version": "1.0.0",\n  "description": "A game CLI tool",\n  "main": "index.js",\n  "directories": {\n    "lib": "game-cli"\n  },\n  "scripts": {\n    "start": "node index.js"\n  },\n  "author": "Nhat Phuc Pham",\n  "license": "ISC"\n}
