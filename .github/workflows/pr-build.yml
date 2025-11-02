@@ -104,7 +104,6 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           
       - name: Verify NPM token
@@ -181,7 +180,6 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           
       - name: Verify NPM token
@@ -258,7 +256,6 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           
       - name: Verify NPM token
@@ -335,7 +332,6 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           
       - name: Verify NPM token
