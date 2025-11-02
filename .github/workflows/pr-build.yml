@@ -12,6 +12,8 @@ on:
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       cli_changed: ${{ steps.changes.outputs.cli }}
       client_changed: ${{ steps.changes.outputs.client }}
@@ -381,6 +383,8 @@ jobs:
     needs: [publish-cli]
     if: needs.publish-cli.result == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -417,6 +421,8 @@ jobs:
     needs: [publish-client, publish-server, publish-builder]
     if: always()
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         package: 
