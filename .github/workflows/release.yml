@@ -1,4 +1,4 @@
-name: Publish Packages to NPM
+name: Release Packages to NPM
 
 on:
   push:
@@ -10,13 +10,6 @@ on:
       - 'server/**'
       - 'builders/**'
       - 'package.json'
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'cli/**'
-      - 'base/**'
-      - 'server/**'
-      - 'builders/**'
   workflow_dispatch:
     inputs:
       package:
@@ -39,36 +32,18 @@ on:
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       cli_changed: ${{ steps.changes.outputs.cli }}
       client_changed: ${{ steps.changes.outputs.client }}
       server_changed: ${{ steps.changes.outputs.server }}
       builder_changed: ${{ steps.changes.outputs.builder }}
-      pr_number: ${{ steps.pr.outputs.pr_number }}
-      is_main: ${{ steps.branch.outputs.is_main }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Check branch
-        id: branch
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "is_main=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_main=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Get PR number
-        id: pr
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
-          else
-            echo "pr_number=" >> $GITHUB_OUTPUT
-          fi
 
       - name: Detect changes
         id: changes
@@ -128,8 +103,7 @@ jobs:
       contents: write
       packages: write
     if: |
-      (needs.detect-changes.outputs.cli_changed == 'true' && 
-       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
+      (needs.detect-changes.outputs.cli_changed == 'true' && github.event_name == 'push') ||
       (github.event_name == 'workflow_dispatch' && 
        (github.event.inputs.package == 'cli' || github.event.inputs.package == 'all'))
     steps:
@@ -157,7 +131,6 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           
       - name: Verify NPM token
@@ -169,22 +142,10 @@ jobs:
         id: version
         run: |
           cd cli
-          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
-            # Main branch - publish as latest
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Publishing version: $VERSION with tag: latest"
-          else
-            # PR branch - publish as beta with semantic versioning
-            BASE_VERSION=$(node -p "require('./package.json').version")
-            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
-            npm version $BETA_VERSION --no-git-tag-version
-            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "Publishing version: $BETA_VERSION with tag: beta"
-          fi
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION with tag: latest"
           
       - name: Publish to NPM
         run: |
@@ -208,11 +169,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npx @nhatphucpham/cli create my-game" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "npx @nhatphucpham/cli@${{ steps.version.outputs.version }} create my-game" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "npx @nhatphucpham/cli create my-game" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   publish-client:
@@ -222,8 +179,7 @@ jobs:
       contents: write
       packages: write
     if: |
-      (needs.detect-changes.outputs.client_changed == 'true' && 
-       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
+      (needs.detect-changes.outputs.client_changed == 'true' && github.event_name == 'push') ||
       (github.event_name == 'workflow_dispatch' && 
        (github.event.inputs.package == 'client' || github.event.inputs.package == 'all'))
     steps:
@@ -251,7 +207,6 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           
       - name: Verify NPM token
@@ -263,20 +218,10 @@ jobs:
         id: version
         run: |
           cd base
-          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Publishing version: $VERSION with tag: latest"
-          else
-            BASE_VERSION=$(node -p "require('./package.json').version")
-            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
-            npm version $BETA_VERSION --no-git-tag-version
-            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "Publishing version: $BETA_VERSION with tag: beta"
-          fi
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION with tag: latest"
           
       - name: Publish to NPM
         run: |
@@ -300,11 +245,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @nhatphucpham/game-core-client" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "npm install @nhatphucpham/game-core-client@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "npm install @nhatphucpham/game-core-client" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   publish-server:
@@ -314,8 +255,7 @@ jobs:
       contents: write
       packages: write
     if: |
-      (needs.detect-changes.outputs.server_changed == 'true' && 
-       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
+      (needs.detect-changes.outputs.server_changed == 'true' && github.event_name == 'push') ||
       (github.event_name == 'workflow_dispatch' && 
        (github.event.inputs.package == 'server' || github.event.inputs.package == 'all'))
     steps:
@@ -343,7 +283,6 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           
       - name: Verify NPM token
@@ -355,20 +294,10 @@ jobs:
         id: version
         run: |
           cd server
-          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Publishing version: $VERSION with tag: latest"
-          else
-            BASE_VERSION=$(node -p "require('./package.json').version")
-            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
-            npm version $BETA_VERSION --no-git-tag-version
-            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "Publishing version: $BETA_VERSION with tag: beta"
-          fi
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION with tag: latest"
           
       - name: Publish to NPM
         run: |
@@ -392,11 +321,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "npm install @nhatphucpham/game-core-server@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "npm install @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   publish-builder:
@@ -406,8 +331,7 @@ jobs:
       contents: write
       packages: write
     if: |
-      (needs.detect-changes.outputs.builder_changed == 'true' && 
-       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
+      (needs.detect-changes.outputs.builder_changed == 'true' && github.event_name == 'push') ||
       (github.event_name == 'workflow_dispatch' && 
        (github.event.inputs.package == 'builder' || github.event.inputs.package == 'all'))
     steps:
@@ -435,7 +359,6 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           
       - name: Verify NPM token
@@ -447,20 +370,10 @@ jobs:
         id: version
         run: |
           cd builders
-          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Publishing version: $VERSION with tag: latest"
-          else
-            BASE_VERSION=$(node -p "require('./package.json').version")
-            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
-            npm version $BETA_VERSION --no-git-tag-version
-            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "Publishing version: $BETA_VERSION with tag: beta"
-          fi
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION with tag: latest"
           
       - name: Publish to NPM
         run: |
@@ -484,11 +397,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @nhatphucpham/builder" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "npm install @nhatphucpham/builder@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "npm install @nhatphucpham/builder" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   # Run tests after publishing
@@ -496,6 +405,8 @@ jobs:
     needs: [publish-cli]
     if: needs.publish-cli.result == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -532,6 +443,8 @@ jobs:
     needs: [publish-client, publish-server, publish-builder]
     if: always()
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         package: 
