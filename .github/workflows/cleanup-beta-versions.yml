@@ -63,7 +63,7 @@ jobs:
               echo "$BETA_VERSIONS" | while read -r VERSION; do
                 echo "    - $VERSION"
                 # Deprecate the version
-                npm deprecate "${PACKAGE}@${VERSION}" "Beta version for PR #${PR_NUMBER} - PR has been merged/closed" 2>/dev/null || echo "    ⚠️  Failed to deprecate ${VERSION}"
+                npm deprecate "${PACKAGE}@${VERSION}" "Beta version for PR #${PR_NUMBER} - PR has been closed" 2>/dev/null || echo "    ⚠️  Failed to deprecate ${VERSION}"
               done
             fi
           done
