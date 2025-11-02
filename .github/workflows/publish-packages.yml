@@ -124,6 +124,9 @@ jobs:
   publish-cli:
     needs: detect-changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     if: |
       (needs.detect-changes.outputs.cli_changed == 'true' && 
        (github.event_name == 'push' || github.event_name == 'pull_request')) ||
@@ -132,6 +135,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -213,6 +218,9 @@ jobs:
   publish-client:
     needs: detect-changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     if: |
       (needs.detect-changes.outputs.client_changed == 'true' && 
        (github.event_name == 'push' || github.event_name == 'pull_request')) ||
@@ -221,6 +229,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -300,6 +310,9 @@ jobs:
   publish-server:
     needs: detect-changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     if: |
       (needs.detect-changes.outputs.server_changed == 'true' && 
        (github.event_name == 'push' || github.event_name == 'pull_request')) ||
@@ -308,6 +321,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -387,6 +402,9 @@ jobs:
   publish-builder:
     needs: detect-changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     if: |
       (needs.detect-changes.outputs.builder_changed == 'true' && 
        (github.event_name == 'push' || github.event_name == 'pull_request')) ||
@@ -395,6 +413,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Setup Node.js
         uses: actions/setup-node@v4

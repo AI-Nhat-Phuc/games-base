@@ -37,6 +37,7 @@ npm view @nhatphucpham/builder  # 404 Not Found
 - **Added NPM token verification step** using `npm whoami` before publishing to catch authentication issues early
 - **Added Git tag creation** after successful package publication to link versions to repository tags
 - **Improved change detection** to only trigger publishing when code-related files change (excludes documentation-only changes)
+- **Added proper permissions** for tag creation (`contents: write`) to enable github-actions bot to push tags
 
 ### 2. Created Beta Cleanup Workflow (`.github/workflows/cleanup-beta-versions.yml`)
 - **Automatically triggers when a PR is merged or closed**
@@ -44,6 +45,7 @@ npm view @nhatphucpham/builder  # 404 Not Found
 - Deletes all beta Git tags associated with that PR
 - Keeps the npm registry clean by marking old beta versions as deprecated
 - Prevents tag clutter in the repository
+- **Added proper permissions** for tag deletion (`contents: write`)
 
 ### 3. Added `publishConfig` to all package.json files
 Added to: `cli/package.json`, `base/package.json`, `server/package.json`, `builders/package.json`
