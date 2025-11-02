@@ -149,10 +149,10 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
             echo "Publishing version: $VERSION with tag: latest"
           else
-            # PR branch - publish as beta
+            # PR branch - publish as beta with semantic versioning
             BASE_VERSION=$(node -p "require('./package.json').version")
             PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta-pr-${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
             npm version $BETA_VERSION --no-git-tag-version
             echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
             echo "tag=beta" >> $GITHUB_OUTPUT
@@ -223,7 +223,7 @@ jobs:
           else
             BASE_VERSION=$(node -p "require('./package.json').version")
             PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta-pr-${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
             npm version $BETA_VERSION --no-git-tag-version
             echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
             echo "tag=beta" >> $GITHUB_OUTPUT
@@ -294,7 +294,7 @@ jobs:
           else
             BASE_VERSION=$(node -p "require('./package.json').version")
             PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta-pr-${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
             npm version $BETA_VERSION --no-git-tag-version
             echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
             echo "tag=beta" >> $GITHUB_OUTPUT
@@ -365,7 +365,7 @@ jobs:
           else
             BASE_VERSION=$(node -p "require('./package.json').version")
             PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta-pr-${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
             npm version $BETA_VERSION --no-git-tag-version
             echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
             echo "tag=beta" >> $GITHUB_OUTPUT

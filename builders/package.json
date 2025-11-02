@@ -17,6 +17,10 @@
   ],
   "author": "",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "express": "^4.18.2"
   },
