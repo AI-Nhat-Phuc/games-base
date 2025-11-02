@@ -1,0 +1,100 @@
+name: Cleanup Beta Versions
+
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - 'cli/**'
+      - 'base/**'
+      - 'server/**'
+      - 'builders/**'
+
+jobs:
+  cleanup-beta-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Configure NPM authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
+          
+      - name: Get PR number
+        id: pr
+        run: |
+          echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          
+      - name: Find and deprecate beta versions for this PR
+        run: |
+          PR_NUMBER="${{ steps.pr.outputs.pr_number }}"
+          echo "🧹 Cleaning up beta versions for PR #${PR_NUMBER}"
+          
+          # List of packages to check
+          PACKAGES=("@nhatphucpham/cli" "@nhatphucpham/game-core-client" "@nhatphucpham/game-core-server" "@nhatphucpham/builder")
+          
+          for PACKAGE in "${PACKAGES[@]}"; do
+            echo ""
+            echo "Checking package: $PACKAGE"
+            
+            # Get all versions with beta.pr{PR_NUMBER} pattern
+            BETA_VERSIONS=$(npm view "$PACKAGE" versions --json 2>/dev/null | jq -r ".[]" | grep "beta\.pr${PR_NUMBER}\." || true)
+            
+            if [ -z "$BETA_VERSIONS" ]; then
+              echo "  ℹ️  No beta versions found for PR #${PR_NUMBER}"
+            else
+              echo "  Found beta versions to deprecate:"
+              echo "$BETA_VERSIONS" | while read -r VERSION; do
+                echo "    - $VERSION"
+                # Deprecate the version
+                npm deprecate "${PACKAGE}@${VERSION}" "Beta version for PR #${PR_NUMBER} - PR has been merged/closed" 2>/dev/null || echo "    ⚠️  Failed to deprecate ${VERSION}"
+              done
+            fi
+          done
+          
+      - name: Delete beta tags for this PR
+        run: |
+          PR_NUMBER="${{ steps.pr.outputs.pr_number }}"
+          echo ""
+          echo "🏷️  Cleaning up Git tags for PR #${PR_NUMBER}"
+          
+          # Find all tags matching the beta pattern for this PR
+          BETA_TAGS=$(git tag -l | grep "beta\.pr${PR_NUMBER}\." || true)
+          
+          if [ -z "$BETA_TAGS" ]; then
+            echo "  ℹ️  No beta tags found for PR #${PR_NUMBER}"
+          else
+            echo "  Found beta tags to delete:"
+            echo "$BETA_TAGS" | while read -r TAG; do
+              echo "    - $TAG"
+              git push --delete origin "$TAG" 2>/dev/null || echo "    ⚠️  Failed to delete tag $TAG"
+            done
+          fi
+          
+      - name: Create cleanup summary
+        run: |
+          PR_NUMBER="${{ steps.pr.outputs.pr_number }}"
+          echo "## 🧹 Beta Version Cleanup for PR #${PR_NUMBER}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Deprecated all beta npm package versions for this PR" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Deleted all beta Git tags for this PR" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** Beta versions are deprecated (not unpublished) to maintain npm registry integrity." >> $GITHUB_STEP_SUMMARY

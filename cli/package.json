@@ -37,6 +37,10 @@
     "directory": "cli"
   },
   "homepage": "https://github.com/AI-Nhat-Phuc/games-base#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "commander": "^11.1.0",
     "chalk": "^4.1.2",
