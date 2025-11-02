@@ -453,7 +453,7 @@ jobs:
       - name: Test CLI create command
         run: |
           cd cli
-          node bin/pnp.js create test-game --skip-install
+          node bin/pnp.js create test-game --no-install
           test -d test-game
           test -f test-game/package.json
   
