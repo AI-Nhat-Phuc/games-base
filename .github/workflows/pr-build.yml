@@ -1,15 +1,6 @@
-name: Publish Packages to NPM
+name: PR Build and Test
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'cli/**'
-      - 'base/**'
-      - 'server/**'
-      - 'builders/**'
-      - 'package.json'
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
@@ -17,24 +8,6 @@ on:
       - 'base/**'
       - 'server/**'
       - 'builders/**'
-  workflow_dispatch:
-    inputs:
-      package:
-        description: 'Package to publish'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - cli
-          - client
-          - server
-          - builder
-          - all
-      force_publish:
-        description: 'Force publish even if no changes'
-        required: false
-        type: boolean
-        default: false
 
 jobs:
   detect-changes:
@@ -45,80 +18,58 @@ jobs:
       server_changed: ${{ steps.changes.outputs.server }}
       builder_changed: ${{ steps.changes.outputs.builder }}
       pr_number: ${{ steps.pr.outputs.pr_number }}
-      is_main: ${{ steps.branch.outputs.is_main }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check branch
-        id: branch
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "is_main=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_main=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Get PR number
         id: pr
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
-          else
-            echo "pr_number=" >> $GITHUB_OUTPUT
-          fi
+          echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
 
       - name: Detect changes
         id: changes
         run: |
-          if [ "${{ github.event.inputs.force_publish }}" == "true" ] || [ "${{ github.event.inputs.package }}" != "" ]; then
-            # Manual workflow dispatch or force publish
+          # Check for code-related file changes only (exclude docs, tests metadata)
+          # Include: src/, bin/, package.json, tsconfig.json, dependencies
+          # Exclude: README.md, CHANGELOG.md, .md files, LICENSE, etc.
+          
+          # CLI package
+          if git diff --name-only HEAD^ HEAD | grep -E '^cli/(src/|bin/|package\.json|tsconfig\.json|templates/)' | grep -qv '\.md$'; then
             echo "cli=true" >> $GITHUB_OUTPUT
-            echo "client=true" >> $GITHUB_OUTPUT
-            echo "server=true" >> $GITHUB_OUTPUT
-            echo "builder=true" >> $GITHUB_OUTPUT
+            echo "✓ CLI: Code changes detected"
           else
-            # Check for code-related file changes only (exclude docs, tests metadata)
-            # Include: src/, bin/, package.json, tsconfig.json, dependencies
-            # Exclude: README.md, CHANGELOG.md, .md files, LICENSE, etc.
-            
-            # CLI package
-            if git diff --name-only HEAD^ HEAD | grep -E '^cli/(src/|bin/|package\.json|tsconfig\.json|templates/)' | grep -qv '\.md$'; then
-              echo "cli=true" >> $GITHUB_OUTPUT
-              echo "✓ CLI: Code changes detected"
-            else
-              echo "cli=false" >> $GITHUB_OUTPUT
-              echo "✗ CLI: No code changes (docs/metadata only or no changes)"
-            fi
-            
-            # Base/Client package
-            if git diff --name-only HEAD^ HEAD | grep -E '^base/(src/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
-              echo "client=true" >> $GITHUB_OUTPUT
-              echo "✓ Client: Code changes detected"
-            else
-              echo "client=false" >> $GITHUB_OUTPUT
-              echo "✗ Client: No code changes (docs/metadata only or no changes)"
-            fi
-            
-            # Server package
-            if git diff --name-only HEAD^ HEAD | grep -E '^server/(src/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
-              echo "server=true" >> $GITHUB_OUTPUT
-              echo "✓ Server: Code changes detected"
-            else
-              echo "server=false" >> $GITHUB_OUTPUT
-              echo "✗ Server: No code changes (docs/metadata only or no changes)"
-            fi
-            
-            # Builder package
-            if git diff --name-only HEAD^ HEAD | grep -E '^builders/(src/|public/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
-              echo "builder=true" >> $GITHUB_OUTPUT
-              echo "✓ Builder: Code changes detected"
-            else
-              echo "builder=false" >> $GITHUB_OUTPUT
-              echo "✗ Builder: No code changes (docs/metadata only or no changes)"
-            fi
+            echo "cli=false" >> $GITHUB_OUTPUT
+            echo "✗ CLI: No code changes (docs/metadata only or no changes)"
+          fi
+          
+          # Base/Client package
+          if git diff --name-only HEAD^ HEAD | grep -E '^base/(src/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
+            echo "client=true" >> $GITHUB_OUTPUT
+            echo "✓ Client: Code changes detected"
+          else
+            echo "client=false" >> $GITHUB_OUTPUT
+            echo "✗ Client: No code changes (docs/metadata only or no changes)"
+          fi
+          
+          # Server package
+          if git diff --name-only HEAD^ HEAD | grep -E '^server/(src/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
+            echo "server=true" >> $GITHUB_OUTPUT
+            echo "✓ Server: Code changes detected"
+          else
+            echo "server=false" >> $GITHUB_OUTPUT
+            echo "✗ Server: No code changes (docs/metadata only or no changes)"
+          fi
+          
+          # Builder package
+          if git diff --name-only HEAD^ HEAD | grep -E '^builders/(src/|public/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
+            echo "builder=true" >> $GITHUB_OUTPUT
+            echo "✓ Builder: Code changes detected"
+          else
+            echo "builder=false" >> $GITHUB_OUTPUT
+            echo "✗ Builder: No code changes (docs/metadata only or no changes)"
           fi
 
   publish-cli:
@@ -127,11 +78,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-    if: |
-      (needs.detect-changes.outputs.cli_changed == 'true' && 
-       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
-      (github.event_name == 'workflow_dispatch' && 
-       (github.event.inputs.package == 'cli' || github.event.inputs.package == 'all'))
+    if: needs.detect-changes.outputs.cli_changed == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -169,22 +116,13 @@ jobs:
         id: version
         run: |
           cd cli
-          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
-            # Main branch - publish as latest
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Publishing version: $VERSION with tag: latest"
-          else
-            # PR branch - publish as beta with semantic versioning
-            BASE_VERSION=$(node -p "require('./package.json').version")
-            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
-            npm version $BETA_VERSION --no-git-tag-version
-            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "Publishing version: $BETA_VERSION with tag: beta"
-          fi
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
+          BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+          npm version $BETA_VERSION --no-git-tag-version
+          echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
+          echo "tag=beta" >> $GITHUB_OUTPUT
+          echo "Publishing version: $BETA_VERSION with tag: beta"
           
       - name: Publish to NPM
         run: |
@@ -202,17 +140,13 @@ jobs:
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @nhatphucpham/cli" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/cli (Beta)" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npx @nhatphucpham/cli create my-game" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "npx @nhatphucpham/cli@${{ steps.version.outputs.version }} create my-game" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "npx @nhatphucpham/cli@${{ steps.version.outputs.version }} create my-game" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   publish-client:
@@ -221,11 +155,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-    if: |
-      (needs.detect-changes.outputs.client_changed == 'true' && 
-       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
-      (github.event_name == 'workflow_dispatch' && 
-       (github.event.inputs.package == 'client' || github.event.inputs.package == 'all'))
+    if: needs.detect-changes.outputs.client_changed == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -263,20 +193,13 @@ jobs:
         id: version
         run: |
           cd base
-          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Publishing version: $VERSION with tag: latest"
-          else
-            BASE_VERSION=$(node -p "require('./package.json').version")
-            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
-            npm version $BETA_VERSION --no-git-tag-version
-            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "Publishing version: $BETA_VERSION with tag: beta"
-          fi
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
+          BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+          npm version $BETA_VERSION --no-git-tag-version
+          echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
+          echo "tag=beta" >> $GITHUB_OUTPUT
+          echo "Publishing version: $BETA_VERSION with tag: beta"
           
       - name: Publish to NPM
         run: |
@@ -294,17 +217,13 @@ jobs:
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @nhatphucpham/game-core-client" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/game-core-client (Beta)" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @nhatphucpham/game-core-client" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "npm install @nhatphucpham/game-core-client@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "npm install @nhatphucpham/game-core-client@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   publish-server:
@@ -313,11 +232,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-    if: |
-      (needs.detect-changes.outputs.server_changed == 'true' && 
-       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
-      (github.event_name == 'workflow_dispatch' && 
-       (github.event.inputs.package == 'server' || github.event.inputs.package == 'all'))
+    if: needs.detect-changes.outputs.server_changed == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -355,20 +270,13 @@ jobs:
         id: version
         run: |
           cd server
-          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Publishing version: $VERSION with tag: latest"
-          else
-            BASE_VERSION=$(node -p "require('./package.json').version")
-            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
-            npm version $BETA_VERSION --no-git-tag-version
-            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "Publishing version: $BETA_VERSION with tag: beta"
-          fi
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
+          BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+          npm version $BETA_VERSION --no-git-tag-version
+          echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
+          echo "tag=beta" >> $GITHUB_OUTPUT
+          echo "Publishing version: $BETA_VERSION with tag: beta"
           
       - name: Publish to NPM
         run: |
@@ -386,17 +294,13 @@ jobs:
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/game-core-server (Beta)" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "npm install @nhatphucpham/game-core-server@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "npm install @nhatphucpham/game-core-server@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   publish-builder:
@@ -405,11 +309,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-    if: |
-      (needs.detect-changes.outputs.builder_changed == 'true' && 
-       (github.event_name == 'push' || github.event_name == 'pull_request')) ||
-      (github.event_name == 'workflow_dispatch' && 
-       (github.event.inputs.package == 'builder' || github.event.inputs.package == 'all'))
+    if: needs.detect-changes.outputs.builder_changed == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -447,20 +347,13 @@ jobs:
         id: version
         run: |
           cd builders
-          if [ "${{ needs.detect-changes.outputs.is_main }}" == "true" ]; then
-            VERSION=$(node -p "require('./package.json').version")
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Publishing version: $VERSION with tag: latest"
-          else
-            BASE_VERSION=$(node -p "require('./package.json').version")
-            PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
-            BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
-            npm version $BETA_VERSION --no-git-tag-version
-            echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "Publishing version: $BETA_VERSION with tag: beta"
-          fi
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          PR_NUMBER="${{ needs.detect-changes.outputs.pr_number }}"
+          BETA_VERSION="${BASE_VERSION}-beta.pr${PR_NUMBER}.$(date +%Y%m%d%H%M%S)"
+          npm version $BETA_VERSION --no-git-tag-version
+          echo "version=$BETA_VERSION" >> $GITHUB_OUTPUT
+          echo "tag=beta" >> $GITHUB_OUTPUT
+          echo "Publishing version: $BETA_VERSION with tag: beta"
           
       - name: Publish to NPM
         run: |
@@ -478,17 +371,13 @@ jobs:
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @nhatphucpham/builder" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/builder (Beta)" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            echo "npm install @nhatphucpham/builder" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "npm install @nhatphucpham/builder@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "npm install @nhatphucpham/builder@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   # Run tests after publishing

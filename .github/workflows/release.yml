@@ -1,0 +1,493 @@
+name: Release Packages to NPM
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cli/**'
+      - 'base/**'
+      - 'server/**'
+      - 'builders/**'
+      - 'package.json'
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - cli
+          - client
+          - server
+          - builder
+          - all
+      force_publish:
+        description: 'Force publish even if no changes'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      cli_changed: ${{ steps.changes.outputs.cli }}
+      client_changed: ${{ steps.changes.outputs.client }}
+      server_changed: ${{ steps.changes.outputs.server }}
+      builder_changed: ${{ steps.changes.outputs.builder }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        id: changes
+        run: |
+          if [ "${{ github.event.inputs.force_publish }}" == "true" ] || [ "${{ github.event.inputs.package }}" != "" ]; then
+            # Manual workflow dispatch or force publish
+            echo "cli=true" >> $GITHUB_OUTPUT
+            echo "client=true" >> $GITHUB_OUTPUT
+            echo "server=true" >> $GITHUB_OUTPUT
+            echo "builder=true" >> $GITHUB_OUTPUT
+          else
+            # Check for code-related file changes only (exclude docs, tests metadata)
+            # Include: src/, bin/, package.json, tsconfig.json, dependencies
+            # Exclude: README.md, CHANGELOG.md, .md files, LICENSE, etc.
+            
+            # CLI package
+            if git diff --name-only HEAD^ HEAD | grep -E '^cli/(src/|bin/|package\.json|tsconfig\.json|templates/)' | grep -qv '\.md$'; then
+              echo "cli=true" >> $GITHUB_OUTPUT
+              echo "✓ CLI: Code changes detected"
+            else
+              echo "cli=false" >> $GITHUB_OUTPUT
+              echo "✗ CLI: No code changes (docs/metadata only or no changes)"
+            fi
+            
+            # Base/Client package
+            if git diff --name-only HEAD^ HEAD | grep -E '^base/(src/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
+              echo "client=true" >> $GITHUB_OUTPUT
+              echo "✓ Client: Code changes detected"
+            else
+              echo "client=false" >> $GITHUB_OUTPUT
+              echo "✗ Client: No code changes (docs/metadata only or no changes)"
+            fi
+            
+            # Server package
+            if git diff --name-only HEAD^ HEAD | grep -E '^server/(src/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
+              echo "server=true" >> $GITHUB_OUTPUT
+              echo "✓ Server: Code changes detected"
+            else
+              echo "server=false" >> $GITHUB_OUTPUT
+              echo "✗ Server: No code changes (docs/metadata only or no changes)"
+            fi
+            
+            # Builder package
+            if git diff --name-only HEAD^ HEAD | grep -E '^builders/(src/|public/|package\.json|tsconfig\.json)' | grep -qv '\.md$'; then
+              echo "builder=true" >> $GITHUB_OUTPUT
+              echo "✓ Builder: Code changes detected"
+            else
+              echo "builder=false" >> $GITHUB_OUTPUT
+              echo "✗ Builder: No code changes (docs/metadata only or no changes)"
+            fi
+          fi
+
+  publish-cli:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    if: |
+      (needs.detect-changes.outputs.cli_changed == 'true' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.package == 'cli' || github.event.inputs.package == 'all'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: |
+          cd cli
+          npm install
+          
+      - name: Build package
+        run: |
+          cd cli
+          npm run build
+          
+      - name: Configure NPM authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          cat ~/.npmrc
+          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+          
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
+          
+      - name: Set version
+        id: version
+        run: |
+          cd cli
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION with tag: latest"
+          
+      - name: Publish to NPM
+        run: |
+          cd cli
+          npm publish --access public --tag ${{ steps.version.outputs.tag }}
+          
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="cli@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/cli@${{ steps.version.outputs.version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
+          
+      - name: Create summary
+        run: |
+          echo "## ✅ Published @nhatphucpham/cli" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Install:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "npx @nhatphucpham/cli create my-game" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  publish-client:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    if: |
+      (needs.detect-changes.outputs.client_changed == 'true' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.package == 'client' || github.event.inputs.package == 'all'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: |
+          cd base
+          npm install
+          
+      - name: Build package
+        run: |
+          cd base
+          npm run build
+          
+      - name: Configure NPM authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          cat ~/.npmrc
+          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+          
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
+          
+      - name: Set version
+        id: version
+        run: |
+          cd base
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION with tag: latest"
+          
+      - name: Publish to NPM
+        run: |
+          cd base
+          npm publish --access public --tag ${{ steps.version.outputs.tag }}
+          
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="client@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/game-core-client@${{ steps.version.outputs.version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
+          
+      - name: Create summary
+        run: |
+          echo "## ✅ Published @nhatphucpham/game-core-client" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Install:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "npm install @nhatphucpham/game-core-client" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  publish-server:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    if: |
+      (needs.detect-changes.outputs.server_changed == 'true' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.package == 'server' || github.event.inputs.package == 'all'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: |
+          cd server
+          npm install
+          
+      - name: Build package
+        run: |
+          cd server
+          npm run build
+          
+      - name: Configure NPM authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          cat ~/.npmrc
+          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+          
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
+          
+      - name: Set version
+        id: version
+        run: |
+          cd server
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION with tag: latest"
+          
+      - name: Publish to NPM
+        run: |
+          cd server
+          npm publish --access public --tag ${{ steps.version.outputs.tag }}
+          
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="server@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/game-core-server@${{ steps.version.outputs.version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
+          
+      - name: Create summary
+        run: |
+          echo "## ✅ Published @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Install:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "npm install @nhatphucpham/game-core-server" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  publish-builder:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    if: |
+      (needs.detect-changes.outputs.builder_changed == 'true' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.package == 'builder' || github.event.inputs.package == 'all'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: |
+          cd builders
+          npm install
+          
+      - name: Build package
+        run: |
+          cd builders
+          npm run build
+          
+      - name: Configure NPM authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          cat ~/.npmrc
+          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+          
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
+          
+      - name: Set version
+        id: version
+        run: |
+          cd builders
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION with tag: latest"
+          
+      - name: Publish to NPM
+        run: |
+          cd builders
+          npm publish --access public --tag ${{ steps.version.outputs.tag }}
+          
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="builder@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/builder@${{ steps.version.outputs.version }}"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
+          
+      - name: Create summary
+        run: |
+          echo "## ✅ Published @nhatphucpham/builder" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Install:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "npm install @nhatphucpham/builder" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # Run tests after publishing
+  test-published-cli:
+    needs: [publish-cli]
+    if: needs.publish-cli.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install CLI dependencies
+        run: |
+          cd cli
+          npm install
+          
+      - name: Build CLI
+        run: |
+          cd cli
+          npm run build
+          
+      - name: Test CLI commands
+        run: |
+          cd cli
+          node bin/pnp.js --version
+          node bin/pnp.js --help
+          
+      - name: Test CLI create command
+        run: |
+          cd cli
+          node bin/pnp.js create test-game --no-install
+          test -d test-game
+          test -f test-game/package.json
+  
+  test-published-packages:
+    needs: [publish-client, publish-server, publish-builder]
+    if: always()
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: 
+          - { name: 'client', dir: 'base', needs: 'publish-client' }
+          - { name: 'server', dir: 'server', needs: 'publish-server' }
+          - { name: 'builder', dir: 'builders', needs: 'publish-builder' }
+    steps:
+      - name: Check if package was published
+        id: check
+        run: |
+          if [ "${{ needs[matrix.package.needs].result }}" == "success" ]; then
+            echo "published=true" >> $GITHUB_OUTPUT
+          else
+            echo "published=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Checkout repository
+        if: steps.check.outputs.published == 'true'
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        if: steps.check.outputs.published == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        if: steps.check.outputs.published == 'true'
+        run: |
+          cd ${{ matrix.package.dir }}
+          npm install
+          
+      - name: Build package
+        if: steps.check.outputs.published == 'true'
+        run: |
+          cd ${{ matrix.package.dir }}
+          npm run build
+          
+      - name: Run security audit
+        if: steps.check.outputs.published == 'true'
+        run: |
+          cd ${{ matrix.package.dir }}
+          npm audit --audit-level=moderate || true
+          
+      - name: Create test summary
+        if: steps.check.outputs.published == 'true'
+        run: |
+          echo "## ✅ Tests passed for ${{ matrix.package.name }}" >> $GITHUB_STEP_SUMMARY
