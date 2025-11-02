@@ -34,6 +34,7 @@ npm view @nhatphucpham/builder  # 404 Not Found
 - Changed beta version format from `beta-pr-{number}` to `beta.pr{number}`
 - Applied to all 4 package publishing jobs (cli, client, server, builder)
 - Updated comments to clarify semantic versioning compliance
+- **Added NPM token verification step** using `npm whoami` before publishing to catch authentication issues early
 
 ### 2. Added `publishConfig` to all package.json files
 Added to: `cli/package.json`, `base/package.json`, `server/package.json`, `builders/package.json`
@@ -79,7 +80,12 @@ To complete the npm publishing setup, the repository owner needs to:
    - Create new repository secret named `NPM_TOKEN`
    - Paste the npm automation token
 
-4. **Test the publishing workflow**
+4. **Verify the token (optional, but recommended)**
+   - The workflow now includes an automatic verification step using `npm whoami`
+   - This step runs before publishing to catch authentication issues early
+   - If the token is invalid, the workflow will fail at this step with a clear error message
+
+5. **Test the publishing workflow**
    - Create a pull request to trigger beta publishing
    - Or manually trigger workflow from GitHub Actions tab
    - Verify packages are published with new version format

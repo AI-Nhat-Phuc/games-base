@@ -138,6 +138,11 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
+          
       - name: Set version
         id: version
         run: |
@@ -211,6 +216,11 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
+          
       - name: Set version
         id: version
         run: |
@@ -282,6 +292,11 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
+          
       - name: Set version
         id: version
         run: |
@@ -352,6 +367,11 @@ jobs:
       - name: Configure NPM authentication
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          
+      - name: Verify NPM token
+        run: |
+          npm whoami
+          echo "✅ NPM authentication verified successfully"
           
       - name: Set version
         id: version
