@@ -8,6 +8,12 @@ on:
       - 'base/**'
       - 'server/**'
       - 'builders/**'
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to clean up (leave empty to clean all closed PRs)'
+        required: false
+        type: string
 
 jobs:
   cleanup-beta-versions:
@@ -40,52 +46,73 @@ jobs:
       - name: Get PR number
         id: pr
         run: |
-          echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Manual workflow dispatch
+            if [ -n "${{ github.event.inputs.pr_number }}" ]; then
+              echo "pr_number=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+            else
+              echo "pr_number=" >> $GITHUB_OUTPUT
+            fi
+          else
+            # Automatic trigger from PR closure
+            echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          fi
           
       - name: Find and deprecate beta versions for this PR
         run: |
           PR_NUMBER="${{ steps.pr.outputs.pr_number }}"
-          echo "🧹 Cleaning up beta versions for PR #${PR_NUMBER}"
           
-          # List of packages to check
-          PACKAGES=("@nhatphucpham/cli" "@nhatphucpham/game-core-client" "@nhatphucpham/game-core-server" "@nhatphucpham/builder")
-          
-          for PACKAGE in "${PACKAGES[@]}"; do
-            echo ""
-            echo "Checking package: $PACKAGE"
+          if [ -z "$PR_NUMBER" ]; then
+            echo "ℹ️  No specific PR number provided - skipping individual PR cleanup"
+            echo "Will clean up all closed PRs in the next step"
+          else
+            echo "🧹 Cleaning up beta versions for PR #${PR_NUMBER}"
             
-            # Get all versions with beta.pr{PR_NUMBER} pattern
-            BETA_VERSIONS=$(npm view "$PACKAGE" versions --json 2>/dev/null | jq -r ".[]" | grep "beta\.pr${PR_NUMBER}\." || true)
+            # List of packages to check
+            PACKAGES=("@nhatphucpham/cli" "@nhatphucpham/game-core-client" "@nhatphucpham/game-core-server" "@nhatphucpham/builder")
             
-            if [ -z "$BETA_VERSIONS" ]; then
-              echo "  ℹ️  No beta versions found for PR #${PR_NUMBER}"
-            else
-              echo "  Found beta versions to deprecate:"
-              echo "$BETA_VERSIONS" | while read -r VERSION; do
-                echo "    - $VERSION"
-                # Deprecate the version
-                npm deprecate "${PACKAGE}@${VERSION}" "Beta version for PR #${PR_NUMBER} - PR has been closed" 2>/dev/null || echo "    ⚠️  Failed to deprecate ${VERSION}"
-              done
-            fi
-          done
+            for PACKAGE in "${PACKAGES[@]}"; do
+              echo ""
+              echo "Checking package: $PACKAGE"
+              
+              # Get all versions with beta.pr{PR_NUMBER} pattern
+              BETA_VERSIONS=$(npm view "$PACKAGE" versions --json 2>/dev/null | jq -r ".[]" | grep "beta\.pr${PR_NUMBER}\." || true)
+              
+              if [ -z "$BETA_VERSIONS" ]; then
+                echo "  ℹ️  No beta versions found for PR #${PR_NUMBER}"
+              else
+                echo "  Found beta versions to deprecate:"
+                echo "$BETA_VERSIONS" | while read -r VERSION; do
+                  echo "    - $VERSION"
+                  # Deprecate the version
+                  npm deprecate "${PACKAGE}@${VERSION}" "Beta version for PR #${PR_NUMBER} - PR has been closed" 2>/dev/null || echo "    ⚠️  Failed to deprecate ${VERSION}"
+                done
+              fi
+            done
+          fi
           
       - name: Delete beta tags for this PR
         run: |
           PR_NUMBER="${{ steps.pr.outputs.pr_number }}"
-          echo ""
-          echo "🏷️  Cleaning up Git tags for PR #${PR_NUMBER}"
           
-          # Find all tags matching the beta pattern for this PR
-          BETA_TAGS=$(git tag -l | grep "beta\.pr${PR_NUMBER}\." || true)
-          
-          if [ -z "$BETA_TAGS" ]; then
-            echo "  ℹ️  No beta tags found for PR #${PR_NUMBER}"
+          if [ -z "$PR_NUMBER" ]; then
+            echo "ℹ️  No specific PR number provided - skipping individual PR tag cleanup"
           else
-            echo "  Found beta tags to delete:"
-            echo "$BETA_TAGS" | while read -r TAG; do
-              echo "    - $TAG"
-              git push --delete origin "$TAG" 2>/dev/null || echo "    ⚠️  Failed to delete tag $TAG"
-            done
+            echo ""
+            echo "🏷️  Cleaning up Git tags for PR #${PR_NUMBER}"
+            
+            # Find all tags matching the beta pattern for this PR
+            BETA_TAGS=$(git tag -l | grep "beta\.pr${PR_NUMBER}\." || true)
+            
+            if [ -z "$BETA_TAGS" ]; then
+              echo "  ℹ️  No beta tags found for PR #${PR_NUMBER}"
+            else
+              echo "  Found beta tags to delete:"
+              echo "$BETA_TAGS" | while read -r TAG; do
+                echo "    - $TAG"
+                git push --delete origin "$TAG" 2>/dev/null || echo "    ⚠️  Failed to delete tag $TAG"
+              done
+            fi
           fi
           
       - name: Cleanup beta tags from other closed PRs
@@ -167,10 +194,17 @@ jobs:
       - name: Create cleanup summary
         run: |
           PR_NUMBER="${{ steps.pr.outputs.pr_number }}"
-          echo "## 🧹 Beta Version Cleanup for PR #${PR_NUMBER}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Deprecated all beta npm package versions for this PR" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Deleted all beta Git tags for this PR" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Cleaned up beta Git tags from other closed PRs" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -z "$PR_NUMBER" ]; then
+            echo "## 🧹 Beta Version Cleanup (All Closed PRs)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Cleaned up beta Git tags from all closed PRs" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## 🧹 Beta Version Cleanup for PR #${PR_NUMBER}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Deprecated all beta npm package versions for this PR" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Deleted all beta Git tags for this PR" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Cleaned up beta Git tags from other closed PRs" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Note:** Beta versions are deprecated (not unpublished) to maintain npm registry integrity." >> $GITHUB_STEP_SUMMARY
