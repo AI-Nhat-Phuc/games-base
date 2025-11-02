@@ -37,7 +37,14 @@ npm view @nhatphucpham/builder  # 404 Not Found
 - **Added NPM token verification step** using `npm whoami` before publishing to catch authentication issues early
 - **Added Git tag creation** after successful package publication to link versions to repository tags
 
-### 2. Added `publishConfig` to all package.json files
+### 2. Created Beta Cleanup Workflow (`.github/workflows/cleanup-beta-versions.yml`)
+- **Automatically triggers when a PR is merged or closed**
+- Deprecates all beta npm package versions published for that specific PR
+- Deletes all beta Git tags associated with that PR
+- Keeps the npm registry clean by marking old beta versions as deprecated
+- Prevents tag clutter in the repository
+
+### 3. Added `publishConfig` to all package.json files
 Added to: `cli/package.json`, `base/package.json`, `server/package.json`, `builders/package.json`
 
 ```json
@@ -91,6 +98,30 @@ To complete the npm publishing setup, the repository owner needs to:
    - Or manually trigger workflow from GitHub Actions tab
    - Verify packages are published with new version format
    - Check that Git tags are created (visible in GitHub repository under "Releases" or "Tags")
+
+## Beta Version Cleanup
+
+When a PR is merged or closed, the cleanup workflow automatically runs to maintain repository hygiene:
+
+**Automatic Cleanup Actions:**
+1. **Deprecates npm beta versions** - All beta package versions for that specific PR are marked as deprecated in npm registry
+   - Example: `@nhatphucpham/cli@1.0.0-beta.pr123.20251102020619` gets deprecated with message "Beta version for PR #123 - PR has been merged/closed"
+   - Versions are deprecated (not unpublished) to maintain npm registry integrity and avoid breaking any dependencies
+   
+2. **Deletes Git tags** - All beta tags for that specific PR are removed from the repository
+   - Example: Tags like `cli@1.0.0-beta.pr123.20251102020619` are deleted
+   - Keeps the repository's tag list clean and focused on stable releases
+
+**Workflow Trigger:**
+- Runs automatically when a PR is closed (merged or not merged)
+- Only processes PRs that have changes in package directories (cli, base, server, builders)
+- Uses the same NPM_TOKEN for authentication
+
+**Benefits:**
+- Prevents accumulation of obsolete beta versions in npm registry
+- Keeps Git tags focused on stable releases
+- Automatic cleanup requires no manual intervention
+- Deprecated versions can still be accessed if needed, but are clearly marked as outdated
 
 ## Git Tagging
 
