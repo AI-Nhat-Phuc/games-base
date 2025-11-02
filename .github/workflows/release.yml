@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'cli/**'
+      - 'game-cli/**'
       - 'base/**'
       - 'server/**'
       - 'builders/**'
@@ -60,7 +60,7 @@ jobs:
             # Exclude: README.md, CHANGELOG.md, .md files, LICENSE, etc.
             
             # CLI package
-            if git diff --name-only HEAD^ HEAD | grep -E '^cli/(src/|bin/|package\.json|tsconfig\.json|templates/)' | grep -qv '\.md$'; then
+            if git diff --name-only HEAD^ HEAD | grep -E '^game-cli/(src/|bin/|package\.json|tsconfig\.json|templates/)' | grep -qv '\.md$'; then
               echo "cli=true" >> $GITHUB_OUTPUT
               echo "✓ CLI: Code changes detected"
             else
@@ -120,12 +120,12 @@ jobs:
           
       - name: Install dependencies
         run: |
-          cd cli
+          cd game-cli
           npm install
           
       - name: Build package
         run: |
-          cd cli
+          cd game-cli
           npm run build
           
       - name: Configure NPM authentication
@@ -141,7 +141,7 @@ jobs:
       - name: Set version
         id: version
         run: |
-          cd cli
+          cd game-cli
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=latest" >> $GITHUB_OUTPUT
@@ -149,7 +149,7 @@ jobs:
           
       - name: Publish to NPM
         run: |
-          cd cli
+          cd game-cli
           npm publish --access public --tag ${{ steps.version.outputs.tag }}
           
       - name: Create Git tag
@@ -157,19 +157,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           TAG_NAME="cli@${{ steps.version.outputs.version }}"
-          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/cli@${{ steps.version.outputs.version }}"
+          git tag -a "$TAG_NAME" -m "Release @nhatphucpham/game-cli@${{ steps.version.outputs.version }}"
           git push origin "$TAG_NAME"
           echo "Created and pushed tag: $TAG_NAME"
           
       - name: Create summary
         run: |
-          echo "## ✅ Published @nhatphucpham/cli" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Published @nhatphucpham/game-cli" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag**: ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Install:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "npx @nhatphucpham/cli create my-game" >> $GITHUB_STEP_SUMMARY
+          echo "npx @nhatphucpham/game-cli create my-game" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   publish-client:
@@ -418,23 +418,23 @@ jobs:
           
       - name: Install CLI dependencies
         run: |
-          cd cli
+          cd game-cli
           npm install
           
       - name: Build CLI
         run: |
-          cd cli
+          cd game-cli
           npm run build
           
       - name: Test CLI commands
         run: |
-          cd cli
+          cd game-cli
           node bin/pnp.js --version
           node bin/pnp.js --help
           
       - name: Test CLI create command
         run: |
-          cd cli
+          cd game-cli
           node bin/pnp.js create test-game --no-install
           test -d test-game
           test -f test-game/package.json

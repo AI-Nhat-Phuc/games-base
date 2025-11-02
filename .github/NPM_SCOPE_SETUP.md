@@ -27,16 +27,16 @@ If you don't control the `@nhatphucpham` scope, use your own NPM username or org
 
 ```bash
 # Replace @nhatphucpham with @your-username or @your-org
-# Example: @nhatphucpham/cli → @your-username/cli
+# Example: @nhatphucpham/game-cli → @your-username/game-cli
 
 # Update these files:
 - base/package.json: "@nhatphucpham/game-core-client" → "@your-username/game-core-client"
-- cli/package.json: "@nhatphucpham/cli" → "@your-username/cli"
+- game-cli/package.json: "@nhatphucpham/game-cli" → "@your-username/game-cli"
 - server/package.json: "@nhatphucpham/game-core-server" → "@your-username/game-core-server"
 - builders/package.json: "@nhatphucpham/builder" → "@your-username/builder"
 ```
 
-2. **Update imports in CLI templates** (`cli/src/commands/create.ts`):
+2. **Update imports in CLI templates** (`game-cli/src/commands/create.ts`):
 ```typescript
 // Change from:
 import { initGame } from '@nhatphucpham/game-core-client';
@@ -59,7 +59,7 @@ Remove the scope entirely and use plain names:
 ```json
 {
   "name": "games-base-client",  // instead of @nhatphucpham/game-core-client
-  "name": "games-base-cli",     // instead of @nhatphucpham/cli
+  "name": "games-base-cli",     // instead of @nhatphucpham/game-cli
   "name": "games-base-server",  // instead of @nhatphucpham/game-core-server
   "name": "games-base-builder"  // instead of @nhatphucpham/builder
 }

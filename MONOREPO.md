@@ -12,16 +12,16 @@ This repository is organized as a monorepo containing multiple packages under th
 - **Purpose**: Core game engine with rendering, physics, and game loop
 - **Usage**: `import { initGame, getGame } from '@nhatphucpham/game-core-client'`
 
-### @nhatphucpham/cli (cli/)
+### @nhatphucpham/game-cli (game-cli/)
 **Command-line tool for project creation and character building**
 
-- **Package Name**: `@nhatphucpham/cli`
-- **Location**: `/cli`
+- **Package Name**: `@nhatphucpham/game-cli`
+- **Location**: `/game-cli`
 - **Purpose**: Scaffold new game projects and generate character assets
 - **Commands**: 
   - `pnp create <project-name>` - Create new game project
   - `pnp build-character` - Generate character from sprites
-- **Usage**: `npx @nhatphucpham/cli create my-game`
+- **Usage**: `npx @nhatphucpham/game-cli create my-game`
 
 ### @nhatphucpham/game-core-server (server/)
 **Multiplayer game server with WebSocket support**
@@ -76,7 +76,7 @@ Each package can be published independently to npm:
 
 ```bash
 # Publish CLI
-cd cli && npm publish --access public
+cd game-cli && npm publish --access public
 
 # Publish Client
 cd base && npm publish --access public
@@ -92,7 +92,7 @@ Or use the GitHub Actions workflow for automated publishing.
 
 ## Package Relationships
 
-- **@nhatphucpham/cli** → Creates projects that use **@nhatphucpham/game-core-client**
+- **@nhatphucpham/game-cli** → Creates projects that use **@nhatphucpham/game-core-client**
 - **@nhatphucpham/builder** → Generates data for **@nhatphucpham/game-core-client**
 - **@nhatphucpham/game-core-client** → Can connect to **@nhatphucpham/game-core-server** for multiplayer
 - **@nhatphucpham/game-core-server** → Works independently but designed for **@nhatphucpham/game-core-client** games
@@ -102,10 +102,10 @@ Or use the GitHub Actions workflow for automated publishing.
 All packages have been renamed from the `@games-base` scope to `@nhatphucpham`:
 
 - `@games-base/client` → `@nhatphucpham/game-core-client`
-- `@games-base/cli` → `@nhatphucpham/cli`
+- `@games-base/cli` → `@nhatphucpham/game-cli`
 - `@games-base/server` → `@nhatphucpham/game-core-server`
 - `@games-base/builders` → `@nhatphucpham/builder`
 
 Commands have also been updated:
 - `games-base` → `pnp`
-- `npx @games-base/cli` → `npx @nhatphucpham/cli`
+- `npx @games-base/cli` → `npx @nhatphucpham/game-cli`

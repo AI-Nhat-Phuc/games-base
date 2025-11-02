@@ -12,7 +12,7 @@ The monorepo includes comprehensive automated testing for all packages:
 ## Test CLI Workflow
 
 ### Purpose
-Tests the `@nhatphucpham/cli` package across multiple operating systems and Node.js versions.
+Tests the `@nhatphucpham/game-cli` package across multiple operating systems and Node.js versions.
 
 ### Triggers
 - Push to `main` or `develop` branches (when CLI files change)

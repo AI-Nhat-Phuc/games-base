@@ -120,7 +120,7 @@ The workflow will:
 
 | Package | NPM Name | Description |
 |---------|----------|-------------|
-| CLI | `@nhatphucpham/cli` | Command-line tool for project creation |
+| CLI | `@nhatphucpham/game-cli` | Command-line tool for project creation |
 | Client | `@nhatphucpham/game-core-client` | Client-side 2D game engine |
 | Server | `@nhatphucpham/game-core-server` | Multiplayer server engine |
 | Builder | `@nhatphucpham/builder` | Visual character creation tool |
@@ -164,8 +164,8 @@ Beta versions are automatically generated for PRs:
 ### Latest (Production)
 ```bash
 npm install @nhatphucpham/game-core-client          # Installs latest
-npm install @nhatphucpham/cli             # Installs latest
-npx @nhatphucpham/cli create my-game      # Uses latest
+npm install @nhatphucpham/game-cli             # Installs latest
+npx @nhatphucpham/game-cli create my-game      # Uses latest
 ```
 
 ### Beta (Development/Testing)
@@ -177,7 +177,7 @@ npm install @nhatphucpham/game-core-client@1.0.0-beta-pr-45.20241101153025
 npm install @nhatphucpham/game-core-client@beta
 
 # Use specific beta CLI
-npx @nhatphucpham/cli@1.0.0-beta-pr-45.20241101153025 create my-game
+npx @nhatphucpham/game-cli@1.0.0-beta-pr-45.20241101153025 create my-game
 ```
 
 ## Verifying Publication
@@ -186,7 +186,7 @@ After the workflow completes:
 
 1. Check the **Actions** tab for workflow status
 2. View npm registry:
-   - CLI: https://www.npmjs.com/package/@nhatphucpham/cli
+   - CLI: https://www.npmjs.com/package/@nhatphucpham/game-cli
    - Client: https://www.npmjs.com/package/@nhatphucpham/game-core-client
    - Server: https://www.npmjs.com/package/@nhatphucpham/game-core-server
    - Builder: https://www.npmjs.com/package/@nhatphucpham/builder
@@ -194,10 +194,10 @@ After the workflow completes:
 3. Test installation:
 ```bash
 # Test latest production version
-npx @nhatphucpham/cli@latest create test-game
+npx @nhatphucpham/game-cli@latest create test-game
 
 # Test specific beta version
-npx @nhatphucpham/cli@1.0.0-beta-pr-123.20241101120000 create test-game
+npx @nhatphucpham/game-cli@1.0.0-beta-pr-123.20241101120000 create test-game
 ```
 
 ## Workflow Scenarios
@@ -288,7 +288,7 @@ npx @nhatphucpham/cli@1.0.0-beta-pr-123.20241101120000 create test-game
    ```bash
    # In your test project
    npm install @nhatphucpham/game-core-client@beta
-   npm install @nhatphucpham/cli@1.0.0-beta-pr-45.20241101120000
+   npm install @nhatphucpham/game-cli@1.0.0-beta-pr-45.20241101120000
    ```
 
 7. **Coordinate multi-package releases:**

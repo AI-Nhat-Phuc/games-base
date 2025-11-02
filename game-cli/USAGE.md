@@ -9,7 +9,7 @@
 ### 1. Create a New Game Project
 
 ```bash
-npx @nhatphucpham/cli create my-game
+npx @nhatphucpham/game-cli create my-game
 ```
 
 This will:
@@ -34,7 +34,7 @@ Your game will open in the browser at `http://localhost:3000` with:
 ### 3. Build Characters
 
 ```bash
-npx @nhatphucpham/cli build-character \
+npx @nhatphucpham/game-cli build-character \
   --name Hero \
   --sprite ./assets/hero.png \
   --walk ./assets/hero_walk.png \
@@ -52,7 +52,7 @@ If you want to test the CLI locally before it's published to npm:
 ### Method 1: npm link
 
 ```bash
-cd cli
+cd game-cli
 npm install
 npm run build
 npm link
@@ -65,19 +65,19 @@ games-base create test-game
 
 ```bash
 # From the repository root
-npx ./cli create test-game
+npx ./game-cli create test-game
 ```
 
 ### Method 3: Local Package
 
 ```bash
 # From within a project directory
-npx /absolute/path/to/games-base/cli create test-game
+npx /absolute/path/to/games-base/game-cli create test-game
 ```
 
 ## Publishing to npm
 
-To make the CLI available via `npx @nhatphucpham/cli`:
+To make the CLI available via `npx @nhatphucpham/game-cli`:
 
 1. **Ensure you're logged in to npm:**
    ```bash
@@ -86,7 +86,7 @@ To make the CLI available via `npx @nhatphucpham/cli`:
 
 2. **Build the CLI:**
    ```bash
-   cd cli
+   cd game-cli
    npm run build
    ```
 
@@ -97,7 +97,7 @@ To make the CLI available via `npx @nhatphucpham/cli`:
 
 4. **Now anyone can use it:**
    ```bash
-   npx @nhatphucpham/cli create my-game
+   npx @nhatphucpham/game-cli create my-game
    ```
 
 ## Package Structure for npx
@@ -135,10 +135,10 @@ The package is configured to work with npx through:
 
 ### CLI Not Found
 
-If `npx @nhatphucpham/cli` doesn't work:
-- Check if the package is published: `npm view @nhatphucpham/cli`
+If `npx @nhatphucpham/game-cli` doesn't work:
+- Check if the package is published: `npm view @nhatphucpham/game-cli`
 - Try clearing npx cache: `npx clear-npx-cache`
-- Use the full path for local testing: `npx /path/to/cli`
+- Use the full path for local testing: `npx /path/to/game-cli`
 
 ### Permission Denied
 
@@ -151,7 +151,7 @@ chmod +x cli/bin/games-base.js
 
 If imports fail:
 ```bash
-cd cli
+cd game-cli
 rm -rf node_modules
 npm install
 npm run build
@@ -163,7 +163,7 @@ npm run build
 
 ```bash
 # Create and run a game in 3 commands
-npx @nhatphucpham/cli create awesome-game
+npx @nhatphucpham/game-cli create awesome-game
 cd awesome-game
 npm start
 ```
@@ -172,7 +172,7 @@ npm start
 
 ```bash
 # Skip auto-install
-npx @nhatphucpham/cli create my-game --no-install
+npx @nhatphucpham/game-cli create my-game --no-install
 
 cd my-game
 npm install
@@ -183,13 +183,13 @@ npm start
 
 ```bash
 # Hero character
-npx @nhatphucpham/cli build-character \
+npx @nhatphucpham/game-cli build-character \
   --name Hero \
   --sprite ./assets/hero.png \
   --walk ./assets/hero_walk.png
 
 # Enemy character
-npx @nhatphucpham/cli build-character \
+npx @nhatphucpham/game-cli build-character \
   --name Goblin \
   --sprite ./assets/goblin.png \
   --attack ./assets/goblin_attack.png \
@@ -202,7 +202,7 @@ npx @nhatphucpham/cli build-character \
 
 After global install:
 ```bash
-npm install -g @nhatphucpham/cli
+npm install -g @nhatphucpham/game-cli
 
 # Use short alias
 gb create my-game
@@ -214,13 +214,13 @@ gb build-character --name Player
 ```yaml
 # .github/workflows/create-game.yml
 - name: Create Game Project
-  run: npx @nhatphucpham/cli create game-project --no-install
+  run: npx @nhatphucpham/game-cli create game-project --no-install
 ```
 
 ### Docker
 
 ```dockerfile
-RUN npx @nhatphucpham/cli create game \
+RUN npx @nhatphucpham/game-cli create game \
     && cd game \
     && npm install \
     && npm run build

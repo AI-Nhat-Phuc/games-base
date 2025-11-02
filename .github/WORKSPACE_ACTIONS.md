@@ -122,7 +122,7 @@ git push
 | Workspace | Directory | Job Name | Package Name |
 |-----------|-----------|----------|--------------|
 | Client | `base/**` | `publish-client` | `@nhatphucpham/game-core-client` |
-| CLI | `cli/**` | `publish-cli` | `@nhatphucpham/cli` |
+| CLI | `game-cli/**` | `publish-cli` | `@nhatphucpham/game-cli` |
 | Server | `server/**` | `publish-server` | `@nhatphucpham/game-core-server` |
 | Builder | `builders/**` | `publish-builder` | `@nhatphucpham/builder` |
 
@@ -133,7 +133,7 @@ Each workspace has independent versioning:
 ### Main Branch (Production)
 ```bash
 @nhatphucpham/game-core-client@1.2.3
-@nhatphucpham/cli@1.0.5
+@nhatphucpham/game-cli@1.0.5
 @nhatphucpham/game-core-server@2.1.0
 @nhatphucpham/builder@1.1.2
 ```
@@ -141,7 +141,7 @@ Each workspace has independent versioning:
 ### Pull Request (Beta)
 ```bash
 @nhatphucpham/game-core-client@1.2.4-beta-pr-123.20241101120530
-@nhatphucpham/cli@1.0.6-beta-pr-123.20241101120530
+@nhatphucpham/game-cli@1.0.6-beta-pr-123.20241101120530
 @nhatphucpham/game-core-server@2.1.1-beta-pr-123.20241101120530
 @nhatphucpham/builder@1.1.3-beta-pr-123.20241101120530
 ```
