@@ -6,7 +6,7 @@ A comprehensive 2D web game engine with client-side rendering and server-side mu
 
 This repository provides a complete game development platform consisting of:
 
-- **CLI Tool** (`@nhatphucpham/cli`): Command-line tool for creating game projects instantly
+- **CLI Tool** (`@nhatphucpham/game-cli`): Command-line tool for creating game projects instantly
 - **Base/Client Engine** (`@nhatphucpham/game-core-client`): A powerful 2D game engine that runs in web browsers
 - **Character Builder** (`@nhatphucpham/builder`): A visual tool for creating and configuring game characters
 - **Server** (`@nhatphucpham/game-core-server`): A scalable game server for multiplayer functionality
@@ -16,7 +16,7 @@ This repository provides a complete game development platform consisting of:
 Create a new game project in seconds:
 
 ```bash
-npx @nhatphucpham/cli create my-game
+npx @nhatphucpham/game-cli create my-game
 cd my-game
 npm start
 ```
@@ -51,7 +51,7 @@ const builder = getGame().getCharacterBuilder(); // Access anywhere!
 
 ## Features
 
-### CLI Tool (`/cli`)
+### CLI Tool (`/game-cli`)
 
 Command-line tool for instant game project creation:
 
@@ -65,7 +65,7 @@ Command-line tool for instant game project creation:
 **Usage:**
 ```bash
 # Create project
-npx @nhatphucpham/cli create my-game
+npx @nhatphucpham/game-cli create my-game
 
 # Build character
 games-base build-character \
@@ -203,7 +203,7 @@ PORT=3000 npm start
 
 ```
 games-base/
-├── cli/                  # CLI tool for project creation
+├── game-cli/             # CLI tool for project creation
 │   ├── bin/
 │   │   └── games-base.js # CLI entry point
 │   ├── src/
@@ -337,7 +337,7 @@ This project includes automated GitHub Actions workflows for publishing packages
 3. Click **Run workflow** and select package to publish
 
 **Supported Packages:**
-- `@nhatphucpham/cli` - CLI tool
+- `@nhatphucpham/game-cli` - CLI tool
 - `@nhatphucpham/game-core-client` - Client engine
 - `@nhatphucpham/game-core-server` - Server engine
 

@@ -7,7 +7,7 @@ Command-line tool for creating game projects with the games-base engine.
 ### Global Installation
 
 ```bash
-npm install -g @nhatphucpham/cli
+npm install -g @nhatphucpham/game-cli
 ```
 
 Then use directly:
@@ -22,7 +22,7 @@ gb create my-game
 No installation required! Use directly with npx:
 
 ```bash
-npx @nhatphucpham/cli create my-game
+npx @nhatphucpham/game-cli create my-game
 ```
 
 ### Local Development / Testing
@@ -30,7 +30,7 @@ npx @nhatphucpham/cli create my-game
 To test locally before publishing:
 
 ```bash
-cd cli
+cd game-cli
 npm install
 npm run build
 npm link
@@ -40,7 +40,7 @@ games-base create test-game
 
 # Or test with npx from parent directory
 cd ..
-npx ./cli create test-game
+npx ./game-cli create test-game
 ```
 
 ## Commands
@@ -146,7 +146,7 @@ my-game/
 
 1. **Create a new game:**
 ```bash
-npx @nhatphucpham/cli create my-game
+npx @nhatphucpham/game-cli create my-game
 cd my-game
 ```
 
@@ -212,7 +212,7 @@ const characterBuilder = getGame().getCharacterBuilder();
 To work on the CLI itself:
 
 ```bash
-cd cli
+cd game-cli
 npm install
 npm run build
 

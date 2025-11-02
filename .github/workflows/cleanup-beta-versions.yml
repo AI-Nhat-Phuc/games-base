@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [closed]
     paths:
-      - 'cli/**'
+      - 'game-cli/**'
       - 'base/**'
       - 'server/**'
       - 'builders/**'
@@ -69,7 +69,7 @@ jobs:
             echo "🧹 Cleaning up beta versions for PR #${PR_NUMBER}"
             
             # List of packages to check
-            PACKAGES=("@nhatphucpham/cli" "@nhatphucpham/game-core-client" "@nhatphucpham/game-core-server" "@nhatphucpham/builder")
+            PACKAGES=("@nhatphucpham/game-cli" "@nhatphucpham/game-core-client" "@nhatphucpham/game-core-server" "@nhatphucpham/builder")
             
             for PACKAGE in "${PACKAGES[@]}"; do
               echo ""

@@ -22,7 +22,7 @@ While both formats are technically valid according to Semantic Versioning 2.0.0,
 
 **Verification:**
 ```bash
-npm view @nhatphucpham/cli  # 404 Not Found
+npm view @nhatphucpham/game-cli  # 404 Not Found
 npm view @nhatphucpham/game-core-client  # 404 Not Found
 npm view @nhatphucpham/game-core-server  # 404 Not Found
 npm view @nhatphucpham/builder  # 404 Not Found
@@ -48,7 +48,7 @@ npm view @nhatphucpham/builder  # 404 Not Found
 - **Added proper permissions** for tag deletion (`contents: write`)
 
 ### 3. Added `publishConfig` to all package.json files
-Added to: `cli/package.json`, `base/package.json`, `server/package.json`, `builders/package.json`
+Added to: `game-cli/package.json`, `base/package.json`, `server/package.json`, `builders/package.json`
 
 ```json
 "publishConfig": {
@@ -138,16 +138,16 @@ When a PR is merged or closed, the cleanup workflow automatically runs to mainta
 
 **Automatic Cleanup Actions:**
 1. **Deprecates npm beta versions** - All beta package versions for that specific PR are marked as deprecated in npm registry
-   - Example: `@nhatphucpham/cli@1.0.0-beta.pr123.20251102020619` gets deprecated with message "Beta version for PR #123 - PR has been merged/closed"
+   - Example: `@nhatphucpham/game-cli@1.0.0-beta.pr123.20251102020619` gets deprecated with message "Beta version for PR #123 - PR has been merged/closed"
    - Versions are deprecated (not unpublished) to maintain npm registry integrity and avoid breaking any dependencies
    
 2. **Deletes Git tags** - All beta tags for that specific PR are removed from the repository
-   - Example: Tags like `cli@1.0.0-beta.pr123.20251102020619` are deleted
+   - Example: Tags like `game-cli@1.0.0-beta.pr123.20251102020619` are deleted
    - Keeps the repository's tag list clean and focused on stable releases
 
 **Workflow Trigger:**
 - Runs automatically when a PR is closed (merged or not merged)
-- Only processes PRs that have changes in package directories (cli, base, server, builders)
+- Only processes PRs that have changes in package directories (game-cli, base, server, builders)
 - Uses the same NPM_TOKEN for authentication
 
 **Benefits:**
@@ -163,8 +163,8 @@ Each successful package publication automatically creates a Git tag in the repos
 **Tag Format:** `<package>@<version>`
 
 **Examples:**
-- `cli@1.0.0` - CLI package version 1.0.0 (latest release)
-- `cli@1.0.0-beta.pr123.20251102020619` - CLI package beta version for PR #123
+- `game-cli@1.0.0` - CLI package version 1.0.0 (latest release)
+- `game-cli@1.0.0-beta.pr123.20251102020619` - CLI package beta version for PR #123
 - `client@1.0.0-beta.pr456.20251102030000` - Client package beta version for PR #456
 - `server@1.1.0` - Server package version 1.1.0
 - `builder@2.0.0` - Builder package version 2.0.0
