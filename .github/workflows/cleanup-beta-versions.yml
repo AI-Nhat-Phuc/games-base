@@ -101,10 +101,13 @@ jobs:
           if [ -z "$ALL_BETA_TAGS" ]; then
             echo "  ℹ️  No beta tags found from any PRs"
           else
-            # Extract unique PR numbers from tags
-            PR_NUMBERS=$(echo "$ALL_BETA_TAGS" | grep -oP 'beta\.pr\K[0-9]+' | sort -u)
+            # Extract unique PR numbers from tags using sed (more portable than grep -P)
+            PR_NUMBERS=$(echo "$ALL_BETA_TAGS" | sed -n 's/.*beta\.pr\([0-9]\+\)\..*/\1/p' | sort -u)
             
-            echo "  Found beta tags for PR(s): $(echo $PR_NUMBERS | tr '\n' ' ')"
+            echo "  Found beta tags for PR(s): $PR_NUMBERS"
+            
+            # Collect tags to delete
+            TAGS_TO_DELETE=""
             
             # Check each PR to see if it's closed
             for PR_NUM in $PR_NUMBERS; do
@@ -113,21 +116,36 @@ jobs:
               
               if [ "$PR_STATE" == "CLOSED" ] || [ "$PR_STATE" == "MERGED" ] || [ "$PR_STATE" == "NOT_FOUND" ]; then
                 echo ""
-                echo "  PR #${PR_NUM} is ${PR_STATE} - cleaning up beta tags"
+                echo "  PR #${PR_NUM} is ${PR_STATE} - marking beta tags for deletion"
                 
-                # Find and delete all beta tags for this closed PR
-                TAGS_TO_DELETE=$(git tag -l | grep "beta\.pr${PR_NUM}\." || true)
+                # Find all beta tags for this closed PR and add to deletion list
+                PR_TAGS=$(git tag -l | grep "beta\.pr${PR_NUM}\." || true)
                 
-                if [ -n "$TAGS_TO_DELETE" ]; then
-                  echo "$TAGS_TO_DELETE" | while read -r TAG; do
-                    echo "    Deleting: $TAG"
-                    git push --delete origin "$TAG" 2>/dev/null || echo "      ⚠️  Failed to delete tag $TAG"
+                if [ -n "$PR_TAGS" ]; then
+                  echo "$PR_TAGS" | while read -r TAG; do
+                    echo "    Will delete: $TAG"
                   done
+                  TAGS_TO_DELETE="${TAGS_TO_DELETE} ${PR_TAGS}"
                 fi
               else
                 echo "  PR #${PR_NUM} is still ${PR_STATE} - keeping tags"
               fi
             done
+            
+            # Delete all collected tags in batches
+            if [ -n "$TAGS_TO_DELETE" ]; then
+              echo ""
+              echo "  Deleting tags in batch..."
+              # Convert newlines to spaces and delete all tags at once
+              TAGS_ARRAY=($TAGS_TO_DELETE)
+              # Delete in batches of 10 to avoid command line length issues
+              for ((i=0; i<${#TAGS_ARRAY[@]}; i+=10)); do
+                BATCH=("${TAGS_ARRAY[@]:i:10}")
+                if [ ${#BATCH[@]} -gt 0 ]; then
+                  git push --delete origin "${BATCH[@]}" 2>/dev/null || echo "    ⚠️  Failed to delete some tags in batch"
+                fi
+              done
+            fi
           fi
           
       - name: Create cleanup summary
