@@ -4,8 +4,6 @@
  */
 
 import { GameManager, GameManagerConfig, initGame } from './GameManager';
-import { Character } from '../builders/CharacterBuilder';
-import { GameMap } from '../builders/MapBuilder';
 
 export interface GameSetup {
   onInit?: () => void | Promise<void>;

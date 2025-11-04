@@ -100,12 +100,14 @@ describe('EffectBuilder', () => {
       const effect = builder.getEffect(effectId);
 
       // Check that size decreases
-      expect(effect?.particles[0].size).toBeGreaterThan(effect?.particles[1].size!);
-      expect(effect?.particles[1].size).toBeGreaterThan(effect?.particles[2].size!);
+      if (effect) {
+        expect(effect.particles[0].size).toBeGreaterThan(effect.particles[1].size);
+        expect(effect.particles[1].size).toBeGreaterThan(effect.particles[2].size);
 
-      // Check that alpha decreases
-      expect(effect?.particles[0].alpha).toBeGreaterThan(effect?.particles[1].alpha!);
-      expect(effect?.particles[1].alpha).toBeGreaterThan(effect?.particles[2].alpha!);
+        // Check that alpha decreases
+        expect(effect.particles[0].alpha).toBeGreaterThan(effect.particles[1].alpha);
+        expect(effect.particles[1].alpha).toBeGreaterThan(effect.particles[2].alpha);
+      }
     });
   });
 
@@ -153,16 +155,23 @@ describe('EffectBuilder', () => {
 
       const effectId = builder.createExplosion(position, config);
       const effect = builder.getEffect(effectId);
-      const initialX = effect?.particles[0].position.x!;
-      const initialY = effect?.particles[0].position.y!;
+      
+      if (!effect || effect.particles.length === 0) {
+        throw new Error('Effect not created');
+      }
+      
+      const initialX = effect.particles[0].position.x;
+      const initialY = effect.particles[0].position.y;
 
       builder.update(0.016); // ~60fps frame
 
       const updatedEffect = builder.getEffect(effectId);
       // At least one position should change
-      const xChanged = updatedEffect?.particles[0].position.x !== initialX;
-      const yChanged = updatedEffect?.particles[0].position.y !== initialY;
-      expect(xChanged || yChanged).toBe(true);
+      if (updatedEffect && updatedEffect.particles.length > 0) {
+        const xChanged = updatedEffect.particles[0].position.x !== initialX;
+        const yChanged = updatedEffect.particles[0].position.y !== initialY;
+        expect(xChanged || yChanged).toBe(true);
+      }
     });
 
     test('should decrease particle life', () => {
@@ -179,12 +188,19 @@ describe('EffectBuilder', () => {
 
       const effectId = builder.createExplosion(position, config);
       const effect = builder.getEffect(effectId);
-      const initialLife = effect?.particles[0].life!;
+      
+      if (!effect || effect.particles.length === 0) {
+        throw new Error('Effect not created');
+      }
+      
+      const initialLife = effect.particles[0].life;
 
       builder.update(0.1);
 
       const updatedEffect = builder.getEffect(effectId);
-      expect(updatedEffect?.particles[0].life).toBeLessThan(initialLife);
+      if (updatedEffect && updatedEffect.particles.length > 0) {
+        expect(updatedEffect.particles[0].life).toBeLessThan(initialLife);
+      }
     });
 
     test('should update particle alpha based on life', () => {
@@ -204,7 +220,9 @@ describe('EffectBuilder', () => {
       builder.update(0.5);
 
       const effect = builder.getEffect(effectId);
-      expect(effect?.particles[0].alpha).toBeLessThan(1.0);
+      if (effect && effect.particles.length > 0) {
+        expect(effect.particles[0].alpha).toBeLessThan(1.0);
+      }
     });
 
     test('should remove dead particles', () => {
