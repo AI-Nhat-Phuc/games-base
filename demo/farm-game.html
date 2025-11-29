@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌾 Nông Trại Mini 2.5D - PNP Game Engine Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a4d1a 0%, #2d5a2d 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      color: #fff;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .subtitle {
+      color: #aaffaa;
+      margin-bottom: 20px;
+      font-size: 0.9em;
+    }
+    
+    .badge-2-5d {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      color: #000;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.5em;
+      font-weight: bold;
+      vertical-align: middle;
+      margin-left: 10px;
+      text-shadow: none;
+    }
+    
+    .game-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    #gameCanvas {
+      border: 4px solid #8B4513;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 50%, #7CB342 100%);
+    }
+    
+    .panel {
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      padding: 15px;
+      min-width: 200px;
+    }
+    
+    .panel h3 {
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      color: #4CAF50;
+    }
+    
+    .controls {
+      text-align: center;
+    }
+    
+    .arrow-keys {
+      display: grid;
+      grid-template-columns: repeat(3, 50px);
+      gap: 5px;
+      justify-content: center;
+      margin: 15px 0;
+    }
+    
+    .key-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: linear-gradient(145deg, #4a4a4a, #333);
+      color: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: all 0.1s;
+    }
+    
+    .key-btn:hover {
+      background: linear-gradient(145deg, #5a5a5a, #444);
+    }
+    
+    .key-btn:active, .key-btn.active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+      background: linear-gradient(145deg, #333, #222);
+    }
+    
+    .key-btn.empty {
+      visibility: hidden;
+    }
+    
+    .plant-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .plant-btn {
+      padding: 10px;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      background: #2a2a2a;
+      color: #fff;
+      text-align: left;
+    }
+    
+    .plant-btn:hover {
+      background: #3a3a3a;
+    }
+    
+    .plant-btn.selected {
+      border-color: #4CAF50;
+      background: #1a3a1a;
+    }
+    
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 15px;
+    }
+    
+    .action-btn {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-plant {
+      background: linear-gradient(145deg, #8B4513, #654321);
+      color: #fff;
+    }
+    
+    .btn-water {
+      background: linear-gradient(145deg, #2196F3, #1976D2);
+      color: #fff;
+    }
+    
+    .btn-harvest {
+      background: linear-gradient(145deg, #FF9800, #F57C00);
+      color: #fff;
+    }
+    
+    .action-btn:hover:not(:disabled) {
+      transform: scale(1.02);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    
+    .info-panel {
+      font-size: 13px;
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .info-label {
+      color: #aaa;
+    }
+    
+    .info-value {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    
+    .status-msg {
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 5px;
+      font-size: 12px;
+      color: #ffeb3b;
+      min-height: 50px;
+    }
+    
+    .legend {
+      margin-top: 10px;
+      font-size: 11px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+    }
+    
+    .legend-color {
+      width: 20px;
+      height: 12px;
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.3);
+      transform: skewX(-15deg);
+    }
+    
+    .instructions {
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌾 Nông Trại Mini <span class="badge-2-5d">2.5D</span></h1>
+  <p class="subtitle">Demo sử dụng PNP Game Engine - Isometric View</p>
+  
+  <div class="instructions">
+    <strong>Hướng dẫn:</strong> Di chuyển bằng W/A/S/D, chọn loại cây, sau đó Gieo hạt → Tưới nước → Thu hoạch khi cây trưởng thành
+  </div>
+  
+  <div class="game-container">
+    <!-- Left Panel: Controls -->
+    <div class="panel controls">
+      <h3>🎮 Điều khiển</h3>
+      <div class="arrow-keys">
+        <button class="key-btn empty"></button>
+        <button class="key-btn" id="btnW">W</button>
+        <button class="key-btn empty"></button>
+        <button class="key-btn" id="btnA">A</button>
+        <button class="key-btn" id="btnS">S</button>
+        <button class="key-btn" id="btnD">D</button>
+      </div>
+      
+      <h3>🌱 Chọn loại cây</h3>
+      <div class="plant-selector">
+        <button class="plant-btn selected" data-plant="carrot">🥕 Cà rốt (3 giai đoạn)</button>
+        <button class="plant-btn" data-plant="tomato">🍅 Cà chua (4 giai đoạn)</button>
+        <button class="plant-btn" data-plant="corn">🌽 Ngô (5 giai đoạn)</button>
+        <button class="plant-btn" data-plant="wheat">🌾 Lúa mì (3 giai đoạn)</button>
+      </div>
+      
+      <div class="actions">
+        <button class="action-btn btn-plant" id="btnPlant">🌱 Gieo hạt</button>
+        <button class="action-btn btn-water" id="btnWater">💧 Tưới nước</button>
+        <button class="action-btn btn-harvest" id="btnHarvest">🧺 Thu hoạch</button>
+      </div>
+    </div>
+    
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- Right Panel: Info -->
+    <div class="panel info-panel">
+      <h3>📊 Thông tin</h3>
+      <div class="info-row">
+        <span class="info-label">Vị trí:</span>
+        <span class="info-value" id="posInfo">(0, 0)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Ô hiện tại:</span>
+        <span class="info-value" id="cellInfo">Đất trống</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Cây đã chọn:</span>
+        <span class="info-value" id="plantInfo">🥕 Cà rốt</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Số tiền:</span>
+        <span class="info-value" id="moneyInfo">💰 100</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Thu hoạch:</span>
+        <span class="info-value" id="harvestInfo">0</span>
+      </div>
+      
+      <div class="status-msg" id="statusMsg">Chào mừng đến nông trại! Di chuyển đến ô đất và gieo hạt.</div>
+      
+      <h3>📖 Chú thích</h3>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-color" style="background: #654321;"></span>
+          <span>Đất trống (có thể gieo)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #8B7355;"></span>
+          <span>Hạt giống</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #90EE90;"></span>
+          <span>Cây đang phát triển</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #228B22;"></span>
+          <span>Sẵn sàng thu hoạch</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #808080;"></span>
+          <span>Ngôi nhà</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    /**
+     * Farm Game Demo - 2.5D Isometric Version
+     * Sử dụng các concept từ PNP Game Engine:
+     * - GameEngine: Game loop, canvas rendering
+     * - MapBuilder: Tile-based map với 10x10 grid (Isometric)
+     * - CharacterBuilder: Player character
+     * - InputManager: Keyboard input
+     */
+    
+    // Cấu hình cây trồng
+    const PLANT_CONFIG = {
+      carrot: {
+        name: 'Cà rốt',
+        icon: '🥕',
+        stages: 3,
+        growTime: 3000,
+        harvestValue: 15,
+        seedCost: 5
+      },
+      tomato: {
+        name: 'Cà chua',
+        icon: '🍅',
+        stages: 4,
+        growTime: 4000,
+        harvestValue: 25,
+        seedCost: 10
+      },
+      corn: {
+        name: 'Ngô',
+        icon: '🌽',
+        stages: 5,
+        growTime: 5000,
+        harvestValue: 40,
+        seedCost: 15
+      },
+      wheat: {
+        name: 'Lúa mì',
+        icon: '🌾',
+        stages: 3,
+        growTime: 2500,
+        harvestValue: 10,
+        seedCost: 3
+      }
+    };
+    
+    // Trạng thái cây
+    const CELL_STATE = {
+      EMPTY: 'empty',
+      SEEDED: 'seeded',
+      GROWING: 'growing',
+      READY: 'ready',
+      HOUSE: 'house'
+    };
+    
+    // Constants
+    const MOVE_DELAY_MS = 150;
+    const SPARKLE_ANIMATION_PERIOD_MS = 200;
+    const TILE_DEPTH = 15;
+    const CANVAS_PADDING_X = 50;
+    const CANVAS_PADDING_Y = 150;
+    
+    // Player rendering constants
+    const PLAYER_SHADOW_RADIUS_X = 12;
+    const PLAYER_SHADOW_RADIUS_Y = 6;
+    const PLAYER_SHADOW_OFFSET_Y = 5;
+    const PLAYER_BODY_RADIUS_X = 10;
+    const PLAYER_BODY_RADIUS_Y = 18;
+    const PLAYER_BODY_OFFSET_Y = -15;
+    const PLAYER_BODY_HIGHLIGHT_OFFSET_X = -3;
+    const PLAYER_BODY_HIGHLIGHT_OFFSET_Y = -18;
+    const PLAYER_BODY_HIGHLIGHT_RADIUS_X = 4;
+    const PLAYER_BODY_HIGHLIGHT_RADIUS_Y = 10;
+    const PLAYER_HEAD_RADIUS = 10;
+    const PLAYER_HEAD_OFFSET_Y = -38;
+    const PLAYER_HAT_BRIM_RADIUS_X = 14;
+    const PLAYER_HAT_BRIM_RADIUS_Y = 5;
+    const PLAYER_HAT_BRIM_OFFSET_Y = -48;
+    const PLAYER_HAT_TOP_WIDTH = 16;
+    const PLAYER_HAT_TOP_HEIGHT = 10;
+    const PLAYER_HAT_TOP_OFFSET_X = -8;
+    const PLAYER_HAT_TOP_OFFSET_Y = -58;
+    const PLAYER_EYE_RADIUS = 1.5;
+    const PLAYER_EYE_OFFSET_X = 3;
+    const PLAYER_EYE_OFFSET_Y = -40;
+    const PLAYER_SMILE_RADIUS = 4;
+    const PLAYER_SMILE_OFFSET_Y = -36;
+    
+    // House rendering constants
+    const HOUSE_FOUNDATION_OFFSET_Y = -10;
+    const HOUSE_WALL_HEIGHT = 50;
+    const HOUSE_ROOF_HEIGHT = 90;
+    const HOUSE_ROOF_OVERHANG = 5;
+    const HOUSE_DOOR_WIDTH = 15;
+    const HOUSE_DOOR_HEIGHT = 30;
+    const HOUSE_DOOR_OFFSET_X = 5;
+    const HOUSE_DOOR_OFFSET_Y = 8;
+    const HOUSE_WINDOW_SIZE = 15;
+    const HOUSE_CHIMNEY_WIDTH = 12;
+    const HOUSE_CHIMNEY_HEIGHT = 25;
+    const HOUSE_CHIMNEY_CAP_WIDTH = 16;
+    const HOUSE_CHIMNEY_CAP_HEIGHT = 5;
+    
+    // Helper function for smooth movement (defined once, not per frame)
+    const smoothMove = (current, target, moveSpeed) => {
+      if (Math.abs(current - target) > 1) {
+        return current + Math.sign(target - current) * Math.min(moveSpeed, Math.abs(target - current));
+      }
+      return target;
+    };
+    
+    class FarmGame {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        const ctx = this.canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('Could not get 2D context from canvas');
+        }
+        this.ctx = ctx;
+        
+        // Isometric settings
+        this.gridSize = 10;
+        this.tileWidth = 64;  // Width của isometric tile
+        this.tileHeight = 32; // Height của isometric tile
+        this.tileDepth = TILE_DEPTH; // Độ sâu của tile
+        
+        // Canvas size để fit isometric grid
+        this.canvas.width = (this.gridSize + this.gridSize) * (this.tileWidth / 2) + CANVAS_PADDING_X;
+        this.canvas.height = (this.gridSize + this.gridSize) * (this.tileHeight / 2) + CANVAS_PADDING_Y;
+        
+        // Offset để center map
+        this.offsetX = this.canvas.width / 2;
+        this.offsetY = 80;
+        
+        // Player
+        this.player = {
+          gridX: 5,
+          gridY: 5,
+          renderX: 0,
+          renderY: 0,
+          targetRenderX: 0,
+          targetRenderY: 0,
+          speed: 200,
+          moving: false
+        };
+        this.updatePlayerTarget();
+        this.player.renderX = this.player.targetRenderX;
+        this.player.renderY = this.player.targetRenderY;
+        
+        // Game state
+        this.selectedPlant = 'carrot';
+        this.money = 100;
+        this.harvestCount = 0;
+        this.keys = new Set();
+        this.lastMoveTime = 0;
+        this.moveDelay = MOVE_DELAY_MS;
+        
+        // Track growing cells for performance optimization
+        this.growingCells = [];
+        
+        // Initialize field (10x10)
+        this.field = [];
+        this.initField();
+        
+        // Setup
+        this.setupInput();
+        this.setupUI();
+        
+        // Start game loop
+        this.lastTime = performance.now();
+        this.gameLoop();
+        
+        this.showStatus('Chào mừng đến nông trại 2.5D! Di chuyển đến ô đất và gieo hạt.');
+      }
+      
+      // Convert grid coordinates to isometric screen coordinates
+      gridToIso(gx, gy) {
+        const x = (gx - gy) * (this.tileWidth / 2) + this.offsetX;
+        const y = (gx + gy) * (this.tileHeight / 2) + this.offsetY;
+        return { x, y };
+      }
+      
+      updatePlayerTarget() {
+        const pos = this.gridToIso(this.player.gridX, this.player.gridY);
+        this.player.targetRenderX = pos.x;
+        this.player.targetRenderY = pos.y;
+      }
+      
+      initField() {
+        for (let y = 0; y < this.gridSize; y++) {
+          this.field[y] = [];
+          for (let x = 0; x < this.gridSize; x++) {
+            this.field[y][x] = {
+              state: CELL_STATE.EMPTY,
+              plant: null,
+              stage: 0,
+              maxStage: 0,
+              watered: false,
+              growProgress: 0,
+              growTime: 0
+            };
+          }
+        }
+        
+        // Đặt ngôi nhà ở góc trên trái (2x2 tiles)
+        for (let y = 0; y < 2; y++) {
+          for (let x = 0; x < 2; x++) {
+            this.field[y][x].state = CELL_STATE.HOUSE;
+          }
+        }
+      }
+      
+      setupInput() {
+        // Keyboard events
+        window.addEventListener('keydown', (e) => {
+          this.keys.add(e.code);
+          
+          // Highlight button
+          const btnId = 'btn' + e.key.toUpperCase();
+          const btn = document.getElementById(btnId);
+          if (btn) btn.classList.add('active');
+        });
+        
+        window.addEventListener('keyup', (e) => {
+          this.keys.delete(e.code);
+          
+          const btnId = 'btn' + e.key.toUpperCase();
+          const btn = document.getElementById(btnId);
+          if (btn) btn.classList.remove('active');
+        });
+        
+        // Button controls
+        ['W', 'A', 'S', 'D'].forEach(key => {
+          const btn = document.getElementById('btn' + key);
+          if (btn) {
+            btn.addEventListener('mousedown', () => {
+              this.keys.add('Key' + key);
+              btn.classList.add('active');
+            });
+            btn.addEventListener('mouseup', () => {
+              this.keys.delete('Key' + key);
+              btn.classList.remove('active');
+            });
+            btn.addEventListener('mouseleave', () => {
+              this.keys.delete('Key' + key);
+              btn.classList.remove('active');
+            });
+          }
+        });
+      }
+      
+      setupUI() {
+        // Plant selector
+        document.querySelectorAll('.plant-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.plant-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            this.selectedPlant = btn.dataset.plant;
+            const plant = PLANT_CONFIG[this.selectedPlant];
+            document.getElementById('plantInfo').textContent = plant.icon + ' ' + plant.name;
+          });
+        });
+        
+        // Action buttons
+        document.getElementById('btnPlant').addEventListener('click', () => this.plantSeed());
+        document.getElementById('btnWater').addEventListener('click', () => this.waterPlant());
+        document.getElementById('btnHarvest').addEventListener('click', () => this.harvest());
+      }
+      
+      update(deltaTime) {
+        const now = performance.now();
+        
+        // Movement với delay - điều chỉnh cho isometric
+        if (now - this.lastMoveTime > this.moveDelay) {
+          let dx = 0, dy = 0;
+          
+          // Isometric movement: W = up-left, S = down-right, A = down-left, D = up-right
+          if (this.keys.has('KeyW') || this.keys.has('ArrowUp')) { dx = -1; dy = 0; }
+          if (this.keys.has('KeyS') || this.keys.has('ArrowDown')) { dx = 1; dy = 0; }
+          if (this.keys.has('KeyA') || this.keys.has('ArrowLeft')) { dx = 0; dy = 1; }
+          if (this.keys.has('KeyD') || this.keys.has('ArrowRight')) { dx = 0; dy = -1; }
+          
+          if (dx !== 0 || dy !== 0) {
+            const newX = Math.max(0, Math.min(this.gridSize - 1, this.player.gridX + dx));
+            const newY = Math.max(0, Math.min(this.gridSize - 1, this.player.gridY + dy));
+            
+            // Không cho đi vào nhà
+            if (this.field[newY][newX].state !== CELL_STATE.HOUSE) {
+              this.player.gridX = newX;
+              this.player.gridY = newY;
+              this.updatePlayerTarget();
+              this.lastMoveTime = now;
+            }
+          }
+        }
+        
+        // Smooth movement using helper function defined outside
+        const moveSpeed = this.player.speed * deltaTime;
+        this.player.renderX = smoothMove(this.player.renderX, this.player.targetRenderX, moveSpeed);
+        this.player.renderY = smoothMove(this.player.renderY, this.player.targetRenderY, moveSpeed);
+        
+        // Cập nhật cây trồng - chỉ kiểm tra các cells đang growing để tối ưu hiệu năng
+        const cellsToRemove = [];
+        for (let i = 0; i < this.growingCells.length; i++) {
+          const { x, y } = this.growingCells[i];
+          const cell = this.field[y][x];
+          
+          if (cell.state === CELL_STATE.GROWING && cell.watered) {
+            cell.growProgress += deltaTime * 1000;
+            if (cell.growProgress >= cell.growTime) {
+              cell.stage++;
+              cell.growProgress = 0;
+              cell.watered = false;
+              
+              if (cell.stage >= cell.maxStage) {
+                cell.state = CELL_STATE.READY;
+                cellsToRemove.push(i);
+              }
+            }
+          } else if (cell.state !== CELL_STATE.GROWING) {
+            cellsToRemove.push(i);
+          }
+        }
+        
+        // Remove cells that are no longer growing (iterate in reverse to maintain indices)
+        for (let i = cellsToRemove.length - 1; i >= 0; i--) {
+          this.growingCells.splice(cellsToRemove[i], 1);
+        }
+        
+        // Update UI
+        this.updateUI();
+      }
+      
+      updateUI() {
+        document.getElementById('posInfo').textContent = `(${this.player.gridX}, ${this.player.gridY})`;
+        document.getElementById('moneyInfo').textContent = '💰 ' + this.money;
+        document.getElementById('harvestInfo').textContent = this.harvestCount;
+        
+        const cell = this.field[this.player.gridY][this.player.gridX];
+        let cellText = '';
+        switch (cell.state) {
+          case CELL_STATE.EMPTY:
+            cellText = 'Đất trống';
+            break;
+          case CELL_STATE.SEEDED:
+            cellText = `Hạt ${PLANT_CONFIG[cell.plant].icon}`;
+            break;
+          case CELL_STATE.GROWING:
+            const progress = Math.floor((cell.stage / cell.maxStage) * 100);
+            cellText = `${PLANT_CONFIG[cell.plant].icon} ${progress}%`;
+            if (!cell.watered) cellText += ' (cần nước)';
+            break;
+          case CELL_STATE.READY:
+            cellText = `${PLANT_CONFIG[cell.plant].icon} Sẵn sàng!`;
+            break;
+          case CELL_STATE.HOUSE:
+            cellText = '🏠 Ngôi nhà';
+            break;
+        }
+        document.getElementById('cellInfo').textContent = cellText;
+        
+        // Enable/disable buttons based on current cell
+        document.getElementById('btnPlant').disabled = cell.state !== CELL_STATE.EMPTY;
+        document.getElementById('btnWater').disabled = !(cell.state === CELL_STATE.SEEDED || (cell.state === CELL_STATE.GROWING && !cell.watered));
+        document.getElementById('btnHarvest').disabled = cell.state !== CELL_STATE.READY;
+      }
+      
+      render() {
+        // Clear với gradient sky
+        const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+        gradient.addColorStop(0, '#87CEEB');
+        gradient.addColorStop(0.5, '#B0E0E6');
+        gradient.addColorStop(1, '#98D8C8');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw tiles in isometric order (back to front)
+        for (let sum = 0; sum < this.gridSize * 2 - 1; sum++) {
+          for (let x = 0; x < this.gridSize; x++) {
+            const y = sum - x;
+            if (y >= 0 && y < this.gridSize) {
+              const cell = this.field[y][x];
+              const pos = this.gridToIso(x, y);
+              
+              // Draw cell based on state
+              switch (cell.state) {
+                case CELL_STATE.HOUSE:
+                  this.drawIsoHouse(pos.x, pos.y, x, y);
+                  break;
+                case CELL_STATE.EMPTY:
+                  this.drawIsoTile(pos.x, pos.y, '#654321', '#8B4513');
+                  break;
+                case CELL_STATE.SEEDED:
+                  this.drawIsoTile(pos.x, pos.y, '#8B7355', '#A08060');
+                  this.drawSeedMound(pos.x, pos.y);
+                  break;
+                case CELL_STATE.GROWING:
+                  this.drawIsoTile(pos.x, pos.y, cell.watered ? '#5D4E37' : '#654321', cell.watered ? '#7D6E57' : '#8B4513');
+                  this.drawGrowingPlant3D(pos.x, pos.y, cell);
+                  break;
+                case CELL_STATE.READY:
+                  this.drawIsoTile(pos.x, pos.y, '#654321', '#8B4513');
+                  this.drawReadyPlant3D(pos.x, pos.y, cell);
+                  break;
+              }
+              
+              // Highlight current cell
+              if (x === this.player.gridX && y === this.player.gridY) {
+                this.drawIsoHighlight(pos.x, pos.y);
+              }
+            }
+          }
+        }
+        
+        // Draw player (after tiles for proper depth)
+        this.drawPlayer3D();
+      }
+      
+      drawIsoTile(x, y, topColor, sideColor) {
+        const w = this.tileWidth / 2;
+        const h = this.tileHeight / 2;
+        const depth = this.tileDepth;
+        
+        // Top face
+        this.ctx.fillStyle = topColor;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x + w, y + h);
+        this.ctx.lineTo(x, y + h * 2);
+        this.ctx.lineTo(x - w, y + h);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Left face (darker)
+        this.ctx.fillStyle = this.darkenColor(sideColor, 0.3);
+        this.ctx.beginPath();
+        this.ctx.moveTo(x - w, y + h);
+        this.ctx.lineTo(x, y + h * 2);
+        this.ctx.lineTo(x, y + h * 2 + depth);
+        this.ctx.lineTo(x - w, y + h + depth);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Right face (lighter)
+        this.ctx.fillStyle = sideColor;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + w, y + h);
+        this.ctx.lineTo(x, y + h * 2);
+        this.ctx.lineTo(x, y + h * 2 + depth);
+        this.ctx.lineTo(x + w, y + h + depth);
+        this.ctx.closePath();
+        this.ctx.fill();
+        
+        // Outline
+        this.ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y);
+        this.ctx.lineTo(x + w, y + h);
+        this.ctx.lineTo(x, y + h * 2);
+        this.ctx.lineTo(x - w, y + h);
+        this.ctx.closePath();
+        this.ctx.stroke();
+      }
+      
+      drawIsoHighlight(x, y) {
+        const w = this.tileWidth / 2;
+        const h = this.tileHeight / 2;
+        
+        this.ctx.strokeStyle = '#FFD700';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y - 2);
+        this.ctx.lineTo(x + w + 2, y + h);
+        this.ctx.lineTo(x, y + h * 2 + 2);
+        this.ctx.lineTo(x - w - 2, y + h);
+        this.ctx.closePath();
+        this.ctx.stroke();
+        
+        // Glow effect
+        this.ctx.shadowColor = '#FFD700';
+        this.ctx.shadowBlur = 10;
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+      }
+      
+      drawSeedMound(x, y) {
+        const h = this.tileHeight / 2;
+        
+        // Small mound
+        this.ctx.fillStyle = '#6B5344';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x, y + h, 8, 4, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Highlight
+        this.ctx.fillStyle = '#8B7355';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x - 2, y + h - 1, 4, 2, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+      
+      drawGrowingPlant3D(x, y, cell) {
+        const h = this.tileHeight / 2;
+        const growthPercent = cell.stage / cell.maxStage;
+        const plantHeight = 15 + growthPercent * 25;
+        
+        // Stem
+        this.ctx.strokeStyle = '#228B22';
+        this.ctx.lineWidth = 2 + growthPercent * 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y + h);
+        this.ctx.lineTo(x, y + h - plantHeight);
+        this.ctx.stroke();
+        
+        // Leaves
+        this.ctx.fillStyle = '#90EE90';
+        const leafSize = 6 + growthPercent * 6;
+        
+        // Left leaf
+        this.ctx.beginPath();
+        this.ctx.ellipse(x - 6, y + h - plantHeight/2, leafSize, leafSize/3, -0.8, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Right leaf
+        this.ctx.beginPath();
+        this.ctx.ellipse(x + 6, y + h - plantHeight/2, leafSize, leafSize/3, 0.8, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Water droplets if watered
+        if (cell.watered) {
+          this.ctx.fillStyle = 'rgba(100, 200, 255, 0.7)';
+          for (let i = 0; i < 3; i++) {
+            const dropX = x - 10 + i * 10;
+            const dropY = y + h - 5 - i * 3;
+            this.ctx.beginPath();
+            this.ctx.arc(dropX, dropY, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+          }
+        }
+        
+        // Progress indicator
+        const barWidth = 30;
+        const stagePercent = cell.maxStage > 0 
+          ? cell.stage / cell.maxStage + (cell.growProgress / cell.growTime / cell.maxStage)
+          : 0;
+        
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.fillRect(x - barWidth/2, y - 5, barWidth, 4);
+        this.ctx.fillStyle = cell.watered ? '#4CAF50' : '#FFC107';
+        this.ctx.fillRect(x - barWidth/2, y - 5, barWidth * Math.min(stagePercent, 1), 4);
+      }
+      
+      drawReadyPlant3D(x, y, cell) {
+        const h = this.tileHeight / 2;
+        const plant = PLANT_CONFIG[cell.plant];
+        
+        // Full stem
+        this.ctx.strokeStyle = '#228B22';
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x, y + h);
+        this.ctx.lineTo(x, y + h - 45);
+        this.ctx.stroke();
+        
+        // Leaves
+        this.ctx.fillStyle = '#228B22';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x - 10, y + h - 25, 12, 5, -0.6, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.beginPath();
+        this.ctx.ellipse(x + 10, y + h - 25, 12, 5, 0.6, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Fruit/crop icon with 3D effect (shadow)
+        this.ctx.font = '24px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        this.ctx.fillText(plant.icon, x + 2, y + h - 42);
+        this.ctx.fillStyle = '#fff';
+        this.ctx.fillText(plant.icon, x, y + h - 45);
+        
+        // Sparkle effect
+        this.ctx.fillStyle = '#FFD700';
+        const time = performance.now() / SPARKLE_ANIMATION_PERIOD_MS;
+        for (let i = 0; i < 4; i++) {
+          const angle = time + i * 1.57;
+          const sx = x + Math.cos(angle) * 18;
+          const sy = y + h - 35 + Math.sin(angle) * 12;
+          this.ctx.beginPath();
+          this.ctx.arc(sx, sy, 2, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+      }
+      
+      drawIsoHouse(x, y, gx, gy) {
+        // Only draw full house from top-left corner of house area
+        if (gx === 0 && gy === 0) {
+          const w = this.tileWidth;
+          const h = this.tileHeight;
+          
+          // Calculate center of 2x2 house area
+          const houseX = x + w/4;
+          const houseY = y + h/2;
+          
+          const wallTopOffset = HOUSE_FOUNDATION_OFFSET_Y + HOUSE_WALL_HEIGHT;
+          
+          // Foundation
+          this.ctx.fillStyle = '#696969';
+          this.ctx.beginPath();
+          this.ctx.moveTo(houseX, houseY + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX + w, houseY + h + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX - w, houseY + h + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.closePath();
+          this.ctx.fill();
+          
+          // Walls - left
+          this.ctx.fillStyle = '#CD853F';
+          this.ctx.beginPath();
+          this.ctx.moveTo(houseX - w, houseY + h + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 - wallTopOffset);
+          this.ctx.lineTo(houseX - w, houseY + h - wallTopOffset);
+          this.ctx.closePath();
+          this.ctx.fill();
+          
+          // Walls - right
+          this.ctx.fillStyle = '#DEB887';
+          this.ctx.beginPath();
+          this.ctx.moveTo(houseX + w, houseY + h + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 - wallTopOffset);
+          this.ctx.lineTo(houseX + w, houseY + h - wallTopOffset);
+          this.ctx.closePath();
+          this.ctx.fill();
+          
+          // Roof - left side
+          this.ctx.fillStyle = '#8B0000';
+          this.ctx.beginPath();
+          this.ctx.moveTo(houseX - w - HOUSE_ROOF_OVERHANG, houseY + h - wallTopOffset);
+          this.ctx.lineTo(houseX, houseY - HOUSE_ROOF_HEIGHT);
+          this.ctx.lineTo(houseX + HOUSE_ROOF_OVERHANG, houseY + h * 2 - wallTopOffset);
+          this.ctx.lineTo(houseX - w - HOUSE_ROOF_OVERHANG, houseY + h - wallTopOffset);
+          this.ctx.closePath();
+          this.ctx.fill();
+          
+          // Roof - right side
+          this.ctx.fillStyle = '#A52A2A';
+          this.ctx.beginPath();
+          this.ctx.moveTo(houseX + w + HOUSE_ROOF_OVERHANG, houseY + h - wallTopOffset);
+          this.ctx.lineTo(houseX, houseY - HOUSE_ROOF_HEIGHT);
+          this.ctx.lineTo(houseX + HOUSE_ROOF_OVERHANG, houseY + h * 2 - wallTopOffset);
+          this.ctx.lineTo(houseX + w + HOUSE_ROOF_OVERHANG, houseY + h - wallTopOffset);
+          this.ctx.closePath();
+          this.ctx.fill();
+          
+          // Door
+          this.ctx.fillStyle = '#5D3A1A';
+          this.ctx.beginPath();
+          this.ctx.moveTo(houseX + HOUSE_DOOR_OFFSET_X, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX + HOUSE_DOOR_OFFSET_X, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y - HOUSE_DOOR_HEIGHT);
+          this.ctx.lineTo(houseX + HOUSE_DOOR_OFFSET_X + HOUSE_DOOR_WIDTH, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y - HOUSE_DOOR_HEIGHT - HOUSE_DOOR_OFFSET_Y);
+          this.ctx.lineTo(houseX + HOUSE_DOOR_OFFSET_X + HOUSE_DOOR_WIDTH, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y - HOUSE_DOOR_OFFSET_Y);
+          this.ctx.closePath();
+          this.ctx.fill();
+          
+          // Window left wall
+          this.ctx.fillStyle = '#87CEEB';
+          this.ctx.beginPath();
+          this.ctx.moveTo(houseX - w/2 - HOUSE_ROOF_OVERHANG, houseY + h - 35);
+          this.ctx.lineTo(houseX - w/2 + HOUSE_WINDOW_SIZE - 5, houseY + h - 28);
+          this.ctx.lineTo(houseX - w/2 + HOUSE_WINDOW_SIZE - 5, houseY + h - 43);
+          this.ctx.lineTo(houseX - w/2 - HOUSE_ROOF_OVERHANG, houseY + h - 50);
+          this.ctx.closePath();
+          this.ctx.fill();
+          
+          // Window right wall  
+          this.ctx.fillStyle = '#87CEEB';
+          this.ctx.beginPath();
+          this.ctx.moveTo(houseX + w/2 + HOUSE_ROOF_OVERHANG, houseY + h - 35);
+          this.ctx.lineTo(houseX + w/2 - HOUSE_WINDOW_SIZE + 5, houseY + h - 28);
+          this.ctx.lineTo(houseX + w/2 - HOUSE_WINDOW_SIZE + 5, houseY + h - 43);
+          this.ctx.lineTo(houseX + w/2 + HOUSE_ROOF_OVERHANG, houseY + h - 50);
+          this.ctx.closePath();
+          this.ctx.fill();
+          
+          // Chimney
+          this.ctx.fillStyle = '#696969';
+          this.ctx.fillRect(houseX + w/3, houseY - 70, HOUSE_CHIMNEY_WIDTH, HOUSE_CHIMNEY_HEIGHT);
+          this.ctx.fillStyle = '#555';
+          this.ctx.fillRect(houseX + w/3 - 2, houseY - 73, HOUSE_CHIMNEY_CAP_WIDTH, HOUSE_CHIMNEY_CAP_HEIGHT);
+        }
+      }
+      
+      drawPlayer3D() {
+        const x = this.player.renderX;
+        const y = this.player.renderY;
+        const h = this.tileHeight / 2;
+        
+        // Shadow
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x, y + h + PLAYER_SHADOW_OFFSET_Y, PLAYER_SHADOW_RADIUS_X, PLAYER_SHADOW_RADIUS_Y, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Body (3D oval)
+        this.ctx.fillStyle = '#4169E1';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x, y + h + PLAYER_BODY_OFFSET_Y, PLAYER_BODY_RADIUS_X, PLAYER_BODY_RADIUS_Y, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Body highlight
+        this.ctx.fillStyle = '#5179F1';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x + PLAYER_BODY_HIGHLIGHT_OFFSET_X, y + h + PLAYER_BODY_HIGHLIGHT_OFFSET_Y, PLAYER_BODY_HIGHLIGHT_RADIUS_X, PLAYER_BODY_HIGHLIGHT_RADIUS_Y, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Head
+        this.ctx.fillStyle = '#FFDAB9';
+        this.ctx.beginPath();
+        this.ctx.arc(x, y + h + PLAYER_HEAD_OFFSET_Y, PLAYER_HEAD_RADIUS, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Hat
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x, y + h + PLAYER_HAT_BRIM_OFFSET_Y, PLAYER_HAT_BRIM_RADIUS_X, PLAYER_HAT_BRIM_RADIUS_Y, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.fillRect(x + PLAYER_HAT_TOP_OFFSET_X, y + h + PLAYER_HAT_TOP_OFFSET_Y, PLAYER_HAT_TOP_WIDTH, PLAYER_HAT_TOP_HEIGHT);
+        
+        // Hat top highlight
+        this.ctx.fillStyle = '#A0522D';
+        this.ctx.beginPath();
+        this.ctx.ellipse(x, y + h + PLAYER_HAT_TOP_OFFSET_Y, PLAYER_HAT_TOP_WIDTH / 2, 3, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Eyes
+        this.ctx.fillStyle = '#000';
+        this.ctx.beginPath();
+        this.ctx.arc(x - PLAYER_EYE_OFFSET_X, y + h + PLAYER_EYE_OFFSET_Y, PLAYER_EYE_RADIUS, 0, Math.PI * 2);
+        this.ctx.arc(x + PLAYER_EYE_OFFSET_X, y + h + PLAYER_EYE_OFFSET_Y, PLAYER_EYE_RADIUS, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Smile
+        this.ctx.strokeStyle = '#000';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y + h + PLAYER_SMILE_OFFSET_Y, PLAYER_SMILE_RADIUS, 0.1 * Math.PI, 0.9 * Math.PI);
+        this.ctx.stroke();
+      }
+      
+      darkenColor(hex, factor) {
+        // Validate hex input
+        if (!hex || typeof hex !== 'string' || hex.length !== 7 || hex[0] !== '#') {
+          return hex; // Return original if invalid
+        }
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        if (isNaN(r) || isNaN(g) || isNaN(b)) {
+          return hex; // Return original if parsing failed
+        }
+        return `rgb(${Math.floor(r * (1 - factor))}, ${Math.floor(g * (1 - factor))}, ${Math.floor(b * (1 - factor))})`;
+      }
+      
+      plantSeed() {
+        const cell = this.field[this.player.gridY][this.player.gridX];
+        if (cell.state !== CELL_STATE.EMPTY) {
+          this.showStatus('❌ Ô này đã có cây hoặc không thể gieo hạt!');
+          return;
+        }
+        
+        const plant = PLANT_CONFIG[this.selectedPlant];
+        if (this.money < plant.seedCost) {
+          this.showStatus(`❌ Không đủ tiền! Cần ${plant.seedCost}💰 để mua hạt ${plant.icon}`);
+          return;
+        }
+        
+        this.money -= plant.seedCost;
+        cell.state = CELL_STATE.SEEDED;
+        cell.plant = this.selectedPlant;
+        cell.stage = 0;
+        cell.maxStage = plant.stages;
+        cell.growTime = plant.growTime;
+        cell.growProgress = 0;
+        cell.watered = false;
+        
+        this.showStatus(`🌱 Đã gieo hạt ${plant.icon} ${plant.name}! Hãy tưới nước để cây phát triển.`);
+      }
+      
+      waterPlant() {
+        const cell = this.field[this.player.gridY][this.player.gridX];
+        const x = this.player.gridX;
+        const y = this.player.gridY;
+        
+        if (cell.state === CELL_STATE.SEEDED) {
+          cell.state = CELL_STATE.GROWING;
+          cell.watered = true;
+          cell.stage = 1;
+          // Add to growing cells list for optimized update loop
+          this.growingCells.push({ x, y });
+          this.showStatus(`💧 Đã tưới nước! Hạt bắt đầu nảy mầm...`);
+        } else if (cell.state === CELL_STATE.GROWING && !cell.watered) {
+          cell.watered = true;
+          this.showStatus(`💧 Đã tưới nước! Cây đang phát triển giai đoạn ${cell.stage}/${cell.maxStage}`);
+        } else {
+          this.showStatus('❌ Không thể tưới nước ở đây!');
+        }
+      }
+      
+      harvest() {
+        const cell = this.field[this.player.gridY][this.player.gridX];
+        
+        if (cell.state !== CELL_STATE.READY) {
+          this.showStatus('❌ Cây chưa sẵn sàng để thu hoạch!');
+          return;
+        }
+        
+        const plant = PLANT_CONFIG[cell.plant];
+        this.money += plant.harvestValue;
+        this.harvestCount++;
+        
+        this.showStatus(`🧺 Thu hoạch ${plant.icon} ${plant.name}! +${plant.harvestValue}💰`);
+        
+        // Reset cell
+        cell.state = CELL_STATE.EMPTY;
+        cell.plant = null;
+        cell.stage = 0;
+        cell.maxStage = 0;
+        cell.watered = false;
+        cell.growProgress = 0;
+      }
+      
+      showStatus(msg) {
+        document.getElementById('statusMsg').textContent = msg;
+      }
+      
+      gameLoop(currentTime = performance.now()) {
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+        
+        this.update(deltaTime);
+        this.render();
+        
+        requestAnimationFrame((time) => this.gameLoop(time));
+      }
+    }
+    
+    // Start game
+    window.game = new FarmGame();
+  </script>
+</body>
+</html>
