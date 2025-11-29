@@ -242,6 +242,59 @@
       border-radius: 8px;
       font-size: 12px;
     }
+    
+    .camera-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    
+    .camera-btn {
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: linear-gradient(145deg, #6366f1, #4f46e5);
+      color: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: all 0.2s;
+    }
+    
+    .camera-btn:hover {
+      background: linear-gradient(145deg, #818cf8, #6366f1);
+      transform: scale(1.05);
+    }
+    
+    .camera-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+    }
+    
+    .camera-angle {
+      font-size: 18px;
+      font-weight: bold;
+      color: #fbbf24;
+      min-width: 50px;
+      text-align: center;
+    }
+    
+    .mouse-hint {
+      text-align: center;
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 8px;
+      padding: 5px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+    
+    #gameCanvas {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -249,7 +302,7 @@
   <p class="subtitle">Demo sử dụng PNP Game Engine - Isometric View</p>
   
   <div class="instructions">
-    <strong>Hướng dẫn:</strong> Di chuyển bằng W/A/S/D, chọn loại cây, sau đó Gieo hạt → Tưới nước → Thu hoạch khi cây trưởng thành
+    <strong>Hướng dẫn:</strong> Di chuyển bằng W/A/S/D hoặc nhấp chuột vào ô, xoay camera bằng Q/E hoặc nút xoay, chọn loại cây, sau đó Gieo hạt → Tưới nước → Thu hoạch khi cây trưởng thành
   </div>
   
   <div class="game-container">
@@ -264,6 +317,14 @@
         <button class="key-btn" id="btnS">S</button>
         <button class="key-btn" id="btnD">D</button>
       </div>
+      
+      <h3>📷 Xoay Camera</h3>
+      <div class="camera-controls">
+        <button class="camera-btn" id="btnRotateLeft" title="Xoay trái (Q)">⟲ Q</button>
+        <span class="camera-angle" id="cameraAngle">0°</span>
+        <button class="camera-btn" id="btnRotateRight" title="Xoay phải (E)">E ⟳</button>
+      </div>
+      <div class="mouse-hint">🖱️ Nhấp chuột vào ô để di chuyển</div>
       
       <h3>🌱 Chọn loại cây</h3>
       <div class="plant-selector">
@@ -289,6 +350,10 @@
       <div class="info-row">
         <span class="info-label">Vị trí:</span>
         <span class="info-value" id="posInfo">(0, 0)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Góc camera:</span>
+        <span class="info-value" id="cameraInfo">📷 0°</span>
       </div>
       <div class="info-row">
         <span class="info-label">Ô hiện tại:</span>
@@ -397,6 +462,10 @@
     const CANVAS_PADDING_X = 50;
     const CANVAS_PADDING_Y = 150;
     
+    // Camera rotation constants - only allow 0°, 90°, 180°, 270°
+    const CAMERA_ANGLES = [0, 90, 180, 270];
+    const CAMERA_ROTATION_STEP = 90;
+    
     // Player rendering constants
     const PLAYER_SHADOW_RADIUS_X = 12;
     const PLAYER_SHADOW_RADIUS_Y = 6;
@@ -484,6 +553,13 @@
         this.player.renderX = this.player.targetRenderX;
         this.player.renderY = this.player.targetRenderY;
         
+        // Camera rotation state - only 0°, 90°, 180°, 270° allowed
+        this.cameraAngle = 0; // Current camera angle (0, 90, 180, 270)
+        this.cameraAngleIndex = 0; // Index in CAMERA_ANGLES array
+        
+        // Mouse state for click-to-move
+        this.mouseTarget = null; // Target grid position when clicking
+        
         // Game state
         this.selectedPlant = 'carrot';
         this.money = 100;
@@ -507,14 +583,70 @@
         this.lastTime = performance.now();
         this.gameLoop();
         
-        this.showStatus('Chào mừng đến nông trại 2.5D! Di chuyển đến ô đất và gieo hạt.');
+        this.showStatus('Chào mừng đến nông trại 2.5D! Di chuyển đến ô đất và gieo hạt. Nhấp chuột để di chuyển, Q/E để xoay camera.');
       }
       
-      // Convert grid coordinates to isometric screen coordinates
+      // Rotate grid coordinates based on camera angle
+      rotateGridCoords(gx, gy) {
+        const center = (this.gridSize - 1) / 2;
+        const rx = gx - center;
+        const ry = gy - center;
+        
+        switch (this.cameraAngle) {
+          case 90:
+            return { x: center - ry, y: center + rx };
+          case 180:
+            return { x: center - rx, y: center - ry };
+          case 270:
+            return { x: center + ry, y: center - rx };
+          default: // 0
+            return { x: gx, y: gy };
+        }
+      }
+      
+      // Inverse rotation for converting screen back to original grid
+      inverseRotateGridCoords(gx, gy) {
+        const center = (this.gridSize - 1) / 2;
+        const rx = gx - center;
+        const ry = gy - center;
+        
+        switch (this.cameraAngle) {
+          case 90:
+            return { x: center + ry, y: center - rx };
+          case 180:
+            return { x: center - rx, y: center - ry };
+          case 270:
+            return { x: center - ry, y: center + rx };
+          default: // 0
+            return { x: gx, y: gy };
+        }
+      }
+      
+      // Convert grid coordinates to isometric screen coordinates (with camera rotation)
       gridToIso(gx, gy) {
-        const x = (gx - gy) * (this.tileWidth / 2) + this.offsetX;
-        const y = (gx + gy) * (this.tileHeight / 2) + this.offsetY;
+        // Apply camera rotation first
+        const rotated = this.rotateGridCoords(gx, gy);
+        const x = (rotated.x - rotated.y) * (this.tileWidth / 2) + this.offsetX;
+        const y = (rotated.x + rotated.y) * (this.tileHeight / 2) + this.offsetY;
         return { x, y };
+      }
+      
+      // Convert isometric screen coordinates to grid coordinates (with camera rotation)
+      isoToGrid(screenX, screenY) {
+        const sx = screenX - this.offsetX;
+        const sy = screenY - this.offsetY;
+        
+        // Inverse isometric transformation
+        const gx = (sx / (this.tileWidth / 2) + sy / (this.tileHeight / 2)) / 2;
+        const gy = (sy / (this.tileHeight / 2) - sx / (this.tileWidth / 2)) / 2;
+        
+        // Apply inverse camera rotation
+        const rotated = this.inverseRotateGridCoords(gx, gy);
+        
+        return {
+          x: Math.round(rotated.x),
+          y: Math.round(rotated.y)
+        };
       }
       
       updatePlayerTarget() {
@@ -552,6 +684,13 @@
         window.addEventListener('keydown', (e) => {
           this.keys.add(e.code);
           
+          // Handle camera rotation keys
+          if (e.code === 'KeyQ') {
+            this.rotateCameraLeft();
+          } else if (e.code === 'KeyE') {
+            this.rotateCameraRight();
+          }
+          
           // Highlight button
           const btnId = 'btn' + e.key.toUpperCase();
           const btn = document.getElementById(btnId);
@@ -566,13 +705,41 @@
           if (btn) btn.classList.remove('active');
         });
         
-        // Button controls
+        // Mouse click on canvas for movement
+        this.canvas.addEventListener('click', (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          
+          // Account for CSS scaling - convert from CSS pixels to canvas pixels
+          const scaleX = this.canvas.width / rect.width;
+          const scaleY = this.canvas.height / rect.height;
+          
+          const screenX = (e.clientX - rect.left) * scaleX;
+          const screenY = (e.clientY - rect.top) * scaleY;
+          
+          // Convert screen position to grid position
+          const gridPos = this.isoToGrid(screenX, screenY);
+          
+          // Check if the position is valid
+          if (gridPos.x >= 0 && gridPos.x < this.gridSize && 
+              gridPos.y >= 0 && gridPos.y < this.gridSize) {
+            // Check if target is not a house
+            if (this.field[gridPos.y][gridPos.x].state !== CELL_STATE.HOUSE) {
+              this.mouseTarget = { x: gridPos.x, y: gridPos.y };
+              this.showStatus(`🖱️ Di chuyển đến (${gridPos.x}, ${gridPos.y})`);
+            } else {
+              this.showStatus('❌ Không thể đi vào ngôi nhà!');
+            }
+          }
+        });
+        
+        // Button controls for movement
         ['W', 'A', 'S', 'D'].forEach(key => {
           const btn = document.getElementById('btn' + key);
           if (btn) {
             btn.addEventListener('mousedown', () => {
               this.keys.add('Key' + key);
               btn.classList.add('active');
+              this.mouseTarget = null; // Cancel mouse movement when using keyboard
             });
             btn.addEventListener('mouseup', () => {
               this.keys.delete('Key' + key);
@@ -584,6 +751,47 @@
             });
           }
         });
+        
+        // Camera rotation buttons
+        const btnRotateLeft = document.getElementById('btnRotateLeft');
+        const btnRotateRight = document.getElementById('btnRotateRight');
+        
+        if (btnRotateLeft) {
+          btnRotateLeft.addEventListener('click', () => this.rotateCameraLeft());
+        }
+        if (btnRotateRight) {
+          btnRotateRight.addEventListener('click', () => this.rotateCameraRight());
+        }
+      }
+      
+      // Rotate camera left (counter-clockwise) by 90°
+      rotateCameraLeft() {
+        this.cameraAngleIndex = (this.cameraAngleIndex - 1 + CAMERA_ANGLES.length) % CAMERA_ANGLES.length;
+        this.cameraAngle = CAMERA_ANGLES[this.cameraAngleIndex];
+        this.updateCameraUI();
+        this.updatePlayerTarget();
+        this.player.renderX = this.player.targetRenderX;
+        this.player.renderY = this.player.targetRenderY;
+        this.showStatus(`📷 Camera xoay sang ${this.cameraAngle}°`);
+      }
+      
+      // Rotate camera right (clockwise) by 90°
+      rotateCameraRight() {
+        this.cameraAngleIndex = (this.cameraAngleIndex + 1) % CAMERA_ANGLES.length;
+        this.cameraAngle = CAMERA_ANGLES[this.cameraAngleIndex];
+        this.updateCameraUI();
+        this.updatePlayerTarget();
+        this.player.renderX = this.player.targetRenderX;
+        this.player.renderY = this.player.targetRenderY;
+        this.showStatus(`📷 Camera xoay sang ${this.cameraAngle}°`);
+      }
+      
+      // Update camera angle display
+      updateCameraUI() {
+        const cameraAngleEl = document.getElementById('cameraAngle');
+        const cameraInfoEl = document.getElementById('cameraInfo');
+        if (cameraAngleEl) cameraAngleEl.textContent = `${this.cameraAngle}°`;
+        if (cameraInfoEl) cameraInfoEl.textContent = `📷 ${this.cameraAngle}°`;
       }
       
       setupUI() {
@@ -607,17 +815,66 @@
       update(deltaTime) {
         const now = performance.now();
         
-        // Movement với delay - điều chỉnh cho isometric
+        // Handle mouse-based movement (click to move)
+        if (this.mouseTarget) {
+          if (now - this.lastMoveTime > this.moveDelay) {
+            const dx = Math.sign(this.mouseTarget.x - this.player.gridX);
+            const dy = Math.sign(this.mouseTarget.y - this.player.gridY);
+            
+            if (dx !== 0 || dy !== 0) {
+              // Move one step at a time towards target
+              let newX = this.player.gridX;
+              let newY = this.player.gridY;
+              
+              // Prioritize X movement, then Y
+              if (dx !== 0) {
+                newX = this.player.gridX + dx;
+              } else if (dy !== 0) {
+                newY = this.player.gridY + dy;
+              }
+              
+              // Check bounds and obstacles
+              if (newX >= 0 && newX < this.gridSize && 
+                  newY >= 0 && newY < this.gridSize &&
+                  this.field[newY][newX].state !== CELL_STATE.HOUSE) {
+                this.player.gridX = newX;
+                this.player.gridY = newY;
+                this.updatePlayerTarget();
+                this.lastMoveTime = now;
+              } else {
+                // Can't reach target, cancel
+                this.mouseTarget = null;
+              }
+            } else {
+              // Reached target
+              this.mouseTarget = null;
+            }
+          }
+        }
+        
+        // Keyboard movement with camera rotation adjustment
         if (now - this.lastMoveTime > this.moveDelay) {
           let dx = 0, dy = 0;
           
-          // Isometric movement: W = up-left, S = down-right, A = down-left, D = up-right
+          // Base isometric movement directions (when camera angle is 0)
+          // W = up-left (-1, 0), S = down-right (1, 0)
+          // A = down-left (0, 1), D = up-right (0, -1)
+          
           if (this.keys.has('KeyW') || this.keys.has('ArrowUp')) { dx = -1; dy = 0; }
           if (this.keys.has('KeyS') || this.keys.has('ArrowDown')) { dx = 1; dy = 0; }
           if (this.keys.has('KeyA') || this.keys.has('ArrowLeft')) { dx = 0; dy = 1; }
           if (this.keys.has('KeyD') || this.keys.has('ArrowRight')) { dx = 0; dy = -1; }
           
+          // Adjust movement direction based on camera rotation
+          // This makes keyboard controls intuitive regardless of camera angle
           if (dx !== 0 || dy !== 0) {
+            this.mouseTarget = null; // Cancel mouse movement when using keyboard
+            
+            // Rotate movement direction based on camera angle
+            const rotatedMove = this.rotateMovementForCamera(dx, dy);
+            dx = rotatedMove.dx;
+            dy = rotatedMove.dy;
+            
             const newX = Math.max(0, Math.min(this.gridSize - 1, this.player.gridX + dx));
             const newY = Math.max(0, Math.min(this.gridSize - 1, this.player.gridY + dy));
             
@@ -668,6 +925,24 @@
         this.updateUI();
       }
       
+      // Rotate movement direction based on camera angle
+      // This ensures WASD always moves "up/down/left/right" visually regardless of camera rotation
+      rotateMovementForCamera(dx, dy) {
+        switch (this.cameraAngle) {
+          case 90:
+            // Rotate 90° clockwise: (dx, dy) -> (dy, -dx)
+            return { dx: dy, dy: -dx };
+          case 180:
+            // Rotate 180°: (dx, dy) -> (-dx, -dy)
+            return { dx: -dx, dy: -dy };
+          case 270:
+            // Rotate 270° (or -90°): (dx, dy) -> (-dy, dx)
+            return { dx: -dy, dy: dx };
+          default: // 0
+            return { dx, dy };
+        }
+      }
+      
       updateUI() {
         document.getElementById('posInfo').textContent = `(${this.player.gridX}, ${this.player.gridY})`;
         document.getElementById('moneyInfo').textContent = '💰 ' + this.money;
@@ -711,41 +986,57 @@
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Draw tiles in isometric order (back to front)
-        for (let sum = 0; sum < this.gridSize * 2 - 1; sum++) {
+        // Draw tiles in isometric order (back to front) - need to account for camera rotation
+        // Create a list of tiles sorted by depth (rotated coordinates)
+        const tiles = [];
+        for (let y = 0; y < this.gridSize; y++) {
           for (let x = 0; x < this.gridSize; x++) {
-            const y = sum - x;
-            if (y >= 0 && y < this.gridSize) {
-              const cell = this.field[y][x];
-              const pos = this.gridToIso(x, y);
-              
-              // Draw cell based on state
-              switch (cell.state) {
-                case CELL_STATE.HOUSE:
-                  this.drawIsoHouse(pos.x, pos.y, x, y);
-                  break;
-                case CELL_STATE.EMPTY:
-                  this.drawIsoTile(pos.x, pos.y, '#654321', '#8B4513');
-                  break;
-                case CELL_STATE.SEEDED:
-                  this.drawIsoTile(pos.x, pos.y, '#8B7355', '#A08060');
-                  this.drawSeedMound(pos.x, pos.y);
-                  break;
-                case CELL_STATE.GROWING:
-                  this.drawIsoTile(pos.x, pos.y, cell.watered ? '#5D4E37' : '#654321', cell.watered ? '#7D6E57' : '#8B4513');
-                  this.drawGrowingPlant3D(pos.x, pos.y, cell);
-                  break;
-                case CELL_STATE.READY:
-                  this.drawIsoTile(pos.x, pos.y, '#654321', '#8B4513');
-                  this.drawReadyPlant3D(pos.x, pos.y, cell);
-                  break;
-              }
-              
-              // Highlight current cell
-              if (x === this.player.gridX && y === this.player.gridY) {
-                this.drawIsoHighlight(pos.x, pos.y);
-              }
-            }
+            const rotated = this.rotateGridCoords(x, y);
+            tiles.push({ 
+              originalX: x, 
+              originalY: y, 
+              rotatedX: rotated.x, 
+              rotatedY: rotated.y,
+              depth: rotated.x + rotated.y // depth for back-to-front sorting
+            });
+          }
+        }
+        
+        // Sort by depth (sum of rotated coordinates for isometric rendering)
+        tiles.sort((a, b) => a.depth - b.depth);
+        
+        // Draw tiles in sorted order
+        for (const tile of tiles) {
+          const x = tile.originalX;
+          const y = tile.originalY;
+          const cell = this.field[y][x];
+          const pos = this.gridToIso(x, y);
+          
+          // Draw cell based on state
+          switch (cell.state) {
+            case CELL_STATE.HOUSE:
+              this.drawIsoHouse(pos.x, pos.y, x, y);
+              break;
+            case CELL_STATE.EMPTY:
+              this.drawIsoTile(pos.x, pos.y, '#654321', '#8B4513');
+              break;
+            case CELL_STATE.SEEDED:
+              this.drawIsoTile(pos.x, pos.y, '#8B7355', '#A08060');
+              this.drawSeedMound(pos.x, pos.y);
+              break;
+            case CELL_STATE.GROWING:
+              this.drawIsoTile(pos.x, pos.y, cell.watered ? '#5D4E37' : '#654321', cell.watered ? '#7D6E57' : '#8B4513');
+              this.drawGrowingPlant3D(pos.x, pos.y, cell);
+              break;
+            case CELL_STATE.READY:
+              this.drawIsoTile(pos.x, pos.y, '#654321', '#8B4513');
+              this.drawReadyPlant3D(pos.x, pos.y, cell);
+              break;
+          }
+          
+          // Highlight current cell
+          if (x === this.player.gridX && y === this.player.gridY) {
+            this.drawIsoHighlight(pos.x, pos.y);
           }
         }
         
