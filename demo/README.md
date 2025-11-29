@@ -22,14 +22,14 @@
 
 ## 🕹️ Hướng dẫn điều khiển
 
-Di chuyển theo góc nhìn isometric:
+Di chuyển theo góc nhìn isometric (có thể dùng bàn phím hoặc click nút):
 
-| Phím | Hành động |
-|------|-----------|
-| W | Di chuyển lên-trái (↖) |
-| S | Di chuyển xuống-phải (↘) |
-| A | Di chuyển xuống-trái (↙) |
-| D | Di chuyển lên-phải (↗) |
+| Phím / Nút | Hành động |
+|------------|-----------|
+| W / ⬆️ | Di chuyển lên-trái (↖) |
+| S / ⬇️ | Di chuyển xuống-phải (↘) |
+| A / ⬅️ | Di chuyển xuống-trái (↙) |
+| D / ➡️ | Di chuyển lên-phải (↗) |
 
 ## 🌱 Loại cây trồng
 

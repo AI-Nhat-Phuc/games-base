@@ -392,10 +392,59 @@
     
     // Constants
     const MOVE_DELAY_MS = 150;
-    const SPARKLE_ANIMATION_SPEED = 200;
+    const SPARKLE_ANIMATION_PERIOD_MS = 200;
     const TILE_DEPTH = 15;
     const CANVAS_PADDING_X = 50;
     const CANVAS_PADDING_Y = 150;
+    
+    // Player rendering constants
+    const PLAYER_SHADOW_RADIUS_X = 12;
+    const PLAYER_SHADOW_RADIUS_Y = 6;
+    const PLAYER_SHADOW_OFFSET_Y = 5;
+    const PLAYER_BODY_RADIUS_X = 10;
+    const PLAYER_BODY_RADIUS_Y = 18;
+    const PLAYER_BODY_OFFSET_Y = -15;
+    const PLAYER_BODY_HIGHLIGHT_OFFSET_X = -3;
+    const PLAYER_BODY_HIGHLIGHT_OFFSET_Y = -18;
+    const PLAYER_BODY_HIGHLIGHT_RADIUS_X = 4;
+    const PLAYER_BODY_HIGHLIGHT_RADIUS_Y = 10;
+    const PLAYER_HEAD_RADIUS = 10;
+    const PLAYER_HEAD_OFFSET_Y = -38;
+    const PLAYER_HAT_BRIM_RADIUS_X = 14;
+    const PLAYER_HAT_BRIM_RADIUS_Y = 5;
+    const PLAYER_HAT_BRIM_OFFSET_Y = -48;
+    const PLAYER_HAT_TOP_WIDTH = 16;
+    const PLAYER_HAT_TOP_HEIGHT = 10;
+    const PLAYER_HAT_TOP_OFFSET_X = -8;
+    const PLAYER_HAT_TOP_OFFSET_Y = -58;
+    const PLAYER_EYE_RADIUS = 1.5;
+    const PLAYER_EYE_OFFSET_X = 3;
+    const PLAYER_EYE_OFFSET_Y = -40;
+    const PLAYER_SMILE_RADIUS = 4;
+    const PLAYER_SMILE_OFFSET_Y = -36;
+    
+    // House rendering constants
+    const HOUSE_FOUNDATION_OFFSET_Y = -10;
+    const HOUSE_WALL_HEIGHT = 50;
+    const HOUSE_ROOF_HEIGHT = 90;
+    const HOUSE_ROOF_OVERHANG = 5;
+    const HOUSE_DOOR_WIDTH = 15;
+    const HOUSE_DOOR_HEIGHT = 30;
+    const HOUSE_DOOR_OFFSET_X = 5;
+    const HOUSE_DOOR_OFFSET_Y = 8;
+    const HOUSE_WINDOW_SIZE = 15;
+    const HOUSE_CHIMNEY_WIDTH = 12;
+    const HOUSE_CHIMNEY_HEIGHT = 25;
+    const HOUSE_CHIMNEY_CAP_WIDTH = 16;
+    const HOUSE_CHIMNEY_CAP_HEIGHT = 5;
+    
+    // Helper function for smooth movement (defined once, not per frame)
+    const smoothMove = (current, target, moveSpeed) => {
+      if (Math.abs(current - target) > 1) {
+        return current + Math.sign(target - current) * Math.min(moveSpeed, Math.abs(target - current));
+      }
+      return target;
+    };
     
     class FarmGame {
       constructor() {
@@ -442,6 +491,9 @@
         this.keys = new Set();
         this.lastMoveTime = 0;
         this.moveDelay = MOVE_DELAY_MS;
+        
+        // Track growing cells for performance optimization
+        this.growingCells = [];
         
         // Initialize field (10x10)
         this.field = [];
@@ -579,35 +631,37 @@
           }
         }
         
-        // Smooth movement
+        // Smooth movement using helper function defined outside
         const moveSpeed = this.player.speed * deltaTime;
-        const smoothMove = (current, target) => {
-          if (Math.abs(current - target) > 1) {
-            return current + Math.sign(target - current) * Math.min(moveSpeed, Math.abs(target - current));
-          }
-          return target;
-        };
+        this.player.renderX = smoothMove(this.player.renderX, this.player.targetRenderX, moveSpeed);
+        this.player.renderY = smoothMove(this.player.renderY, this.player.targetRenderY, moveSpeed);
         
-        this.player.renderX = smoothMove(this.player.renderX, this.player.targetRenderX);
-        this.player.renderY = smoothMove(this.player.renderY, this.player.targetRenderY);
-        
-        // Cập nhật cây trồng
-        for (let y = 0; y < this.gridSize; y++) {
-          for (let x = 0; x < this.gridSize; x++) {
-            const cell = this.field[y][x];
-            if (cell.state === CELL_STATE.GROWING && cell.watered) {
-              cell.growProgress += deltaTime * 1000;
-              if (cell.growProgress >= cell.growTime) {
-                cell.stage++;
-                cell.growProgress = 0;
-                cell.watered = false;
-                
-                if (cell.stage >= cell.maxStage) {
-                  cell.state = CELL_STATE.READY;
-                }
+        // Cập nhật cây trồng - chỉ kiểm tra các cells đang growing để tối ưu hiệu năng
+        const cellsToRemove = [];
+        for (let i = 0; i < this.growingCells.length; i++) {
+          const { x, y } = this.growingCells[i];
+          const cell = this.field[y][x];
+          
+          if (cell.state === CELL_STATE.GROWING && cell.watered) {
+            cell.growProgress += deltaTime * 1000;
+            if (cell.growProgress >= cell.growTime) {
+              cell.stage++;
+              cell.growProgress = 0;
+              cell.watered = false;
+              
+              if (cell.stage >= cell.maxStage) {
+                cell.state = CELL_STATE.READY;
+                cellsToRemove.push(i);
               }
             }
+          } else if (cell.state !== CELL_STATE.GROWING) {
+            cellsToRemove.push(i);
           }
+        }
+        
+        // Remove cells that are no longer growing (iterate in reverse to maintain indices)
+        for (let i = cellsToRemove.length - 1; i >= 0; i--) {
+          this.growingCells.splice(cellsToRemove[i], 1);
         }
         
         // Update UI
@@ -865,7 +919,7 @@
         
         // Sparkle effect
         this.ctx.fillStyle = '#FFD700';
-        const time = performance.now() / SPARKLE_ANIMATION_SPEED;
+        const time = performance.now() / SPARKLE_ANIMATION_PERIOD_MS;
         for (let i = 0; i < 4; i++) {
           const angle = time + i * 1.57;
           const sx = x + Math.cos(angle) * 18;
@@ -886,91 +940,93 @@
           const houseX = x + w/4;
           const houseY = y + h/2;
           
+          const wallTopOffset = HOUSE_FOUNDATION_OFFSET_Y + HOUSE_WALL_HEIGHT;
+          
           // Foundation
           this.ctx.fillStyle = '#696969';
           this.ctx.beginPath();
-          this.ctx.moveTo(houseX, houseY - 10);
-          this.ctx.lineTo(houseX + w, houseY + h - 10);
-          this.ctx.lineTo(houseX, houseY + h * 2 - 10);
-          this.ctx.lineTo(houseX - w, houseY + h - 10);
+          this.ctx.moveTo(houseX, houseY + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX + w, houseY + h + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX - w, houseY + h + HOUSE_FOUNDATION_OFFSET_Y);
           this.ctx.closePath();
           this.ctx.fill();
           
           // Walls - left
           this.ctx.fillStyle = '#CD853F';
           this.ctx.beginPath();
-          this.ctx.moveTo(houseX - w, houseY + h - 10);
-          this.ctx.lineTo(houseX, houseY + h * 2 - 10);
-          this.ctx.lineTo(houseX, houseY + h * 2 - 60);
-          this.ctx.lineTo(houseX - w, houseY + h - 60);
+          this.ctx.moveTo(houseX - w, houseY + h + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 - wallTopOffset);
+          this.ctx.lineTo(houseX - w, houseY + h - wallTopOffset);
           this.ctx.closePath();
           this.ctx.fill();
           
           // Walls - right
           this.ctx.fillStyle = '#DEB887';
           this.ctx.beginPath();
-          this.ctx.moveTo(houseX + w, houseY + h - 10);
-          this.ctx.lineTo(houseX, houseY + h * 2 - 10);
-          this.ctx.lineTo(houseX, houseY + h * 2 - 60);
-          this.ctx.lineTo(houseX + w, houseY + h - 60);
+          this.ctx.moveTo(houseX + w, houseY + h + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX, houseY + h * 2 - wallTopOffset);
+          this.ctx.lineTo(houseX + w, houseY + h - wallTopOffset);
           this.ctx.closePath();
           this.ctx.fill();
           
           // Roof - left side
           this.ctx.fillStyle = '#8B0000';
           this.ctx.beginPath();
-          this.ctx.moveTo(houseX - w - 5, houseY + h - 60);
-          this.ctx.lineTo(houseX, houseY - 90);
-          this.ctx.lineTo(houseX + 5, houseY + h * 2 - 60);
-          this.ctx.lineTo(houseX - w - 5, houseY + h - 60);
+          this.ctx.moveTo(houseX - w - HOUSE_ROOF_OVERHANG, houseY + h - wallTopOffset);
+          this.ctx.lineTo(houseX, houseY - HOUSE_ROOF_HEIGHT);
+          this.ctx.lineTo(houseX + HOUSE_ROOF_OVERHANG, houseY + h * 2 - wallTopOffset);
+          this.ctx.lineTo(houseX - w - HOUSE_ROOF_OVERHANG, houseY + h - wallTopOffset);
           this.ctx.closePath();
           this.ctx.fill();
           
           // Roof - right side
           this.ctx.fillStyle = '#A52A2A';
           this.ctx.beginPath();
-          this.ctx.moveTo(houseX + w + 5, houseY + h - 60);
-          this.ctx.lineTo(houseX, houseY - 90);
-          this.ctx.lineTo(houseX + 5, houseY + h * 2 - 60);
-          this.ctx.lineTo(houseX + w + 5, houseY + h - 60);
+          this.ctx.moveTo(houseX + w + HOUSE_ROOF_OVERHANG, houseY + h - wallTopOffset);
+          this.ctx.lineTo(houseX, houseY - HOUSE_ROOF_HEIGHT);
+          this.ctx.lineTo(houseX + HOUSE_ROOF_OVERHANG, houseY + h * 2 - wallTopOffset);
+          this.ctx.lineTo(houseX + w + HOUSE_ROOF_OVERHANG, houseY + h - wallTopOffset);
           this.ctx.closePath();
           this.ctx.fill();
           
           // Door
           this.ctx.fillStyle = '#5D3A1A';
           this.ctx.beginPath();
-          this.ctx.moveTo(houseX + 5, houseY + h * 2 - 10);
-          this.ctx.lineTo(houseX + 5, houseY + h * 2 - 40);
-          this.ctx.lineTo(houseX + 20, houseY + h * 2 - 48);
-          this.ctx.lineTo(houseX + 20, houseY + h * 2 - 18);
+          this.ctx.moveTo(houseX + HOUSE_DOOR_OFFSET_X, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y);
+          this.ctx.lineTo(houseX + HOUSE_DOOR_OFFSET_X, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y - HOUSE_DOOR_HEIGHT);
+          this.ctx.lineTo(houseX + HOUSE_DOOR_OFFSET_X + HOUSE_DOOR_WIDTH, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y - HOUSE_DOOR_HEIGHT - HOUSE_DOOR_OFFSET_Y);
+          this.ctx.lineTo(houseX + HOUSE_DOOR_OFFSET_X + HOUSE_DOOR_WIDTH, houseY + h * 2 + HOUSE_FOUNDATION_OFFSET_Y - HOUSE_DOOR_OFFSET_Y);
           this.ctx.closePath();
           this.ctx.fill();
           
           // Window left wall
           this.ctx.fillStyle = '#87CEEB';
           this.ctx.beginPath();
-          this.ctx.moveTo(houseX - w/2 - 5, houseY + h - 35);
-          this.ctx.lineTo(houseX - w/2 + 10, houseY + h - 28);
-          this.ctx.lineTo(houseX - w/2 + 10, houseY + h - 43);
-          this.ctx.lineTo(houseX - w/2 - 5, houseY + h - 50);
+          this.ctx.moveTo(houseX - w/2 - HOUSE_ROOF_OVERHANG, houseY + h - 35);
+          this.ctx.lineTo(houseX - w/2 + HOUSE_WINDOW_SIZE - 5, houseY + h - 28);
+          this.ctx.lineTo(houseX - w/2 + HOUSE_WINDOW_SIZE - 5, houseY + h - 43);
+          this.ctx.lineTo(houseX - w/2 - HOUSE_ROOF_OVERHANG, houseY + h - 50);
           this.ctx.closePath();
           this.ctx.fill();
           
           // Window right wall  
           this.ctx.fillStyle = '#87CEEB';
           this.ctx.beginPath();
-          this.ctx.moveTo(houseX + w/2 + 5, houseY + h - 35);
-          this.ctx.lineTo(houseX + w/2 - 10, houseY + h - 28);
-          this.ctx.lineTo(houseX + w/2 - 10, houseY + h - 43);
-          this.ctx.lineTo(houseX + w/2 + 5, houseY + h - 50);
+          this.ctx.moveTo(houseX + w/2 + HOUSE_ROOF_OVERHANG, houseY + h - 35);
+          this.ctx.lineTo(houseX + w/2 - HOUSE_WINDOW_SIZE + 5, houseY + h - 28);
+          this.ctx.lineTo(houseX + w/2 - HOUSE_WINDOW_SIZE + 5, houseY + h - 43);
+          this.ctx.lineTo(houseX + w/2 + HOUSE_ROOF_OVERHANG, houseY + h - 50);
           this.ctx.closePath();
           this.ctx.fill();
           
           // Chimney
           this.ctx.fillStyle = '#696969';
-          this.ctx.fillRect(houseX + w/3, houseY - 70, 12, 25);
+          this.ctx.fillRect(houseX + w/3, houseY - 70, HOUSE_CHIMNEY_WIDTH, HOUSE_CHIMNEY_HEIGHT);
           this.ctx.fillStyle = '#555';
-          this.ctx.fillRect(houseX + w/3 - 2, houseY - 73, 16, 5);
+          this.ctx.fillRect(houseX + w/3 - 2, houseY - 73, HOUSE_CHIMNEY_CAP_WIDTH, HOUSE_CHIMNEY_CAP_HEIGHT);
         }
       }
       
@@ -982,52 +1038,52 @@
         // Shadow
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
         this.ctx.beginPath();
-        this.ctx.ellipse(x, y + h + 5, 12, 6, 0, 0, Math.PI * 2);
+        this.ctx.ellipse(x, y + h + PLAYER_SHADOW_OFFSET_Y, PLAYER_SHADOW_RADIUS_X, PLAYER_SHADOW_RADIUS_Y, 0, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Body (3D oval)
         this.ctx.fillStyle = '#4169E1';
         this.ctx.beginPath();
-        this.ctx.ellipse(x, y + h - 15, 10, 18, 0, 0, Math.PI * 2);
+        this.ctx.ellipse(x, y + h + PLAYER_BODY_OFFSET_Y, PLAYER_BODY_RADIUS_X, PLAYER_BODY_RADIUS_Y, 0, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Body highlight
         this.ctx.fillStyle = '#5179F1';
         this.ctx.beginPath();
-        this.ctx.ellipse(x - 3, y + h - 18, 4, 10, 0, 0, Math.PI * 2);
+        this.ctx.ellipse(x + PLAYER_BODY_HIGHLIGHT_OFFSET_X, y + h + PLAYER_BODY_HIGHLIGHT_OFFSET_Y, PLAYER_BODY_HIGHLIGHT_RADIUS_X, PLAYER_BODY_HIGHLIGHT_RADIUS_Y, 0, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Head
         this.ctx.fillStyle = '#FFDAB9';
         this.ctx.beginPath();
-        this.ctx.arc(x, y + h - 38, 10, 0, Math.PI * 2);
+        this.ctx.arc(x, y + h + PLAYER_HEAD_OFFSET_Y, PLAYER_HEAD_RADIUS, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Hat
         this.ctx.fillStyle = '#8B4513';
         this.ctx.beginPath();
-        this.ctx.ellipse(x, y + h - 48, 14, 5, 0, 0, Math.PI * 2);
+        this.ctx.ellipse(x, y + h + PLAYER_HAT_BRIM_OFFSET_Y, PLAYER_HAT_BRIM_RADIUS_X, PLAYER_HAT_BRIM_RADIUS_Y, 0, 0, Math.PI * 2);
         this.ctx.fill();
-        this.ctx.fillRect(x - 8, y + h - 58, 16, 10);
+        this.ctx.fillRect(x + PLAYER_HAT_TOP_OFFSET_X, y + h + PLAYER_HAT_TOP_OFFSET_Y, PLAYER_HAT_TOP_WIDTH, PLAYER_HAT_TOP_HEIGHT);
         
         // Hat top highlight
         this.ctx.fillStyle = '#A0522D';
         this.ctx.beginPath();
-        this.ctx.ellipse(x, y + h - 58, 8, 3, 0, 0, Math.PI * 2);
+        this.ctx.ellipse(x, y + h + PLAYER_HAT_TOP_OFFSET_Y, PLAYER_HAT_TOP_WIDTH / 2, 3, 0, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Eyes
         this.ctx.fillStyle = '#000';
         this.ctx.beginPath();
-        this.ctx.arc(x - 3, y + h - 40, 1.5, 0, Math.PI * 2);
-        this.ctx.arc(x + 3, y + h - 40, 1.5, 0, Math.PI * 2);
+        this.ctx.arc(x - PLAYER_EYE_OFFSET_X, y + h + PLAYER_EYE_OFFSET_Y, PLAYER_EYE_RADIUS, 0, Math.PI * 2);
+        this.ctx.arc(x + PLAYER_EYE_OFFSET_X, y + h + PLAYER_EYE_OFFSET_Y, PLAYER_EYE_RADIUS, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Smile
         this.ctx.strokeStyle = '#000';
         this.ctx.lineWidth = 1;
         this.ctx.beginPath();
-        this.ctx.arc(x, y + h - 36, 4, 0.1 * Math.PI, 0.9 * Math.PI);
+        this.ctx.arc(x, y + h + PLAYER_SMILE_OFFSET_Y, PLAYER_SMILE_RADIUS, 0.1 * Math.PI, 0.9 * Math.PI);
         this.ctx.stroke();
       }
       
@@ -1072,11 +1128,15 @@
       
       waterPlant() {
         const cell = this.field[this.player.gridY][this.player.gridX];
+        const x = this.player.gridX;
+        const y = this.player.gridY;
         
         if (cell.state === CELL_STATE.SEEDED) {
           cell.state = CELL_STATE.GROWING;
           cell.watered = true;
           cell.stage = 1;
+          // Add to growing cells list for optimized update loop
+          this.growingCells.push({ x, y });
           this.showStatus(`💧 Đã tưới nước! Hạt bắt đầu nảy mầm...`);
         } else if (cell.state === CELL_STATE.GROWING && !cell.watered) {
           cell.watered = true;
