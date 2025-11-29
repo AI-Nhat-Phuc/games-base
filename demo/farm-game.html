@@ -997,12 +997,15 @@
               originalY: y, 
               rotatedX: rotated.x, 
               rotatedY: rotated.y,
-              depth: rotated.x + rotated.y // depth for back-to-front sorting
+              // Depth = sum of rotated coordinates. In isometric view, tiles with lower (x+y) 
+              // values are further from the camera and should be drawn first (back-to-front).
+              // Using rotated coordinates ensures proper depth ordering regardless of camera angle.
+              depth: rotated.x + rotated.y
             });
           }
         }
         
-        // Sort by depth (sum of rotated coordinates for isometric rendering)
+        // Sort by depth (ascending - back to front for proper isometric occlusion)
         tiles.sort((a, b) => a.depth - b.depth);
         
         // Draw tiles in sorted order
