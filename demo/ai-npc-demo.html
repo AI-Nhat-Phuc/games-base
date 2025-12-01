@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🤖 AI NPC Demo - PNP Game Engine</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      color: #fff;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .subtitle {
+      color: #aaccff;
+      margin-bottom: 20px;
+      font-size: 0.9em;
+    }
+    
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.5em;
+      font-weight: bold;
+      vertical-align: middle;
+      margin-left: 10px;
+      text-shadow: none;
+    }
+    
+    .game-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    #gameCanvas {
+      border: 4px solid #4a4a8a;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      background: #1a1a2e;
+    }
+    
+    .panel {
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      padding: 15px;
+      min-width: 220px;
+    }
+    
+    .panel h3 {
+      border-bottom: 2px solid #6366f1;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      color: #8b5cf6;
+    }
+    
+    .npc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .npc-item {
+      background: rgba(99, 102, 241, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .npc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    
+    .npc-name {
+      font-weight: bold;
+      color: #fff;
+    }
+    
+    .npc-type {
+      font-size: 0.8em;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(139, 92, 246, 0.5);
+    }
+    
+    .npc-type.hostile {
+      background: rgba(239, 68, 68, 0.5);
+    }
+    
+    .npc-type.friendly {
+      background: rgba(34, 197, 94, 0.5);
+    }
+    
+    .npc-type.merchant {
+      background: rgba(251, 191, 36, 0.5);
+    }
+    
+    .npc-state {
+      font-size: 0.85em;
+      color: #aaa;
+    }
+    
+    .npc-behavior {
+      font-size: 0.8em;
+      color: #8b5cf6;
+      margin-top: 3px;
+    }
+    
+    .info-panel {
+      font-size: 13px;
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .info-label {
+      color: #aaa;
+    }
+    
+    .info-value {
+      color: #8b5cf6;
+      font-weight: bold;
+    }
+    
+    .instructions {
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    
+    .controls {
+      text-align: center;
+    }
+    
+    .arrow-keys {
+      display: grid;
+      grid-template-columns: repeat(3, 50px);
+      gap: 5px;
+      justify-content: center;
+      margin: 15px 0;
+    }
+    
+    .key-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: linear-gradient(145deg, #4a4a4a, #333);
+      color: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: all 0.1s;
+    }
+    
+    .key-btn:hover {
+      background: linear-gradient(145deg, #5a5a5a, #444);
+    }
+    
+    .key-btn:active, .key-btn.active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+      background: linear-gradient(145deg, #333, #222);
+    }
+    
+    .key-btn.empty {
+      visibility: hidden;
+    }
+    
+    .legend {
+      margin-top: 10px;
+      font-size: 11px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+    }
+    
+    .legend-color {
+      width: 20px;
+      height: 12px;
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    
+    .dialog-box {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid #6366f1;
+      border-radius: 10px;
+      padding: 15px;
+      max-width: 300px;
+      display: none;
+    }
+    
+    .dialog-text {
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    
+    .dialog-close {
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .status-msg {
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 5px;
+      font-size: 12px;
+      color: #ffeb3b;
+      min-height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🤖 AI NPC Demo <span class="badge">AI</span></h1>
+  <p class="subtitle">Demo sử dụng PNP Game Engine AI NPC Package</p>
+  
+  <div class="instructions">
+    <strong>Hướng dẫn:</strong> Di chuyển bằng WASD hoặc phím mũi tên. Các NPC sẽ tự động hành động dựa trên AI behaviors. Tiếp cận NPC để tương tác!
+  </div>
+  
+  <div class="game-container">
+    <!-- Left Panel: NPC Status -->
+    <div class="panel">
+      <h3>🤖 Danh sách NPC</h3>
+      <div class="npc-list" id="npcList">
+        <!-- NPCs will be rendered here -->
+      </div>
+    </div>
+    
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- Right Panel: Controls & Info -->
+    <div class="panel info-panel">
+      <h3>🎮 Điều khiển</h3>
+      <div class="controls">
+        <div class="arrow-keys">
+          <button class="key-btn empty"></button>
+          <button class="key-btn" id="btnW">W</button>
+          <button class="key-btn empty"></button>
+          <button class="key-btn" id="btnA">A</button>
+          <button class="key-btn" id="btnS">S</button>
+          <button class="key-btn" id="btnD">D</button>
+        </div>
+      </div>
+      
+      <h3>📊 Thông tin</h3>
+      <div class="info-row">
+        <span class="info-label">Vị trí Player:</span>
+        <span class="info-value" id="posInfo">(0, 0)</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Số NPC:</span>
+        <span class="info-value" id="npcCount">0</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">NPC Gần nhất:</span>
+        <span class="info-value" id="nearestNpc">-</span>
+      </div>
+      
+      <div class="status-msg" id="statusMsg">Chào mừng! Di chuyển để xem AI NPC hoạt động.</div>
+      
+      <h3>📖 Chú thích</h3>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-color" style="background: #00ff00;"></span>
+          <span>Player (Bạn)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #4169E1;"></span>
+          <span>Guard (Tuần tra)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #ff4444;"></span>
+          <span>Enemy (Đuổi theo)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #ffd700;"></span>
+          <span>Merchant (Bán hàng)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #90EE90;"></span>
+          <span>Villager (Lang thang)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    /**
+     * AI NPC Demo
+     * Demonstrates the AI NPC package capabilities:
+     * - NPCBuilder: Creating and managing NPCs
+     * - Behaviors: Patrol, Chase, Wander, Idle
+     * - Dialog system
+     * - Auto behavior selection
+     * 
+     * This demo recreates the AI module concepts in vanilla JS
+     * for demonstration purposes without requiring build tools.
+     */
+    
+    // ============================================
+    // AI MODULE SIMULATION (Vanilla JS version)
+    // In real usage, you would import from the package
+    // ============================================
+    
+    /**
+     * Calculate distance between two points
+     */
+    function distance(a, b) {
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    /**
+     * Normalize a vector
+     */
+    function normalize(v) {
+      const len = Math.sqrt(v.x * v.x + v.y * v.y);
+      if (len === 0) return { x: 0, y: 0 };
+      return { x: v.x / len, y: v.y / len };
+    }
+    
+    /**
+     * IdleBehavior - NPC stands still
+     */
+    class IdleBehavior {
+      constructor(maxIdleTime = 3000) {
+        this.name = 'idle';
+        this.idleTime = 0;
+        this.maxIdleTime = maxIdleTime;
+      }
+      
+      update(npc, deltaTime, context) {
+        this.idleTime += deltaTime * 1000;
+      }
+      
+      canActivate() {
+        return true;
+      }
+      
+      onEnter() {
+        this.idleTime = 0;
+      }
+      
+      onExit() {
+        this.idleTime = 0;
+      }
+      
+      isIdleComplete() {
+        return this.idleTime >= this.maxIdleTime;
+      }
+    }
+    
+    /**
+     * PatrolBehavior - NPC moves between waypoints
+     */
+    class PatrolBehavior {
+      constructor() {
+        this.name = 'patrol';
+        this.currentWaypointIndex = 0;
+        this.waitTime = 0;
+        this.isWaiting = false;
+      }
+      
+      update(npc, deltaTime, context) {
+        const waypoints = npc.behaviorConfig.patrolPoints;
+        if (!waypoints || waypoints.length === 0) return;
+        
+        const currentWaypoint = waypoints[this.currentWaypointIndex];
+        const npcPos = npc.character.position;
+        const dist = distance(npcPos, currentWaypoint);
+        
+        if (dist < 5) {
+          if (!this.isWaiting) {
+            this.isWaiting = true;
+            this.waitTime = 0;
+          }
+          
+          this.waitTime += deltaTime * 1000;
+          
+          if (this.waitTime >= (npc.behaviorConfig.patrolWaitTime || 1000)) {
+            this.isWaiting = false;
+            this.currentWaypointIndex++;
+            if (this.currentWaypointIndex >= waypoints.length) {
+              if (npc.behaviorConfig.patrolLoop !== false) {
+                this.currentWaypointIndex = 0;
+              } else {
+                this.currentWaypointIndex = waypoints.length - 1;
+              }
+            }
+          }
+        } else {
+          const direction = normalize({
+            x: currentWaypoint.x - npcPos.x,
+            y: currentWaypoint.y - npcPos.y
+          });
+          
+          const speed = npc.character.speed * deltaTime;
+          npc.character.position.x += direction.x * speed;
+          npc.character.position.y += direction.y * speed;
+        }
+      }
+      
+      canActivate(npc) {
+        return npc.behaviorConfig.patrolPoints && npc.behaviorConfig.patrolPoints.length > 0;
+      }
+      
+      onEnter() {
+        this.currentWaypointIndex = 0;
+        this.waitTime = 0;
+        this.isWaiting = false;
+      }
+      
+      onExit() {}
+    }
+    
+    /**
+     * ChaseBehavior - NPC chases target
+     */
+    class ChaseBehavior {
+      constructor() {
+        this.name = 'chase';
+        this.target = null;
+      }
+      
+      update(npc, deltaTime, context) {
+        this.target = context.playerPosition || this.target;
+        if (!this.target) return;
+        
+        const npcPos = npc.character.position;
+        const dist = distance(npcPos, this.target);
+        const attackRange = npc.behaviorConfig.attackRange || 30;
+        
+        if (dist <= attackRange) return;
+        
+        const direction = normalize({
+          x: this.target.x - npcPos.x,
+          y: this.target.y - npcPos.y
+        });
+        
+        const chaseSpeedMultiplier = 1.2;
+        const speed = npc.character.speed * chaseSpeedMultiplier * deltaTime;
+        npc.character.position.x += direction.x * speed;
+        npc.character.position.y += direction.y * speed;
+      }
+      
+      canActivate(npc, context) {
+        if (!context.playerPosition) return false;
+        const npcPos = npc.character.position;
+        const dist = distance(npcPos, context.playerPosition);
+        const detectionRange = npc.behaviorConfig.detectionRange || 100;
+        return dist <= detectionRange && npc.hostile;
+      }
+      
+      onEnter() {
+        this.target = null;
+      }
+      
+      onExit() {
+        this.target = null;
+      }
+    }
+    
+    /**
+     * WanderBehavior - NPC randomly moves around
+     */
+    class WanderBehavior {
+      constructor(wanderRadius = 100, maxWaitTime = 2000) {
+        this.name = 'wander';
+        this.wanderRadius = wanderRadius;
+        this.maxWaitTime = maxWaitTime;
+        this.targetPosition = null;
+        this.centerPosition = null;
+        this.waitTime = 0;
+        this.isWaiting = false;
+      }
+      
+      update(npc, deltaTime, context) {
+        const npcPos = npc.character.position;
+        
+        if (!this.centerPosition) {
+          this.centerPosition = { x: npcPos.x, y: npcPos.y };
+        }
+        
+        if (!this.targetPosition) {
+          this.targetPosition = this.generateRandomTarget();
+        }
+        
+        const dist = distance(npcPos, this.targetPosition);
+        if (dist < 5) {
+          if (!this.isWaiting) {
+            this.isWaiting = true;
+            this.waitTime = 0;
+          }
+          
+          this.waitTime += deltaTime * 1000;
+          
+          if (this.waitTime >= this.maxWaitTime) {
+            this.isWaiting = false;
+            this.targetPosition = this.generateRandomTarget();
+          }
+        } else {
+          const direction = normalize({
+            x: this.targetPosition.x - npcPos.x,
+            y: this.targetPosition.y - npcPos.y
+          });
+          
+          const speed = npc.character.speed * deltaTime;
+          npc.character.position.x += direction.x * speed;
+          npc.character.position.y += direction.y * speed;
+        }
+      }
+      
+      generateRandomTarget() {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = Math.random() * this.wanderRadius;
+        return {
+          x: this.centerPosition.x + Math.cos(angle) * radius,
+          y: this.centerPosition.y + Math.sin(angle) * radius
+        };
+      }
+      
+      canActivate() {
+        return true;
+      }
+      
+      onEnter(npc) {
+        this.centerPosition = { x: npc.character.position.x, y: npc.character.position.y };
+        this.targetPosition = null;
+        this.waitTime = 0;
+        this.isWaiting = false;
+      }
+      
+      onExit() {}
+    }
+    
+    /**
+     * NPCBuilder - Creates and manages NPCs
+     */
+    class NPCBuilder {
+      constructor() {
+        this.npcs = new Map();
+      }
+      
+      createNPC(id, name, position, size, stats, options = {}) {
+        const character = {
+          id,
+          name,
+          position: { ...position },
+          size: { ...size },
+          speed: stats.speed,
+          health: stats.health,
+          maxHealth: stats.maxHealth
+        };
+        
+        const npc = {
+          id,
+          character,
+          state: 'idle',
+          behaviorConfig: options.behaviorConfig || {},
+          currentBehavior: null,
+          behaviors: new Map(),
+          dialogs: new Map(),
+          npcType: options.npcType || 'neutral',
+          hostile: options.hostile || false,
+          properties: options.properties || {}
+        };
+        
+        // Add default idle behavior
+        npc.behaviors.set('idle', new IdleBehavior());
+        npc.currentBehavior = npc.behaviors.get('idle');
+        
+        // Add dialogs
+        if (options.dialogs) {
+          for (const dialog of options.dialogs) {
+            npc.dialogs.set(dialog.id, dialog);
+          }
+        }
+        
+        this.npcs.set(id, npc);
+        return npc;
+      }
+      
+      getNPC(id) {
+        return this.npcs.get(id);
+      }
+      
+      getAllNPCs() {
+        return Array.from(this.npcs.values());
+      }
+      
+      addBehavior(npcId, behavior) {
+        const npc = this.npcs.get(npcId);
+        if (npc) {
+          npc.behaviors.set(behavior.name, behavior);
+        }
+        return this;
+      }
+      
+      setBehavior(npcId, behaviorName) {
+        const npc = this.npcs.get(npcId);
+        if (!npc) return this;
+        
+        const behavior = npc.behaviors.get(behaviorName);
+        if (!behavior) return this;
+        
+        if (npc.currentBehavior && npc.currentBehavior.onExit) {
+          npc.currentBehavior.onExit(npc);
+        }
+        
+        npc.currentBehavior = behavior;
+        npc.state = behaviorName;
+        
+        if (behavior.onEnter) {
+          behavior.onEnter(npc);
+        }
+        
+        return this;
+      }
+      
+      updateNPC(npc, deltaTime, context) {
+        if (npc.currentBehavior) {
+          npc.currentBehavior.update(npc, deltaTime, context);
+        }
+      }
+      
+      updateAll(deltaTime, context) {
+        for (const npc of this.npcs.values()) {
+          this.updateNPC(npc, deltaTime, context);
+        }
+      }
+      
+      autoSelectBehavior(npc, context) {
+        const behaviorPriority = ['chase', 'patrol', 'wander', 'idle'];
+        
+        for (const behaviorName of behaviorPriority) {
+          const behavior = npc.behaviors.get(behaviorName);
+          if (behavior && behavior.canActivate && behavior.canActivate(npc, context)) {
+            if (npc.currentBehavior !== behavior) {
+              this.setBehavior(npc.id, behaviorName);
+            }
+            return;
+          }
+        }
+      }
+      
+      getNPCsInRange(position, range) {
+        return Array.from(this.npcs.values()).filter(npc => {
+          const dist = distance(npc.character.position, position);
+          return dist <= range;
+        });
+      }
+    }
+    
+    // ============================================
+    // GAME IMPLEMENTATION
+    // ============================================
+    
+    class AIDemo {
+      constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.canvas.width = 800;
+        this.canvas.height = 600;
+        
+        // Player
+        this.player = {
+          x: 400,
+          y: 300,
+          width: 24,
+          height: 24,
+          speed: 200
+        };
+        
+        // Input
+        this.keys = new Set();
+        
+        // Create NPC Builder
+        this.npcBuilder = new NPCBuilder();
+        
+        // Initialize NPCs
+        this.initNPCs();
+        
+        // Setup
+        this.setupInput();
+        
+        // Game loop
+        this.lastTime = performance.now();
+        this.gameLoop();
+        
+        this.showStatus('Chào mừng! Di chuyển để xem AI NPC hoạt động.');
+      }
+      
+      initNPCs() {
+        // Guard NPC - Patrols around
+        const guard = this.npcBuilder.createNPC(
+          'guard_01',
+          '🛡️ Lính Canh',
+          { x: 100, y: 100 },
+          { width: 24, height: 24 },
+          { health: 100, maxHealth: 100, speed: 80 },
+          {
+            npcType: 'neutral',
+            hostile: false,
+            behaviorConfig: {
+              patrolPoints: [
+                { x: 100, y: 100 },
+                { x: 250, y: 100 },
+                { x: 250, y: 250 },
+                { x: 100, y: 250 }
+              ],
+              patrolLoop: true,
+              patrolWaitTime: 1500
+            },
+            dialogs: [
+              { id: 'greeting', lines: ['Đứng lại! Ai đó?', 'À, chỉ là dân làng thôi.'] }
+            ]
+          }
+        );
+        this.npcBuilder.addBehavior('guard_01', new PatrolBehavior());
+        this.npcBuilder.setBehavior('guard_01', 'patrol');
+        
+        // Enemy NPC - Chases player
+        const enemy = this.npcBuilder.createNPC(
+          'enemy_01',
+          '👹 Quái Vật',
+          { x: 600, y: 450 },
+          { width: 28, height: 28 },
+          { health: 80, maxHealth: 80, speed: 100 },
+          {
+            npcType: 'hostile',
+            hostile: true,
+            behaviorConfig: {
+              detectionRange: 200,
+              attackRange: 30
+            }
+          }
+        );
+        this.npcBuilder.addBehavior('enemy_01', new ChaseBehavior());
+        this.npcBuilder.addBehavior('enemy_01', new WanderBehavior(80, 2000));
+        
+        // Merchant NPC - Stays in place
+        const merchant = this.npcBuilder.createNPC(
+          'merchant_01',
+          '💰 Thương Nhân',
+          { x: 650, y: 150 },
+          { width: 24, height: 24 },
+          { health: 100, maxHealth: 100, speed: 0 },
+          {
+            npcType: 'merchant',
+            hostile: false,
+            dialogs: [
+              { 
+                id: 'shop', 
+                lines: ['Chào mừng đến cửa hàng!', 'Tôi có những món đồ tốt nhất!'] 
+              }
+            ]
+          }
+        );
+        
+        // Villager NPC - Wanders around
+        const villager = this.npcBuilder.createNPC(
+          'villager_01',
+          '👨‍🌾 Dân Làng',
+          { x: 300, y: 450 },
+          { width: 22, height: 22 },
+          { health: 50, maxHealth: 50, speed: 50 },
+          {
+            npcType: 'friendly',
+            hostile: false,
+            dialogs: [
+              { id: 'chat', lines: ['Trời đẹp quá nhỉ!', 'Bạn có thấy con gà của tôi không?'] }
+            ]
+          }
+        );
+        this.npcBuilder.addBehavior('villager_01', new WanderBehavior(120, 3000));
+        this.npcBuilder.setBehavior('villager_01', 'wander');
+        
+        // Second Guard - Different patrol route
+        const guard2 = this.npcBuilder.createNPC(
+          'guard_02',
+          '🛡️ Lính Canh 2',
+          { x: 500, y: 300 },
+          { width: 24, height: 24 },
+          { health: 100, maxHealth: 100, speed: 60 },
+          {
+            npcType: 'neutral',
+            hostile: false,
+            behaviorConfig: {
+              patrolPoints: [
+                { x: 500, y: 300 },
+                { x: 700, y: 300 },
+                { x: 700, y: 500 },
+                { x: 500, y: 500 }
+              ],
+              patrolLoop: true,
+              patrolWaitTime: 2000
+            }
+          }
+        );
+        this.npcBuilder.addBehavior('guard_02', new PatrolBehavior());
+        this.npcBuilder.setBehavior('guard_02', 'patrol');
+      }
+      
+      setupInput() {
+        window.addEventListener('keydown', (e) => {
+          this.keys.add(e.code);
+          const btnId = 'btn' + e.key.toUpperCase();
+          const btn = document.getElementById(btnId);
+          if (btn) btn.classList.add('active');
+        });
+        
+        window.addEventListener('keyup', (e) => {
+          this.keys.delete(e.code);
+          const btnId = 'btn' + e.key.toUpperCase();
+          const btn = document.getElementById(btnId);
+          if (btn) btn.classList.remove('active');
+        });
+        
+        // Button controls
+        ['W', 'A', 'S', 'D'].forEach(key => {
+          const btn = document.getElementById('btn' + key);
+          if (btn) {
+            btn.addEventListener('mousedown', () => {
+              this.keys.add('Key' + key);
+              btn.classList.add('active');
+            });
+            btn.addEventListener('mouseup', () => {
+              this.keys.delete('Key' + key);
+              btn.classList.remove('active');
+            });
+            btn.addEventListener('mouseleave', () => {
+              this.keys.delete('Key' + key);
+              btn.classList.remove('active');
+            });
+          }
+        });
+      }
+      
+      update(deltaTime) {
+        // Player movement
+        if (this.keys.has('KeyW') || this.keys.has('ArrowUp')) {
+          this.player.y -= this.player.speed * deltaTime;
+        }
+        if (this.keys.has('KeyS') || this.keys.has('ArrowDown')) {
+          this.player.y += this.player.speed * deltaTime;
+        }
+        if (this.keys.has('KeyA') || this.keys.has('ArrowLeft')) {
+          this.player.x -= this.player.speed * deltaTime;
+        }
+        if (this.keys.has('KeyD') || this.keys.has('ArrowRight')) {
+          this.player.x += this.player.speed * deltaTime;
+        }
+        
+        // Keep player in bounds
+        this.player.x = Math.max(0, Math.min(this.canvas.width - this.player.width, this.player.x));
+        this.player.y = Math.max(0, Math.min(this.canvas.height - this.player.height, this.player.y));
+        
+        // AI Context for NPCs
+        const context = {
+          playerPosition: { x: this.player.x, y: this.player.y },
+          otherNPCs: this.npcBuilder.getAllNPCs(),
+          gameTime: performance.now()
+        };
+        
+        // Update NPCs with auto behavior selection
+        for (const npc of this.npcBuilder.getAllNPCs()) {
+          this.npcBuilder.autoSelectBehavior(npc, context);
+        }
+        
+        // Update all NPCs
+        this.npcBuilder.updateAll(deltaTime, context);
+        
+        // Keep NPCs in bounds
+        for (const npc of this.npcBuilder.getAllNPCs()) {
+          npc.character.position.x = Math.max(0, Math.min(this.canvas.width - npc.character.size.width, npc.character.position.x));
+          npc.character.position.y = Math.max(0, Math.min(this.canvas.height - npc.character.size.height, npc.character.position.y));
+        }
+        
+        // Update UI
+        this.updateUI();
+      }
+      
+      updateUI() {
+        // Position info
+        document.getElementById('posInfo').textContent = 
+          `(${Math.floor(this.player.x)}, ${Math.floor(this.player.y)})`;
+        
+        // NPC count
+        document.getElementById('npcCount').textContent = this.npcBuilder.getAllNPCs().length;
+        
+        // Nearest NPC
+        const nearestNPCs = this.npcBuilder.getNPCsInRange(this.player, 100);
+        if (nearestNPCs.length > 0) {
+          const nearest = nearestNPCs.sort((a, b) => {
+            const distA = distance(a.character.position, this.player);
+            const distB = distance(b.character.position, this.player);
+            return distA - distB;
+          })[0];
+          document.getElementById('nearestNpc').textContent = nearest.character.name;
+          
+          // Show interaction message
+          const dist = distance(nearest.character.position, this.player);
+          if (dist < 50 && nearest.dialogs.size > 0) {
+            const firstDialog = nearest.dialogs.values().next().value;
+            this.showStatus(`💬 ${nearest.character.name}: "${firstDialog.lines[0]}"`);
+          }
+        } else {
+          document.getElementById('nearestNpc').textContent = '-';
+        }
+        
+        // Update NPC list
+        this.renderNPCList();
+      }
+      
+      renderNPCList() {
+        const listEl = document.getElementById('npcList');
+        listEl.innerHTML = '';
+        
+        for (const npc of this.npcBuilder.getAllNPCs()) {
+          const item = document.createElement('div');
+          item.className = 'npc-item';
+          
+          let typeClass = '';
+          if (npc.hostile) typeClass = 'hostile';
+          else if (npc.npcType === 'friendly') typeClass = 'friendly';
+          else if (npc.npcType === 'merchant') typeClass = 'merchant';
+          
+          item.innerHTML = `
+            <div class="npc-header">
+              <span class="npc-name">${npc.character.name}</span>
+              <span class="npc-type ${typeClass}">${npc.npcType}</span>
+            </div>
+            <div class="npc-state">Trạng thái: ${npc.state}</div>
+            <div class="npc-behavior">Behavior: ${npc.currentBehavior ? npc.currentBehavior.name : 'none'}</div>
+          `;
+          
+          listEl.appendChild(item);
+        }
+      }
+      
+      render() {
+        // Clear
+        this.ctx.fillStyle = '#1a1a2e';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw grid
+        this.ctx.strokeStyle = 'rgba(99, 102, 241, 0.1)';
+        this.ctx.lineWidth = 1;
+        for (let x = 0; x < this.canvas.width; x += 50) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(x, 0);
+          this.ctx.lineTo(x, this.canvas.height);
+          this.ctx.stroke();
+        }
+        for (let y = 0; y < this.canvas.height; y += 50) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, y);
+          this.ctx.lineTo(this.canvas.width, y);
+          this.ctx.stroke();
+        }
+        
+        // Draw waypoints for patrol NPCs
+        for (const npc of this.npcBuilder.getAllNPCs()) {
+          if (npc.behaviorConfig.patrolPoints) {
+            const points = npc.behaviorConfig.patrolPoints;
+            this.ctx.strokeStyle = 'rgba(65, 105, 225, 0.3)';
+            this.ctx.lineWidth = 2;
+            this.ctx.setLineDash([5, 5]);
+            this.ctx.beginPath();
+            this.ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+              this.ctx.lineTo(points[i].x, points[i].y);
+            }
+            this.ctx.lineTo(points[0].x, points[0].y);
+            this.ctx.stroke();
+            this.ctx.setLineDash([]);
+            
+            // Draw waypoint markers
+            for (const point of points) {
+              this.ctx.fillStyle = 'rgba(65, 105, 225, 0.5)';
+              this.ctx.beginPath();
+              this.ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+              this.ctx.fill();
+            }
+          }
+        }
+        
+        // Draw detection range for hostile NPCs
+        for (const npc of this.npcBuilder.getAllNPCs()) {
+          if (npc.hostile && npc.behaviorConfig.detectionRange) {
+            const pos = npc.character.position;
+            this.ctx.strokeStyle = 'rgba(255, 68, 68, 0.2)';
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+            this.ctx.arc(
+              pos.x + npc.character.size.width / 2,
+              pos.y + npc.character.size.height / 2,
+              npc.behaviorConfig.detectionRange,
+              0, Math.PI * 2
+            );
+            this.ctx.stroke();
+          }
+        }
+        
+        // Draw NPCs
+        for (const npc of this.npcBuilder.getAllNPCs()) {
+          this.drawNPC(npc);
+        }
+        
+        // Draw player
+        this.drawPlayer();
+      }
+      
+      drawNPC(npc) {
+        const pos = npc.character.position;
+        const size = npc.character.size;
+        
+        // Shadow
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(pos.x + size.width / 2, pos.y + size.height + 3, size.width / 2, 4, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Body color based on type
+        let color = '#aaa';
+        if (npc.hostile) {
+          color = '#ff4444';
+        } else if (npc.npcType === 'merchant') {
+          color = '#ffd700';
+        } else if (npc.npcType === 'friendly') {
+          color = '#90EE90';
+        } else {
+          color = '#4169E1';
+        }
+        
+        // Body
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(pos.x, pos.y, size.width, size.height);
+        
+        // Outline
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(pos.x, pos.y, size.width, size.height);
+        
+        // Direction indicator when moving
+        if (npc.currentBehavior && npc.currentBehavior.name !== 'idle') {
+          this.ctx.fillStyle = '#fff';
+          this.ctx.beginPath();
+          this.ctx.arc(pos.x + size.width / 2, pos.y + size.height / 2 - 3, 3, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+        
+        // Name label
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = '10px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(npc.character.name, pos.x + size.width / 2, pos.y - 5);
+        
+        // State indicator
+        this.ctx.font = '8px Arial';
+        this.ctx.fillStyle = '#aaa';
+        this.ctx.fillText(`[${npc.state}]`, pos.x + size.width / 2, pos.y + size.height + 15);
+      }
+      
+      drawPlayer() {
+        // Shadow
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(this.player.x + this.player.width / 2, this.player.y + this.player.height + 3, this.player.width / 2, 4, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Body
+        this.ctx.fillStyle = '#00ff00';
+        this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        
+        // Outline
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        
+        // Eyes
+        this.ctx.fillStyle = '#000';
+        this.ctx.beginPath();
+        this.ctx.arc(this.player.x + 8, this.player.y + 10, 2, 0, Math.PI * 2);
+        this.ctx.arc(this.player.x + 16, this.player.y + 10, 2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Name label
+        this.ctx.fillStyle = '#00ff00';
+        this.ctx.font = 'bold 11px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('🎮 Player', this.player.x + this.player.width / 2, this.player.y - 5);
+      }
+      
+      showStatus(msg) {
+        document.getElementById('statusMsg').textContent = msg;
+      }
+      
+      gameLoop(currentTime = performance.now()) {
+        const deltaTime = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+        
+        this.update(deltaTime);
+        this.render();
+        
+        requestAnimationFrame((time) => this.gameLoop(time));
+      }
+    }
+    
+    // Start the demo
+    window.game = new AIDemo();
+  </script>
+</body>
+</html>

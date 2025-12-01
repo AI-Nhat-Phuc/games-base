@@ -1,4 +1,46 @@
-# 🌾 Demo - Nông Trại Mini 2.5D
+# 🎮 Demo - PNP Game Engine
+
+Các demo game được xây dựng sử dụng các concept từ PNP Game Engine.
+
+---
+
+## 🤖 AI NPC Demo
+
+Demo minh họa **AI NPC Package** - hệ thống tạo và quản lý NPC với trí tuệ nhân tạo.
+
+### Tính năng AI NPC
+
+- **NPCBuilder**: Tạo và quản lý nhiều NPC cùng lúc
+- **Behavior System**: Hệ thống hành vi AI
+  - `IdleBehavior`: NPC đứng yên, nghỉ ngơi
+  - `PatrolBehavior`: NPC tuần tra theo waypoints
+  - `ChaseBehavior`: NPC đuổi theo player khi phát hiện
+  - `WanderBehavior`: NPC đi lang thang ngẫu nhiên
+- **Auto Behavior Selection**: Tự động chọn hành vi phù hợp dựa trên context
+- **Dialog System**: Hệ thống hội thoại NPC
+- **NPC Types**: Các loại NPC (friendly, hostile, merchant, neutral)
+
+### Các NPC trong Demo
+
+| NPC | Loại | Hành vi | Mô tả |
+|-----|------|---------|-------|
+| 🛡️ Lính Canh | neutral | Patrol | Tuần tra theo đường đi cố định |
+| 👹 Quái Vật | hostile | Chase/Wander | Đuổi theo player khi phát hiện |
+| 💰 Thương Nhân | merchant | Idle | Đứng tại chỗ bán hàng |
+| 👨‍🌾 Dân Làng | friendly | Wander | Đi lang thang quanh làng |
+
+### Chạy Demo
+
+```bash
+# Mở file trong trình duyệt
+open demo/ai-npc-demo.html  # macOS
+xdg-open demo/ai-npc-demo.html  # Linux
+start demo/ai-npc-demo.html  # Windows
+```
+
+---
+
+## 🌾 Nông Trại Mini 2.5D
 
 Đây là demo game nông trại nhỏ với giao diện **2.5D Isometric** được xây dựng sử dụng các concept từ PNP Game Engine.
 
