@@ -1,0 +1,53 @@
+{
+  "header": {
+    "title": "Map Builder",
+    "description": "Create 2.5D isometric and side-scrolling maps for your game",
+    "backToBuilder": "← Back to Builder"
+  },
+  "mapType": {
+    "title": "Map Type",
+    "isometric": {
+      "name": "2.5D Isometric",
+      "description": "Top-down perspective"
+    },
+    "sideScroll": {
+      "name": "Side-Scrolling",
+      "description": "Platform-style view"
+    }
+  },
+  "settings": {
+    "title": "Map Settings",
+    "mapName": "Map Name",
+    "mapNamePlaceholder": "Enter map name",
+    "mapWidth": "Map Width (tiles)",
+    "mapHeight": "Map Height (tiles)",
+    "tileSize": "Tile Size (px)"
+  },
+  "tileset": {
+    "title": "Tileset",
+    "uploadTileset": "Upload Tileset"
+  },
+  "layers": {
+    "title": "Layers",
+    "groundLayer": "Ground Layer",
+    "addLayer": "+ Add Layer"
+  },
+  "canvas": {
+    "mapInfo": "Map: {width}×{height} | Tile: {tileSize}px | Type: {type}"
+  },
+  "buttons": {
+    "generate": "Generate Map Data",
+    "download": "Download Map",
+    "clear": "Clear Map"
+  },
+  "messages": {
+    "clearConfirm": "Are you sure you want to clear the entire map?",
+    "generated": "Map data generated! Check the browser console for output.",
+    "downloadSuccess": "Map files downloaded successfully!"
+  },
+  "language": {
+    "switch": "Language",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  }
+}

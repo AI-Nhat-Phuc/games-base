@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Character Builder - Games Base</title>
+  <script src="i18n/i18n.js"></script>
   <style>
     * {
       margin: 0;
@@ -230,6 +231,35 @@
       display: flex;
     }
 
+    .language-switcher {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .lang-btn {
+      padding: 8px 16px;
+      border: 2px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .lang-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .lang-btn.active {
+      background: rgba(255,255,255,0.4);
+      border-color: white;
+    }
+
     .tabs {
       display: flex;
       gap: 10px;
@@ -278,191 +308,217 @@
 <body>
   <div class="container">
     <header>
-      <h1>🎮 PNP Builder Tools</h1>
-      <p>Create and configure game characters and maps with visual tools</p>
+      <div class="language-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" data-lang="en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('vi')" data-lang="vi">VI</button>
+      </div>
+      <h1>🎮 <span data-i18n="header.title">PNP Builder Tools</span></h1>
+      <p data-i18n="header.description">Create and configure game characters and maps with visual tools</p>
       <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
-        <a href="index.html" style="padding: 10px 20px; background: rgba(255,255,255,0.3); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; border: 2px solid rgba(255,255,255,0.5);">👤 Character Builder</a>
-        <a href="map-builder.html" style="padding: 10px 20px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.3s;">🗺️ Map Builder</a>
+        <a href="index.html" style="padding: 10px 20px; background: rgba(255,255,255,0.3); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; border: 2px solid rgba(255,255,255,0.5);">👤 <span data-i18n="nav.characterBuilder">Character Builder</span></a>
+        <a href="../map-builder/index.html" style="padding: 10px 20px; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.3s;">🗺️ <span data-i18n="nav.mapBuilder">Map Builder</span></a>
       </div>
     </header>
 
     <div class="content">
       <!-- Left Panel: Basic Info & Assets -->
       <div class="panel">
-        <h2>📝 Basic Information</h2>
+        <h2>📝 <span data-i18n="basicInfo.title">Basic Information</span></h2>
         
         <div class="form-group">
-          <label for="charName">Character Name</label>
-          <input type="text" id="charName" placeholder="Enter character name" value="Hero">
+          <label for="charName" data-i18n="basicInfo.characterName">Character Name</label>
+          <input type="text" id="charName" data-i18n-placeholder="basicInfo.characterNamePlaceholder" placeholder="Enter character name" value="Hero">
         </div>
 
         <div class="form-group">
-          <label for="charId">Character ID</label>
-          <input type="text" id="charId" placeholder="unique_character_id" value="hero_001">
+          <label for="charId" data-i18n="basicInfo.characterId">Character ID</label>
+          <input type="text" id="charId" data-i18n-placeholder="basicInfo.characterIdPlaceholder" placeholder="unique_character_id" value="hero_001">
         </div>
 
         <div class="form-group">
-          <label for="charDescription">Description</label>
-          <textarea id="charDescription" rows="3" placeholder="Character description">A brave hero ready for adventure</textarea>
+          <label for="charDescription" data-i18n="basicInfo.description">Description</label>
+          <textarea id="charDescription" rows="3" data-i18n-placeholder="basicInfo.descriptionPlaceholder" placeholder="Character description">A brave hero ready for adventure</textarea>
         </div>
 
-        <h2 style="margin-top: 30px;">🎨 Visual Assets</h2>
+        <h2 style="margin-top: 30px;">🎨 <span data-i18n="visualAssets.title">Visual Assets</span></h2>
 
         <div class="form-group">
-          <label>Character Sprite</label>
+          <label data-i18n="visualAssets.characterSprite">Character Sprite</label>
           <div class="file-upload">
             <input type="file" id="spriteUpload" accept="image/*">
             <button class="file-upload-btn" onclick="document.getElementById('spriteUpload').click()">
               <span>📁</span>
-              <span id="spriteLabel">Upload Sprite Image</span>
+              <span id="spriteLabel" data-i18n="visualAssets.uploadSprite">Upload Sprite Image</span>
             </button>
           </div>
           <div class="preview-area" id="spritePreview">
-            <div class="placeholder">No sprite uploaded</div>
+            <div class="placeholder" data-i18n="visualAssets.noSpriteUploaded">No sprite uploaded</div>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Animation Sheet</label>
+          <label data-i18n="visualAssets.animationSheet">Animation Sheet</label>
           <div class="file-upload">
             <input type="file" id="animationUpload" accept="image/*">
             <button class="file-upload-btn" onclick="document.getElementById('animationUpload').click()">
               <span>🎬</span>
-              <span id="animationLabel">Upload Animation Sheet</span>
+              <span id="animationLabel" data-i18n="visualAssets.uploadAnimation">Upload Animation Sheet</span>
             </button>
           </div>
           <div class="preview-area" id="animationPreview">
-            <div class="placeholder">No animation sheet uploaded</div>
+            <div class="placeholder" data-i18n="visualAssets.noAnimationUploaded">No animation sheet uploaded</div>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Voice/Sound Effects</label>
+          <label data-i18n="visualAssets.voiceEffects">Voice/Sound Effects</label>
           <div class="file-upload">
             <input type="file" id="voiceUpload" accept="audio/*">
             <button class="file-upload-btn" onclick="document.getElementById('voiceUpload').click()">
               <span>🎤</span>
-              <span id="voiceLabel">Upload Audio File</span>
+              <span id="voiceLabel" data-i18n="visualAssets.uploadAudio">Upload Audio File</span>
             </button>
           </div>
           <div class="preview-area" id="voicePreview">
-            <div class="placeholder">No audio uploaded</div>
+            <div class="placeholder" data-i18n="visualAssets.noAudioUploaded">No audio uploaded</div>
           </div>
         </div>
       </div>
 
       <!-- Right Panel: Stats & Configuration -->
       <div class="panel">
-        <h2>⚙️ Character Stats</h2>
+        <h2>⚙️ <span data-i18n="stats.title">Character Stats</span></h2>
         
         <div class="stats-grid">
           <div class="form-group">
-            <label for="health">Health</label>
+            <label for="health" data-i18n="stats.health">Health</label>
             <input type="number" id="health" value="100" min="1">
           </div>
 
           <div class="form-group">
-            <label for="maxHealth">Max Health</label>
+            <label for="maxHealth" data-i18n="stats.maxHealth">Max Health</label>
             <input type="number" id="maxHealth" value="100" min="1">
           </div>
 
           <div class="form-group">
-            <label for="speed">Speed</label>
+            <label for="speed" data-i18n="stats.speed">Speed</label>
             <input type="number" id="speed" value="200" min="1">
           </div>
 
           <div class="form-group">
-            <label for="strength">Strength</label>
+            <label for="strength" data-i18n="stats.strength">Strength</label>
             <input type="number" id="strength" value="10" min="0">
           </div>
 
           <div class="form-group">
-            <label for="defense">Defense</label>
+            <label for="defense" data-i18n="stats.defense">Defense</label>
             <input type="number" id="defense" value="5" min="0">
           </div>
 
           <div class="form-group">
-            <label for="level">Level</label>
+            <label for="level" data-i18n="stats.level">Level</label>
             <input type="number" id="level" value="1" min="1">
           </div>
         </div>
 
-        <h2 style="margin-top: 30px;">📐 Dimensions</h2>
+        <h2 style="margin-top: 30px;">📐 <span data-i18n="dimensions.title">Dimensions</span></h2>
 
         <div class="stats-grid">
           <div class="form-group">
-            <label for="width">Width (px)</label>
+            <label for="width" data-i18n="dimensions.width">Width (px)</label>
             <input type="number" id="width" value="32" min="1">
           </div>
 
           <div class="form-group">
-            <label for="height">Height (px)</label>
+            <label for="height" data-i18n="dimensions.height">Height (px)</label>
             <input type="number" id="height" value="32" min="1">
           </div>
         </div>
 
-        <h2 style="margin-top: 30px;">🎭 Animation Config</h2>
+        <h2 style="margin-top: 30px;">🎭 <span data-i18n="animation.title">Animation Config</span></h2>
 
         <div class="animation-config">
           <div class="form-group">
-            <label for="frameCount">Frame Count</label>
+            <label for="frameCount" data-i18n="animation.frameCount">Frame Count</label>
             <input type="number" id="frameCount" value="4" min="1">
           </div>
 
           <div class="form-group">
-            <label for="frameWidth">Frame Width (px)</label>
+            <label for="frameWidth" data-i18n="animation.frameWidth">Frame Width (px)</label>
             <input type="number" id="frameWidth" value="32" min="1">
           </div>
 
           <div class="form-group">
-            <label for="frameHeight">Frame Height (px)</label>
+            <label for="frameHeight" data-i18n="animation.frameHeight">Frame Height (px)</label>
             <input type="number" id="frameHeight" value="32" min="1">
           </div>
 
           <div class="form-group">
-            <label for="frameDuration">Frame Duration (ms)</label>
+            <label for="frameDuration" data-i18n="animation.frameDuration">Frame Duration (ms)</label>
             <input type="number" id="frameDuration" value="100" min="1">
           </div>
         </div>
 
         <button class="primary-btn" onclick="generateCharacter()">
-          ✨ Generate Character Data
+          ✨ <span data-i18n="buttons.generate">Generate Character Data</span>
         </button>
       </div>
 
       <!-- Output Section -->
       <div class="output-section">
         <div class="tabs">
-          <div class="tab active" onclick="switchTab('json')">JSON Output</div>
-          <div class="tab" onclick="switchTab('typescript')">TypeScript Code</div>
+          <div class="tab active" onclick="switchTab('json')" data-i18n="output.jsonTab">JSON Output</div>
+          <div class="tab" onclick="switchTab('typescript')" data-i18n="output.typescriptTab">TypeScript Code</div>
         </div>
 
         <div id="json-content" class="tab-content active">
-          <h2>Generated Character JSON</h2>
-          <div class="code-output" id="jsonOutput">
+          <h2 data-i18n="output.jsonTitle">Generated Character JSON</h2>
+          <div class="code-output" id="jsonOutput" data-i18n="output.placeholder">
             Click "Generate Character Data" to see the output
           </div>
         </div>
 
         <div id="typescript-content" class="tab-content">
-          <h2>TypeScript Integration Code</h2>
-          <div class="code-output" id="tsOutput">
+          <h2 data-i18n="output.typescriptTitle">TypeScript Integration Code</h2>
+          <div class="code-output" id="tsOutput" data-i18n="output.placeholder">
             Click "Generate Character Data" to see the output
           </div>
         </div>
 
         <button class="primary-btn" onclick="downloadCharacter()">
-          💾 Download Character Data
+          💾 <span data-i18n="buttons.download">Download Character Data</span>
         </button>
 
         <div class="success-message" id="successMessage">
           <span>✅</span>
-          <span>Character data generated successfully!</span>
+          <span data-i18n="messages.success">Character data generated successfully!</span>
         </div>
       </div>
     </div>
   </div>
 
   <script src="character-builder.js"></script>
+  <script>
+    // Language switcher function
+    function switchLanguage(lang) {
+      I18n.switchLocale(lang).then(() => {
+        // Update active button state
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+      });
+    }
+
+    // Initialize i18n with saved preference or default
+    window.addEventListener('load', () => {
+      const savedLocale = I18n.loadLocalePreference();
+      I18n.init(savedLocale).then(() => {
+        // Update active button state
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === savedLocale);
+        });
+      });
+    });
+  </script>
 </body>
 </html>

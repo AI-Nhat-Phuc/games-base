@@ -1,0 +1,72 @@
+{
+  "header": {
+    "title": "PNP Builder Tools",
+    "description": "Create and configure game characters and maps with visual tools"
+  },
+  "nav": {
+    "characterBuilder": "Character Builder",
+    "mapBuilder": "Map Builder"
+  },
+  "basicInfo": {
+    "title": "Basic Information",
+    "characterName": "Character Name",
+    "characterNamePlaceholder": "Enter character name",
+    "characterId": "Character ID",
+    "characterIdPlaceholder": "unique_character_id",
+    "description": "Description",
+    "descriptionPlaceholder": "Character description"
+  },
+  "visualAssets": {
+    "title": "Visual Assets",
+    "characterSprite": "Character Sprite",
+    "uploadSprite": "Upload Sprite Image",
+    "noSpriteUploaded": "No sprite uploaded",
+    "animationSheet": "Animation Sheet",
+    "uploadAnimation": "Upload Animation Sheet",
+    "noAnimationUploaded": "No animation sheet uploaded",
+    "voiceEffects": "Voice/Sound Effects",
+    "uploadAudio": "Upload Audio File",
+    "noAudioUploaded": "No audio uploaded"
+  },
+  "stats": {
+    "title": "Character Stats",
+    "health": "Health",
+    "maxHealth": "Max Health",
+    "speed": "Speed",
+    "strength": "Strength",
+    "defense": "Defense",
+    "level": "Level"
+  },
+  "dimensions": {
+    "title": "Dimensions",
+    "width": "Width (px)",
+    "height": "Height (px)"
+  },
+  "animation": {
+    "title": "Animation Config",
+    "frameCount": "Frame Count",
+    "frameWidth": "Frame Width (px)",
+    "frameHeight": "Frame Height (px)",
+    "frameDuration": "Frame Duration (ms)"
+  },
+  "output": {
+    "jsonTab": "JSON Output",
+    "typescriptTab": "TypeScript Code",
+    "jsonTitle": "Generated Character JSON",
+    "typescriptTitle": "TypeScript Integration Code",
+    "placeholder": "Click \"Generate Character Data\" to see the output"
+  },
+  "buttons": {
+    "generate": "Generate Character Data",
+    "download": "Download Character Data"
+  },
+  "messages": {
+    "success": "Character data generated successfully!",
+    "downloadSuccess": "Character data downloaded as {filename}\n\nYou can now use this data with the game engine!"
+  },
+  "language": {
+    "switch": "Language",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  }
+}

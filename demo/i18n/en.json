@@ -1,0 +1,23 @@
+{
+  "title": "PNP Game Engine Demo",
+  "aiNpcDemo": {
+    "title": "AI NPC Demo",
+    "description": "Demonstrates AI NPC behaviors and interactions"
+  },
+  "farmGame": {
+    "title": "Mini Farm 2.5D",
+    "description": "A small farming game demo with top-down view"
+  },
+  "controls": {
+    "movement": "Movement",
+    "keyboard": "Keyboard",
+    "mouse": "Mouse",
+    "cameraRotation": "Camera Rotation"
+  },
+  "ui": {
+    "plant": "Plant",
+    "water": "Water",
+    "harvest": "Harvest",
+    "money": "Money"
+  }
+}
