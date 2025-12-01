@@ -1,9 +1,19 @@
 /**
  * AI Behaviors - Pre-built behaviors for NPCs
+ * 
+ * Note: All behaviors expect deltaTime in seconds and internally convert
+ * to milliseconds where needed for time-based operations.
  */
 
 import { Vector2D } from '../core/types';
 import { AIBehavior, AIContext, NPC } from './types';
+
+/**
+ * Convert delta time from seconds to milliseconds
+ */
+function toMilliseconds(deltaTimeSeconds: number): number {
+  return deltaTimeSeconds * 1000;
+}
 
 /**
  * Calculate distance between two points
@@ -36,7 +46,7 @@ export class IdleBehavior implements AIBehavior {
   }
 
   update(npc: NPC, deltaTime: number, _context: AIContext): void {
-    this.idleTime += deltaTime * 1000;
+    this.idleTime += toMilliseconds(deltaTime);
     
     // Update animation if available
     if (npc.character.animations.has('idle')) {
@@ -90,7 +100,7 @@ export class PatrolBehavior implements AIBehavior {
         this.waitTime = 0;
       }
 
-      this.waitTime += deltaTime * 1000;
+      this.waitTime += toMilliseconds(deltaTime);
 
       // Wait at waypoint
       if (this.waitTime >= (config.patrolWaitTime || 1000)) {
@@ -322,7 +332,7 @@ export class AttackBehavior implements AIBehavior {
     // Only attack if within range
     if (dist > attackRange) return;
 
-    this.attackCooldown -= deltaTime * 1000;
+    this.attackCooldown -= toMilliseconds(deltaTime);
 
     if (this.attackCooldown <= 0) {
       // Perform attack
@@ -403,7 +413,7 @@ export class WanderBehavior implements AIBehavior {
         this.waitTime = 0;
       }
 
-      this.waitTime += deltaTime * 1000;
+      this.waitTime += toMilliseconds(deltaTime);
 
       // Wait, then pick new target
       if (this.waitTime >= this.maxWaitTime) {

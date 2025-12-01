@@ -256,7 +256,9 @@ describe('AI Behaviors', () => {
       
       // Position should have changed
       const pos = testNPC.character.transform.position;
-      const dist = Math.sqrt(Math.pow(pos.x - 50, 2) + Math.pow(pos.y - 50, 2));
+      const dx = pos.x - 50;
+      const dy = pos.y - 50;
+      const dist = Math.sqrt(dx * dx + dy * dy);
       expect(dist).toBeLessThanOrEqual(200); // Should be within extended range
     });
 
