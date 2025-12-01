@@ -1,15 +1,14 @@
-# 🌾 Demo - Nông Trại Mini 2.5D
+# 🌾 Demo - Nông Trại Mini
 
-Đây là demo game nông trại nhỏ với giao diện **2.5D Isometric** được xây dựng sử dụng các concept từ PNP Game Engine.
-
-![Farm Game 2.5D Demo](https://github.com/user-attachments/assets/fdab578b-d1eb-46cd-9075-5bb22ec1c120)
+Đây là demo game nông trại nhỏ với giao diện **Top-Down** (nhìn từ trên xuống) được xây dựng sử dụng các concept từ PNP Game Engine.
 
 ## 🎮 Tính năng
 
-- **Giao diện 2.5D Isometric**: Góc nhìn isometric tạo chiều sâu cho game
-- **Cánh đồng 10x10**: Lưới 100 ô có thể trồng cây với hiệu ứng 3D
-- **Ngôi nhà 3D**: Thiết kế isometric với mái, tường, cửa sổ
-- **Người chơi di chuyển**: Sử dụng phím W/A/S/D với animation mượt mà
+- **Giao diện Top-Down**: Góc nhìn từ trên xuống với các ô vuông dễ nhìn
+- **Cánh đồng 10x10**: Lưới 100 ô có thể trồng cây
+- **Ngôi nhà**: Thiết kế đơn giản với mái, tường, cửa sổ
+- **Người chơi di chuyển**: Sử dụng phím W/A/S/D hoặc nhấp chuột với animation mượt mà
+- **Xoay camera**: Hỗ trợ xoay camera với các góc 0°, 90°, 180°, 270° (không cho phép góc xéo)
 - **Hệ thống cây trồng**: 4 loại cây (Cà rốt, Cà chua, Ngô, Lúa mì)
 - **Hiệu ứng đẹp mắt**: Sparkle effect, water droplets, progress bars
 - **Quy trình canh tác**:
@@ -22,14 +21,33 @@
 
 ## 🕹️ Hướng dẫn điều khiển
 
-Di chuyển theo góc nhìn isometric (có thể dùng bàn phím hoặc click nút):
+### Di chuyển nhân vật
+
+Có thể di chuyển bằng **bàn phím** hoặc **chuột**:
+
+| Phương thức | Cách sử dụng |
+|-------------|--------------|
+| **Bàn phím** | Sử dụng phím W/A/S/D hoặc mũi tên |
+| **Chuột** | Nhấp chuột vào ô đất để di chuyển đến đó |
+
+Di chuyển trực quan theo hướng trên màn hình (hướng di chuyển tự động điều chỉnh theo góc xoay camera):
 
 | Phím / Nút | Hành động |
 |------------|-----------|
-| W / ⬆️ | Di chuyển lên-trái (↖) |
-| S / ⬇️ | Di chuyển xuống-phải (↘) |
-| A / ⬅️ | Di chuyển xuống-trái (↙) |
-| D / ➡️ | Di chuyển lên-phải (↗) |
+| W / ⬆️ | Di chuyển lên (↑) |
+| S / ⬇️ | Di chuyển xuống (↓) |
+| A / ⬅️ | Di chuyển trái (←) |
+| D / ➡️ | Di chuyển phải (→) |
+
+### Xoay Camera
+
+Game hỗ trợ xoay camera với **4 góc cố định**: 0°, 90°, 180°, 270° (không cho phép các góc xéo để đảm bảo điều khiển thuận tiện).
+
+| Phím / Nút | Hành động |
+|------------|-----------|
+| Q | Xoay camera trái (ngược chiều kim đồng hồ) |
+| E | Xoay camera phải (theo chiều kim đồng hồ) |
+| ⟲ Q / E ⟳ | Nút UI để xoay camera |
 
 ## 🌱 Loại cây trồng
 
@@ -57,28 +75,41 @@ start demo/farm-game.html  # Windows
 
 ## 🏗️ Kỹ thuật sử dụng
 
-Demo này minh họa các concept từ PNP Game Engine với góc nhìn 2.5D:
+Demo này minh họa các concept từ PNP Game Engine với góc nhìn Top-Down:
 
 1. **Game Loop**: Sử dụng `requestAnimationFrame` cho vòng lặp game mượt mà
-2. **Isometric Rendering**: Chuyển đổi tọa độ grid sang tọa độ màn hình isometric
-3. **Depth Sorting**: Vẽ tiles theo thứ tự từ xa đến gần để tạo hiệu ứng 3D
-4. **Tile-based Map**: Bản đồ dựa trên lưới ô với rendering isometric (tương tự MapBuilder)
-5. **Character Control**: Điều khiển nhân vật với keyboard input (tương tự CharacterBuilder + InputManager)
-6. **State Management**: Quản lý trạng thái cây trồng và người chơi
-7. **Canvas 2.5D Rendering**: Vẽ đồ họa isometric với độ sâu và bóng đổ
+2. **Top-Down Rendering**: Vẽ lưới vuông từ trên xuống
+3. **Camera Rotation**: Hỗ trợ xoay camera 90° với 4 góc cố định (0°, 90°, 180°, 270°)
+4. **Tile-based Map**: Bản đồ dựa trên lưới ô vuông (tương tự MapBuilder)
+5. **Character Control**: Điều khiển nhân vật với keyboard và mouse input (tương tự CharacterBuilder + InputManager)
+6. **Click-to-Move**: Chuyển đổi tọa độ màn hình sang tọa độ grid để di chuyển bằng chuột
+7. **State Management**: Quản lý trạng thái cây trồng và người chơi
+8. **Canvas Rendering**: Vẽ đồ họa 2D
 
-## 📐 Isometric Math
+## 📐 Coordinate Math
 
-Công thức chuyển đổi tọa độ từ grid sang màn hình:
+Công thức chuyển đổi tọa độ từ grid sang màn hình (với hỗ trợ xoay camera):
 ```javascript
 // Grid coordinates (gridX, gridY): Integer position in the 10x10 grid (0-9)
 // Screen coordinates (screenX, screenY): Pixel position on canvas
 
-// tileWidth = 64px, tileHeight = 32px
-// offsetX = canvas center X, offsetY = top padding (80px)
+// tileSize = 50px
+// offsetX, offsetY = padding (50px)
 
-screenX = (gridX - gridY) * (tileWidth / 2) + offsetX
-screenY = (gridX + gridY) * (tileHeight / 2) + offsetY
+// 1. Xoay tọa độ grid theo góc camera
+rotatedX, rotatedY = rotateGridCoords(gridX, gridY, cameraAngle)
+
+// 2. Chuyển đổi sang tọa độ màn hình (top-down)
+screenX = rotatedX * tileSize + offsetX + tileSize / 2
+screenY = rotatedY * tileSize + offsetY + tileSize / 2
+
+// Chuyển đổi ngược từ màn hình sang grid (cho click-to-move)
+// 1. Tính tọa độ grid từ màn hình
+gx = Math.floor((screenX - offsetX) / tileSize)
+gy = Math.floor((screenY - offsetY) / tileSize)
+
+// 2. Xoay ngược theo góc camera
+gridX, gridY = inverseRotateGridCoords(gx, gy, cameraAngle)
 ```
 
 ## 📁 Cấu trúc
@@ -86,9 +117,9 @@ screenY = (gridX + gridY) * (tileHeight / 2) + offsetY
 ```
 demo/
 ├── README.md           # File này
-└── farm-game.html      # Game nông trại mini 2.5D (tự chứa HTML + CSS + JS)
+└── farm-game.html      # Game nông trại mini (tự chứa HTML + CSS + JS)
 ```
 
 ---
 
-*Demo được tạo để minh họa khả năng 2.5D Isometric của PNP Game Engine*
+*Demo được tạo để minh họa khả năng của PNP Game Engine*
