@@ -195,8 +195,8 @@ const I18n = {
 // Make I18n available globally
 window.I18n = I18n;
 
-// Shorthand function for translations
-window.t = (key, params) => I18n.t(key, params);
+// Shorthand function for translations (namespaced to avoid conflicts)
+window.i18nT = (key, params) => I18n.t(key, params);
 
 // Export for module usage
 if (typeof module !== 'undefined' && module.exports) {

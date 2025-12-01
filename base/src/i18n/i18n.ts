@@ -54,19 +54,24 @@ export function getAvailableLocales(): Locale[] {
   return Object.keys(translations) as Locale[];
 }
 
+/** Type guard to check if a value is a record object */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 /**
  * Get a nested value from an object using dot notation
  * @param obj - The object to search
  * @param path - Dot-notation path (e.g., 'errors.gameNotInitialized')
  * @returns The value or undefined if not found
  */
-function getNestedValue(obj: Record<string, unknown>, path: string): string | undefined {
+function getNestedValue(obj: TranslationDict, path: string): string | undefined {
   const keys = path.split('.');
   let current: unknown = obj;
   
   for (const key of keys) {
-    if (current && typeof current === 'object' && key in current) {
-      current = (current as Record<string, unknown>)[key];
+    if (isRecord(current) && key in current) {
+      current = current[key];
     } else {
       return undefined;
     }
@@ -95,11 +100,11 @@ function interpolate(str: string, params: Record<string, string | number>): stri
  */
 export function t(key: string, params: Record<string, string | number> = {}): string {
   // Try current locale first
-  let value = getNestedValue(translations[currentLocale] as unknown as Record<string, unknown>, key);
+  let value = getNestedValue(translations[currentLocale], key);
   
   // Fall back to fallback locale if not found
   if (value === undefined && currentLocale !== fallbackLocale) {
-    value = getNestedValue(translations[fallbackLocale] as unknown as Record<string, unknown>, key);
+    value = getNestedValue(translations[fallbackLocale], key);
   }
   
   // Return key if still not found
@@ -118,8 +123,8 @@ export function t(key: string, params: Record<string, string | number> = {}): st
  * @returns true if the key exists in current or fallback locale
  */
 export function hasKey(key: string): boolean {
-  const inCurrent = getNestedValue(translations[currentLocale] as unknown as Record<string, unknown>, key) !== undefined;
-  const inFallback = getNestedValue(translations[fallbackLocale] as unknown as Record<string, unknown>, key) !== undefined;
+  const inCurrent = getNestedValue(translations[currentLocale], key) !== undefined;
+  const inFallback = getNestedValue(translations[fallbackLocale], key) !== undefined;
   return inCurrent || inFallback;
 }
 
