@@ -261,6 +261,30 @@ Check the `/examples` directory for complete working examples:
 - `client-demo.html`: Interactive client-side game demo
 - More examples coming soon!
 
+## Demos
+
+Interactive demos showcasing the engine capabilities:
+
+### 🤖 AI NPC Demo
+Demonstrates the AI NPC Package with multiple NPC types and behaviors.
+
+![AI NPC Demo](https://github.com/user-attachments/assets/3992e1a0-e8cf-4240-9b7a-aed30cb42022)
+
+**Features:**
+- 🛡️ **Guards** - Patrol behavior following waypoints
+- 👹 **Enemy** - Chase behavior with detection range
+- 💰 **Merchant** - Idle behavior
+- 👨‍🌾 **Villager** - Wander behavior
+
+**Run:** Open `demo/ai-npc-demo.html` in your browser
+
+### 🌾 Farm Game 2.5D
+A mini farming game with 2.5D isometric view.
+
+**Run:** Open `demo/farm-game.html` in your browser
+
+See [Demo README](demo/README.md) for more details.
+
 ## API Documentation
 
 ### Client API
