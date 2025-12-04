@@ -1,0 +1,24 @@
+{
+  "packages": [
+    "base",
+    "builders",
+    "demo",
+    "game-cli",
+    "server"
+  ],
+  "version": "independent",
+  "npmClient": "npm",
+  "useWorkspaces": true,
+  "command": {
+    "version": {
+      "conventionalCommits": true,
+      "message": "chore(release): publish"
+    },
+    "publish": {
+      "ignoreChanges": [
+        "**/README.md",
+        "**/*.md"
+      ]
+    }
+  }
+}
