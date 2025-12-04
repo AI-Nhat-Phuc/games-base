@@ -1,0 +1,53 @@
+{
+  "header": {
+    "title": "Trình tạo bản đồ",
+    "description": "Tạo bản đồ 2.5D isometric và cuộn ngang cho game của bạn",
+    "backToBuilder": "← Quay lại Builder"
+  },
+  "mapType": {
+    "title": "Loại bản đồ",
+    "isometric": {
+      "name": "2.5D Isometric",
+      "description": "Góc nhìn từ trên xuống"
+    },
+    "sideScroll": {
+      "name": "Cuộn ngang",
+      "description": "Dạng platform"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt bản đồ",
+    "mapName": "Tên bản đồ",
+    "mapNamePlaceholder": "Nhập tên bản đồ",
+    "mapWidth": "Chiều rộng (ô)",
+    "mapHeight": "Chiều cao (ô)",
+    "tileSize": "Kích thước ô (px)"
+  },
+  "tileset": {
+    "title": "Tileset",
+    "uploadTileset": "Tải lên Tileset"
+  },
+  "layers": {
+    "title": "Lớp",
+    "groundLayer": "Lớp nền",
+    "addLayer": "+ Thêm lớp"
+  },
+  "canvas": {
+    "mapInfo": "Bản đồ: {width}×{height} | Ô: {tileSize}px | Loại: {type}"
+  },
+  "buttons": {
+    "generate": "Tạo dữ liệu bản đồ",
+    "download": "Tải xuống bản đồ",
+    "clear": "Xóa bản đồ"
+  },
+  "messages": {
+    "clearConfirm": "Bạn có chắc muốn xóa toàn bộ bản đồ?",
+    "generated": "Dữ liệu bản đồ đã được tạo! Kiểm tra console trình duyệt để xem kết quả.",
+    "downloadSuccess": "Tải xuống file bản đồ thành công!"
+  },
+  "language": {
+    "switch": "Ngôn ngữ",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  }
+}

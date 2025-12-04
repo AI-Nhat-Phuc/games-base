@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Map Builder - PNP Game Engine</title>
+  <script src="i18n/i18n.js"></script>
   <style>
     * {
       margin: 0;
@@ -353,6 +354,36 @@
       background: #38a169;
     }
 
+    .language-switcher {
+      position: absolute;
+      top: 50%;
+      right: 30px;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 8px;
+    }
+
+    .lang-btn {
+      padding: 8px 16px;
+      border: 2px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .lang-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .lang-btn.active {
+      background: rgba(255,255,255,0.4);
+      border-color: white;
+    }
+
     @media (max-width: 1024px) {
       .content {
         grid-template-columns: 1fr;
@@ -367,59 +398,63 @@
 <body>
   <div class="container">
     <header>
-      <a href="index.html" class="nav-link">← Back to Builder</a>
-      <h1>🗺️ Map Builder</h1>
-      <p>Create 2.5D isometric and side-scrolling maps for your game</p>
+      <a href="../character-builder/index.html" class="nav-link" data-i18n="header.backToBuilder">← Back to Builder</a>
+      <div class="language-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" data-lang="en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('vi')" data-lang="vi">VI</button>
+      </div>
+      <h1>🗺️ <span data-i18n="header.title">Map Builder</span></h1>
+      <p data-i18n="header.description">Create 2.5D isometric and side-scrolling maps for your game</p>
     </header>
 
     <div class="content">
       <!-- Sidebar -->
       <div class="sidebar">
-        <h2>Map Type</h2>
+        <h2 data-i18n="mapType.title">Map Type</h2>
         <div class="map-type-selector">
           <button class="map-type-btn active" onclick="setMapType('2.5d')" id="btn-2.5d">
             <span class="icon">📐</span>
             <div>
-              <div>2.5D Isometric</div>
-              <small style="opacity: 0.7; font-weight: normal;">Top-down perspective</small>
+              <div data-i18n="mapType.isometric.name">2.5D Isometric</div>
+              <small style="opacity: 0.7; font-weight: normal;" data-i18n="mapType.isometric.description">Top-down perspective</small>
             </div>
           </button>
           <button class="map-type-btn" onclick="setMapType('sidescroll')" id="btn-sidescroll">
             <span class="icon">🎮</span>
             <div>
-              <div>Side-Scrolling</div>
-              <small style="opacity: 0.7; font-weight: normal;">Platform-style view</small>
+              <div data-i18n="mapType.sideScroll.name">Side-Scrolling</div>
+              <small style="opacity: 0.7; font-weight: normal;" data-i18n="mapType.sideScroll.description">Platform-style view</small>
             </div>
           </button>
         </div>
 
-        <h2>Map Settings</h2>
+        <h2 data-i18n="settings.title">Map Settings</h2>
         <div class="form-group">
-          <label for="mapName">Map Name</label>
-          <input type="text" id="mapName" placeholder="Enter map name" value="Level 1">
+          <label for="mapName" data-i18n="settings.mapName">Map Name</label>
+          <input type="text" id="mapName" data-i18n-placeholder="settings.mapNamePlaceholder" placeholder="Enter map name" value="Level 1">
         </div>
 
         <div class="form-group">
-          <label for="mapWidth">Map Width (tiles)</label>
+          <label for="mapWidth" data-i18n="settings.mapWidth">Map Width (tiles)</label>
           <input type="number" id="mapWidth" value="20" min="5" max="100" onchange="updateMapSize()">
         </div>
 
         <div class="form-group">
-          <label for="mapHeight">Map Height (tiles)</label>
+          <label for="mapHeight" data-i18n="settings.mapHeight">Map Height (tiles)</label>
           <input type="number" id="mapHeight" value="15" min="5" max="100" onchange="updateMapSize()">
         </div>
 
         <div class="form-group">
-          <label for="tileSize">Tile Size (px)</label>
+          <label for="tileSize" data-i18n="settings.tileSize">Tile Size (px)</label>
           <input type="number" id="tileSize" value="32" min="8" max="128" onchange="updateMapSize()">
         </div>
 
         <div class="tileset-upload">
-          <h2>Tileset</h2>
+          <h2 data-i18n="tileset.title">Tileset</h2>
           <input type="file" id="tilesetUpload" accept="image/*" style="display: none;" onchange="loadTileset(event)">
           <button class="file-upload-btn" onclick="document.getElementById('tilesetUpload').click()">
             <span>🎨</span>
-            <span id="tilesetLabel">Upload Tileset</span>
+            <span id="tilesetLabel" data-i18n="tileset.uploadTileset">Upload Tileset</span>
           </button>
           <div class="preview-thumbnail" id="tilesetPreview" style="display: none;">
             <img id="tilesetImg" src="" alt="Tileset">
@@ -427,14 +462,14 @@
         </div>
 
         <div class="layer-controls">
-          <h3>Layers</h3>
+          <h3 data-i18n="layers.title">Layers</h3>
           <div class="layer-list" id="layerList">
             <div class="layer-item active" data-layer="0">
-              <span class="layer-name">Ground Layer</span>
+              <span class="layer-name" data-i18n="layers.groundLayer">Ground Layer</span>
               <span>📍</span>
             </div>
           </div>
-          <button class="add-layer-btn" onclick="addLayer()">+ Add Layer</button>
+          <button class="add-layer-btn" onclick="addLayer()" data-i18n="layers.addLayer">+ Add Layer</button>
         </div>
       </div>
 
@@ -447,14 +482,36 @@
           <span class="map-info-badge" id="mapInfo">Map: 20×15 | Tile: 32px | Type: 2.5D Isometric</span>
         </div>
         <div class="action-buttons">
-          <button class="btn btn-primary" onclick="generateMapData()">✨ Generate Map Data</button>
-          <button class="btn btn-secondary" onclick="downloadMapData()">💾 Download Map</button>
-          <button class="btn btn-danger" onclick="clearMap()">🗑️ Clear Map</button>
+          <button class="btn btn-primary" onclick="generateMapData()">✨ <span data-i18n="buttons.generate">Generate Map Data</span></button>
+          <button class="btn btn-secondary" onclick="downloadMapData()">💾 <span data-i18n="buttons.download">Download Map</span></button>
+          <button class="btn btn-danger" onclick="clearMap()">🗑️ <span data-i18n="buttons.clear">Clear Map</span></button>
         </div>
       </div>
     </div>
   </div>
 
   <script src="map-builder.js"></script>
+  <script>
+    // Language switcher function
+    function switchLanguage(lang) {
+      I18n.switchLocale(lang).then(() => {
+        // Update active button state
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+      });
+    }
+
+    // Initialize i18n with saved preference or default
+    window.addEventListener('load', () => {
+      const savedLocale = I18n.loadLocalePreference();
+      I18n.init(savedLocale).then(() => {
+        // Update active button state
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === savedLocale);
+        });
+      });
+    });
+  </script>
 </body>
 </html>

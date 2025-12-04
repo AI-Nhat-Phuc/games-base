@@ -1,0 +1,23 @@
+{
+  "title": "Demo PNP Game Engine",
+  "aiNpcDemo": {
+    "title": "Demo AI NPC",
+    "description": "Minh họa hành vi và tương tác của AI NPC"
+  },
+  "farmGame": {
+    "title": "Nông Trại Mini 2.5D",
+    "description": "Demo game nông trại nhỏ với góc nhìn từ trên xuống"
+  },
+  "controls": {
+    "movement": "Di chuyển",
+    "keyboard": "Bàn phím",
+    "mouse": "Chuột",
+    "cameraRotation": "Xoay camera"
+  },
+  "ui": {
+    "plant": "Trồng",
+    "water": "Tưới nước",
+    "harvest": "Thu hoạch",
+    "money": "Tiền"
+  }
+}

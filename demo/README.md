@@ -1,38 +1,38 @@
 # 🎮 Demo - PNP Game Engine
 
-Các demo game được xây dựng sử dụng các concept từ PNP Game Engine.
+Game demos built using concepts from the PNP Game Engine.
 
 ---
 
 ## 🤖 AI NPC Demo
 
-Demo minh họa **AI NPC Package** - hệ thống tạo và quản lý NPC với trí tuệ nhân tạo.
+A demo showcasing the **AI NPC Package** - a system for creating and managing NPCs with artificial intelligence.
 
-### Tính năng AI NPC
+### AI NPC Features
 
-- **NPCBuilder**: Tạo và quản lý nhiều NPC cùng lúc
-- **Behavior System**: Hệ thống hành vi AI
-  - `IdleBehavior`: NPC đứng yên, nghỉ ngơi
-  - `PatrolBehavior`: NPC tuần tra theo waypoints
-  - `ChaseBehavior`: NPC đuổi theo player khi phát hiện
-  - `WanderBehavior`: NPC đi lang thang ngẫu nhiên
-- **Auto Behavior Selection**: Tự động chọn hành vi phù hợp dựa trên context
-- **Dialog System**: Hệ thống hội thoại NPC
-- **NPC Types**: Các loại NPC (friendly, hostile, merchant, neutral)
+- **NPCBuilder**: Create and manage multiple NPCs simultaneously
+- **Behavior System**: AI behavior system
+  - `IdleBehavior`: NPC stands still, resting
+  - `PatrolBehavior`: NPC patrols along waypoints
+  - `ChaseBehavior`: NPC chases the player when detected
+  - `WanderBehavior`: NPC wanders randomly
+- **Auto Behavior Selection**: Automatically selects appropriate behavior based on context
+- **Dialog System**: NPC dialogue system
+- **NPC Types**: Various NPC types (friendly, hostile, merchant, neutral)
 
-### Các NPC trong Demo
+### NPCs in the Demo
 
-| NPC | Loại | Hành vi | Mô tả |
-|-----|------|---------|-------|
-| 🛡️ Lính Canh | neutral | Patrol | Tuần tra theo đường đi cố định |
-| 👹 Quái Vật | hostile | Chase/Wander | Đuổi theo player khi phát hiện |
-| 💰 Thương Nhân | merchant | Idle | Đứng tại chỗ bán hàng |
-| 👨‍🌾 Dân Làng | friendly | Wander | Đi lang thang quanh làng |
+| NPC | Type | Behavior | Description |
+|-----|------|----------|-------------|
+| 🛡️ Guard | neutral | Patrol | Patrols along a fixed path |
+| 👹 Monster | hostile | Chase/Wander | Chases player when detected |
+| 💰 Merchant | merchant | Idle | Stands in place selling goods |
+| 👨‍🌾 Villager | friendly | Wander | Wanders around the village |
 
-### Chạy Demo
+### Running the Demo
 
 ```bash
-# Mở file trong trình duyệt
+# Open the file in a browser
 open demo/ai-npc-demo.html  # macOS
 xdg-open demo/ai-npc-demo.html  # Linux
 start demo/ai-npc-demo.html  # Windows
@@ -40,97 +40,97 @@ start demo/ai-npc-demo.html  # Windows
 
 ---
 
-## 🌾 Nông Trại Mini 2.5D
+## 🌾 Mini Farm 2.5D
 
-Đây là demo game nông trại nhỏ với giao diện **Top-Down** (nhìn từ trên xuống) được xây dựng sử dụng các concept từ PNP Game Engine.
+This is a small farming game demo with a **Top-Down** view (looking from above) built using concepts from the PNP Game Engine.
 
-## 🎮 Tính năng
+## 🎮 Features
 
-- **Giao diện Top-Down**: Góc nhìn từ trên xuống với các ô vuông dễ nhìn
-- **Cánh đồng 10x10**: Lưới 100 ô có thể trồng cây
-- **Ngôi nhà**: Thiết kế đơn giản với mái, tường, cửa sổ
-- **Người chơi di chuyển**: Sử dụng phím W/A/S/D hoặc nhấp chuột với animation mượt mà
-- **Xoay camera**: Hỗ trợ xoay camera với các góc 0°, 90°, 180°, 270° (không cho phép góc xéo)
-- **Hệ thống cây trồng**: 4 loại cây (Cà rốt, Cà chua, Ngô, Lúa mì)
-- **Hiệu ứng đẹp mắt**: Sparkle effect, water droplets, progress bars
-- **Quy trình canh tác**:
-  1. Di chuyển đến ô đất trống
-  2. Chọn loại cây muốn trồng
-  3. Gieo hạt (tốn tiền)
-  4. Tưới nước để cây phát triển
-  5. Đợi cây qua các giai đoạn
-  6. Thu hoạch khi cây trưởng thành (nhận tiền)
+- **Top-Down View**: Overhead perspective with easy-to-see square tiles
+- **10x10 Field**: 100-cell grid for planting crops
+- **House**: Simple design with roof, walls, and windows
+- **Player Movement**: Use W/A/S/D keys or mouse click with smooth animation
+- **Camera Rotation**: Supports camera rotation at angles 0°, 90°, 180°, 270° (diagonal angles not allowed)
+- **Crop System**: 4 types of crops (Carrot, Tomato, Corn, Wheat)
+- **Visual Effects**: Sparkle effect, water droplets, progress bars
+- **Farming Process**:
+  1. Move to an empty plot
+  2. Select the type of crop to plant
+  3. Sow seeds (costs money)
+  4. Water to help the crop grow
+  5. Wait for the crop to pass through growth stages
+  6. Harvest when mature (earn money)
 
-## 🕹️ Hướng dẫn điều khiển
+## 🕹️ Controls Guide
 
-### Di chuyển nhân vật
+### Character Movement
 
-Có thể di chuyển bằng **bàn phím** hoặc **chuột**:
+You can move using **keyboard** or **mouse**:
 
-| Phương thức | Cách sử dụng |
-|-------------|--------------|
-| **Bàn phím** | Sử dụng phím W/A/S/D hoặc mũi tên |
-| **Chuột** | Nhấp chuột vào ô đất để di chuyển đến đó |
+| Method | Usage |
+|--------|-------|
+| **Keyboard** | Use W/A/S/D keys or arrow keys |
+| **Mouse** | Click on a plot to move there |
 
-Di chuyển trực quan theo hướng trên màn hình (hướng di chuyển tự động điều chỉnh theo góc xoay camera):
+Movement follows the visual direction on screen (movement direction automatically adjusts based on camera rotation):
 
-| Phím / Nút | Hành động |
-|------------|-----------|
-| W / ⬆️ | Di chuyển lên (↑) |
-| S / ⬇️ | Di chuyển xuống (↓) |
-| A / ⬅️ | Di chuyển trái (←) |
-| D / ➡️ | Di chuyển phải (→) |
+| Key / Button | Action |
+|--------------|--------|
+| W / ⬆️ | Move up (↑) |
+| S / ⬇️ | Move down (↓) |
+| A / ⬅️ | Move left (←) |
+| D / ➡️ | Move right (→) |
 
-### Xoay Camera
+### Camera Rotation
 
-Game hỗ trợ xoay camera với **4 góc cố định**: 0°, 90°, 180°, 270° (không cho phép các góc xéo để đảm bảo điều khiển thuận tiện).
+The game supports camera rotation with **4 fixed angles**: 0°, 90°, 180°, 270° (diagonal angles are not allowed to ensure convenient controls).
 
-| Phím / Nút | Hành động |
-|------------|-----------|
-| Q | Xoay camera trái (ngược chiều kim đồng hồ) |
-| E | Xoay camera phải (theo chiều kim đồng hồ) |
-| ⟲ Q / E ⟳ | Nút UI để xoay camera |
+| Key / Button | Action |
+|--------------|--------|
+| Q | Rotate camera left (counter-clockwise) |
+| E | Rotate camera right (clockwise) |
+| ⟲ Q / E ⟳ | UI buttons for camera rotation |
 
-## 🌱 Loại cây trồng
+## 🌱 Crop Types
 
-| Cây | Giai đoạn | Thời gian | Chi phí | Thu hoạch |
-|-----|-----------|-----------|---------|-----------|
-| 🥕 Cà rốt | 3 | 3 giây | 5💰 | 15💰 |
-| 🍅 Cà chua | 4 | 4 giây | 10💰 | 25💰 |
-| 🌽 Ngô | 5 | 5 giây | 15💰 | 40💰 |
-| 🌾 Lúa mì | 3 | 2.5 giây | 3💰 | 10💰 |
+| Crop | Stages | Growth Time | Cost | Harvest |
+|------|--------|-------------|------|---------|
+| 🥕 Carrot | 3 | 3 seconds | 5💰 | 15💰 |
+| 🍅 Tomato | 4 | 4 seconds | 10💰 | 25💰 |
+| 🌽 Corn | 5 | 5 seconds | 15💰 | 40💰 |
+| 🌾 Wheat | 3 | 2.5 seconds | 3💰 | 10💰 |
 
-## 🚀 Chạy Demo
+## 🚀 Running the Demo
 
-Mở file `farm-game.html` trong trình duyệt web:
+Open the `farm-game.html` file in a web browser:
 
 ```bash
-# Sử dụng http-server
+# Using http-server
 npx http-server . -p 8080
-# Sau đó mở http://localhost:8080/demo/farm-game.html
+# Then open http://localhost:8080/demo/farm-game.html
 
-# Hoặc đơn giản mở trực tiếp trong trình duyệt
+# Or simply open directly in the browser
 open demo/farm-game.html  # macOS
 xdg-open demo/farm-game.html  # Linux
 start demo/farm-game.html  # Windows
 ```
 
-## 🏗️ Kỹ thuật sử dụng
+## 🏗️ Technical Implementation
 
-Demo này minh họa các concept từ PNP Game Engine với góc nhìn Top-Down:
+This demo illustrates concepts from PNP Game Engine with a Top-Down view:
 
-1. **Game Loop**: Sử dụng `requestAnimationFrame` cho vòng lặp game mượt mà
-2. **Top-Down Rendering**: Vẽ lưới vuông từ trên xuống
-3. **Camera Rotation**: Hỗ trợ xoay camera 90° với 4 góc cố định (0°, 90°, 180°, 270°)
-4. **Tile-based Map**: Bản đồ dựa trên lưới ô vuông (tương tự MapBuilder)
-5. **Character Control**: Điều khiển nhân vật với keyboard và mouse input (tương tự CharacterBuilder + InputManager)
-6. **Click-to-Move**: Chuyển đổi tọa độ màn hình sang tọa độ grid để di chuyển bằng chuột
-7. **State Management**: Quản lý trạng thái cây trồng và người chơi
-8. **Canvas Rendering**: Vẽ đồ họa 2D
+1. **Game Loop**: Uses `requestAnimationFrame` for smooth game loop
+2. **Top-Down Rendering**: Draws square grid from above
+3. **Camera Rotation**: Supports 90° camera rotation with 4 fixed angles (0°, 90°, 180°, 270°)
+4. **Tile-based Map**: Map based on square grid (similar to MapBuilder)
+5. **Character Control**: Character control with keyboard and mouse input (similar to CharacterBuilder + InputManager)
+6. **Click-to-Move**: Converts screen coordinates to grid coordinates for mouse movement
+7. **State Management**: Manages crop and player states
+8. **Canvas Rendering**: 2D graphics rendering
 
 ## 📐 Coordinate Math
 
-Công thức chuyển đổi tọa độ từ grid sang màn hình (với hỗ trợ xoay camera):
+Formula for converting coordinates from grid to screen (with camera rotation support):
 ```javascript
 // Grid coordinates (gridX, gridY): Integer position in the 10x10 grid (0-9)
 // Screen coordinates (screenX, screenY): Pixel position on canvas
@@ -138,30 +138,32 @@ Công thức chuyển đổi tọa độ từ grid sang màn hình (với hỗ t
 // tileSize = 50px
 // offsetX, offsetY = padding (50px)
 
-// 1. Xoay tọa độ grid theo góc camera
+// 1. Rotate grid coordinates based on camera angle
 rotatedX, rotatedY = rotateGridCoords(gridX, gridY, cameraAngle)
 
-// 2. Chuyển đổi sang tọa độ màn hình (top-down)
+// 2. Convert to screen coordinates (top-down)
 screenX = rotatedX * tileSize + offsetX + tileSize / 2
 screenY = rotatedY * tileSize + offsetY + tileSize / 2
 
-// Chuyển đổi ngược từ màn hình sang grid (cho click-to-move)
-// 1. Tính tọa độ grid từ màn hình
+// Reverse conversion from screen to grid (for click-to-move)
+// 1. Calculate grid coordinates from screen
 gx = Math.floor((screenX - offsetX) / tileSize)
 gy = Math.floor((screenY - offsetY) / tileSize)
 
-// 2. Xoay ngược theo góc camera
+// 2. Reverse rotation based on camera angle
 gridX, gridY = inverseRotateGridCoords(gx, gy, cameraAngle)
 ```
 
-## 📁 Cấu trúc
+## 📁 Structure
 
 ```
 demo/
-├── README.md           # File này
-└── farm-game.html      # Game nông trại mini (tự chứa HTML + CSS + JS)
+├── README.md           # This file (English)
+├── README.vi.md        # Vietnamese version
+├── ai-npc-demo.html    # AI NPC demo
+└── farm-game.html      # Mini farm game (self-contained HTML + CSS + JS)
 ```
 
 ---
 
-*Demo được tạo để minh họa khả năng của PNP Game Engine*
+*Demo created to showcase the capabilities of PNP Game Engine*

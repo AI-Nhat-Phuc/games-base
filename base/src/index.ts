@@ -37,5 +37,17 @@ export type {
   NPCDialogChoice
 } from './ai/types';
 
+// i18n (Internationalization) Module
+export {
+  i18n,
+  t,
+  setLocale,
+  getLocale,
+  getAvailableLocales,
+  hasKey,
+  initI18n
+} from './i18n';
+export type { Locale, TranslationDict, I18nConfig } from './i18n';
+
 // Note: Use initGame() or createGame() to initialize the engine.
 // Access builders via getGame().getCharacterBuilder(), etc.

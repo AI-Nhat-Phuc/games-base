@@ -1,0 +1,72 @@
+{
+  "header": {
+    "title": "Công cụ PNP Builder",
+    "description": "Tạo và cấu hình nhân vật và bản đồ game với công cụ trực quan"
+  },
+  "nav": {
+    "characterBuilder": "Trình tạo nhân vật",
+    "mapBuilder": "Trình tạo bản đồ"
+  },
+  "basicInfo": {
+    "title": "Thông tin cơ bản",
+    "characterName": "Tên nhân vật",
+    "characterNamePlaceholder": "Nhập tên nhân vật",
+    "characterId": "ID nhân vật",
+    "characterIdPlaceholder": "id_nhan_vat_duy_nhat",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Mô tả nhân vật"
+  },
+  "visualAssets": {
+    "title": "Tài nguyên hình ảnh",
+    "characterSprite": "Sprite nhân vật",
+    "uploadSprite": "Tải lên hình Sprite",
+    "noSpriteUploaded": "Chưa tải sprite",
+    "animationSheet": "Bảng Animation",
+    "uploadAnimation": "Tải lên bảng Animation",
+    "noAnimationUploaded": "Chưa tải bảng animation",
+    "voiceEffects": "Hiệu ứng âm thanh/Giọng nói",
+    "uploadAudio": "Tải lên file âm thanh",
+    "noAudioUploaded": "Chưa tải âm thanh"
+  },
+  "stats": {
+    "title": "Chỉ số nhân vật",
+    "health": "Máu",
+    "maxHealth": "Máu tối đa",
+    "speed": "Tốc độ",
+    "strength": "Sức mạnh",
+    "defense": "Phòng thủ",
+    "level": "Cấp độ"
+  },
+  "dimensions": {
+    "title": "Kích thước",
+    "width": "Chiều rộng (px)",
+    "height": "Chiều cao (px)"
+  },
+  "animation": {
+    "title": "Cấu hình Animation",
+    "frameCount": "Số khung hình",
+    "frameWidth": "Chiều rộng khung (px)",
+    "frameHeight": "Chiều cao khung (px)",
+    "frameDuration": "Thời gian khung (ms)"
+  },
+  "output": {
+    "jsonTab": "Kết quả JSON",
+    "typescriptTab": "Mã TypeScript",
+    "jsonTitle": "JSON nhân vật được tạo",
+    "typescriptTitle": "Mã tích hợp TypeScript",
+    "placeholder": "Nhấn \"Tạo dữ liệu nhân vật\" để xem kết quả"
+  },
+  "buttons": {
+    "generate": "Tạo dữ liệu nhân vật",
+    "download": "Tải xuống dữ liệu nhân vật"
+  },
+  "messages": {
+    "success": "Tạo dữ liệu nhân vật thành công!",
+    "downloadSuccess": "Dữ liệu nhân vật đã được tải xuống dưới tên {filename}\n\nBạn có thể sử dụng dữ liệu này với game engine!"
+  },
+  "language": {
+    "switch": "Ngôn ngữ",
+    "en": "English",
+    "vi": "Tiếng Việt"
+  }
+}
