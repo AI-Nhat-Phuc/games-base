@@ -1,0 +1,7 @@
+{
+  "name": "@nhatphucpham/demo",
+  "version": "1.0.0",
+  "description": "Demo games and examples for games-base platform",
+  "private": true,
+  "license": "MIT"
+}
